@@ -18,6 +18,9 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "latency_throughput_full: Full refresh-enabled latency-throughput tests"
     )
+    config.addinivalue_line(
+        "markers", "latency_throughput_fast_model: Fast-model vs cycle-level oracle comparison tests"
+    )
     config.addinivalue_line("markers", "device_timings: DRAM device timing and legality tests")
     config.addinivalue_line(
         "markers", "controller_scheduling: Controller request scheduling tests"

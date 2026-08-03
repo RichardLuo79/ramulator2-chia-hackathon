@@ -16,9 +16,10 @@ from .issued_command_validation_hook import IssuedCommandValidationHook
 from .live_trace_streamer import LiveTraceStreamer
 from .oracle_rh import OracleRH
 from .para import PARA
+from .req_trace_recorder import ReqTraceRecorder
 from .rfm_manager import RFMManager
 from .rrs import RRS
 from .samsung_trr import SamsungTRR
 from .t_wi_ce_ideal import TWiCeIdeal
 
-__all__ = ['AQUA', 'BinTraceRecorder', 'CmdTraceRecorder', 'CommandCounter', 'Graphene', 'Hydra', 'HynixTRR', 'IdealTRR', 'IssuedCommandValidationHook', 'LiveTraceStreamer', 'OracleRH', 'PARA', 'RFMManager', 'RRS', 'SamsungTRR', 'TWiCeIdeal']
+__all__ = ['AQUA', 'BinTraceRecorder', 'CmdTraceRecorder', 'CommandCounter', 'Graphene', 'Hydra', 'HynixTRR', 'IdealTRR', 'IssuedCommandValidationHook', 'LiveTraceStreamer', 'OracleRH', 'PARA', 'RFMManager', 'RRS', 'ReqTraceRecorder', 'SamsungTRR', 'TWiCeIdeal']

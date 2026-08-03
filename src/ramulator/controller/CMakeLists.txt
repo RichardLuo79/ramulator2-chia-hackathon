@@ -34,6 +34,7 @@ target_sources(
   plugin/controller_validation_hook.h
   plugin/impl/command_counter.cpp
   plugin/impl/cmd_trace_recorder.cpp
+  plugin/impl/req_trace_recorder.cpp
   plugin/impl/issued_command_validation_hook.cpp
   plugin/impl/rfm_manager.cpp
   plugin/impl/para.cpp
@@ -51,6 +52,7 @@ target_sources(
   plugin/impl/live_trace_streamer.cpp
 
   impl/generic_ddr_controller.cpp
+  impl/timestamp_controller.cpp
   impl/lpddr_controller_base.h
   impl/lpddr_controller_base.cpp
   impl/lpddr5_controller.cpp

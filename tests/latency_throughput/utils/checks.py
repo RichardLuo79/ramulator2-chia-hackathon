@@ -10,6 +10,21 @@ fields, suitable for printing or feeding into the annotated plot.
 from tests.latency_throughput.utils.spec import Spec
 
 
+def assert_deviations(results: dict[str, dict], tolerances: dict[str, float]) -> None:
+    """Assert |deviation| <= tolerance for each named check present in tolerances.
+
+    `results` maps check name -> check result dict; the deviation field is the
+    first key starting with "deviation".
+    """
+    failures = []
+    for name, tol in tolerances.items():
+        result = results[name]
+        dev = next(v for k, v in result.items() if k.startswith("deviation"))
+        if abs(dev) > tol:
+            failures.append(f"{name}: deviation {dev:+.1f}% exceeds ±{tol}%")
+    assert not failures, "; ".join(failures)
+
+
 def check_unloaded_latency(curves: dict, spec: Spec) -> dict:
     """Compare measured unloaded latency vs theoretical.
 

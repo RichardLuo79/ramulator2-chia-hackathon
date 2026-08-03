@@ -2,13 +2,13 @@
 #define RAMULATOR_CONTROLLER_ADDR_MAPPER_ADDR_MAPPER_BASE_H
 
 #include "ramulator/controller/addr_mapper/i_addr_mapper.h"
-#include "ramulator/controller/controller_base.h"
+#include "ramulator/controller/i_controller.h"
 
 namespace Ramulator {
 
 class AddrMapperBase : public Implementation {
  protected:
-  ControllerBase* m_ctrl;
+  IController* m_ctrl;
 
   int m_num_mapped_levels = -1;  // level_count - 1 (skip channel)
   std::vector<int> m_addr_bits;  // bits per level (index 0 = first non-channel level)
@@ -18,7 +18,7 @@ class AddrMapperBase : public Implementation {
 
  public:
   AddrMapperBase(const ConfigNode& config, Implementation* parent)
-      : Implementation(config, "addr_mapper", "AddrMapperBase", parent), m_ctrl(dynamic_cast<ControllerBase*>(parent)) {
+      : Implementation(config, "addr_mapper", "AddrMapperBase", parent), m_ctrl(dynamic_cast<IController*>(parent)) {
   }
 
   void init() override;

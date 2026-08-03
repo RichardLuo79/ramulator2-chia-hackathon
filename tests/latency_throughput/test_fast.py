@@ -3,6 +3,7 @@
 import pytest
 
 from tests.latency_throughput.utils.checks import (
+    assert_deviations,
     check_peak_throughput,
     check_streaming_peak_throughput,
     check_unloaded_latency,
@@ -126,3 +127,14 @@ def test_latency_throughput_fast(request, standard):
     else:
         png_path = plot_curves(curves, cfg, output_dir="tests/latency_throughput/plots/fast")
     print(f"  Plot saved: {png_path}")
+
+    tolerances = cfg.get("check_tolerances_fast")
+    if tolerances:
+        assert_deviations(
+            {
+                "unloaded_latency": lat_result,
+                "peak_throughput": throughput_result,
+                "streaming_peak_throughput": streaming_result,
+            },
+            tolerances,
+        )

@@ -1,9 +1,11 @@
 #include "ramulator/controller/addr_mapper/addr_mapper_base.h"
 
+#include "ramulator/dram/dram_spec.h"
+
 namespace Ramulator {
 
 void AddrMapperBase::init() {
-  const auto& dram_spec = *m_ctrl->m_device.m_spec;
+  const auto& dram_spec = *m_ctrl->get_spec();
   const auto& level_sizes = dram_spec.organization.level_sizes;
   m_num_mapped_levels = dram_spec.level_count - 1;  // skip channel
   m_addr_bits.resize(m_num_mapped_levels);

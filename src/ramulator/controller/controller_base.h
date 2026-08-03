@@ -36,6 +36,9 @@ class ControllerBase : public IController, public Implementation {
   int get_tx_bytes() const override;
   int get_num_levels() const override;
   float get_tCK() const override;
+  const DRAMSpec* get_spec() const override {
+    return m_device.m_spec;
+  }
 
   bool send(Request& req) override;
   bool priority_send(Request& req) override;

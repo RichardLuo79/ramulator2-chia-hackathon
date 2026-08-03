@@ -11,6 +11,37 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from tests.utils import extract_dram_layout
 
 
+def make_controller(ctrl_cls, cfg: dict, dram, refresh_enabled: bool):
+    """Build a controller passing only the children/params its class declares.
+
+    Cycle-level controllers take scheduler/row_policy/refresh_manager children;
+    fast controllers take a 'refresh' string param instead. controller_kwargs
+    from the testcase config always win.
+    """
+    import ramulator
+    from ramulator.components import _get_descriptors
+
+    descriptors = _get_descriptors(ctrl_cls)
+    kwargs = dict(dram=dram, **cfg.get("controller_kwargs", {}))
+    if "addr_mapper" in descriptors:
+        kwargs.setdefault("addr_mapper", ramulator.addr_mapper.PassThroughAddrMapper())
+    if "scheduler" in descriptors:
+        scheduler_cls = getattr(ramulator.scheduler, cfg.get("scheduler_class", "FRFCFS"))
+        kwargs.setdefault("scheduler", scheduler_cls())
+    if "row_policy" in descriptors:
+        kwargs.setdefault("row_policy", ramulator.row_policy.Open())
+    if "refresh_manager" in descriptors:
+        kwargs.setdefault(
+            "refresh_manager",
+            ramulator.refresh_manager.AllBank()
+            if refresh_enabled
+            else ramulator.refresh_manager.NoRefresh(),
+        )
+    elif "refresh" in descriptors:
+        kwargs.setdefault("refresh", "all_bank" if refresh_enabled else "none")
+    return ctrl_cls(**kwargs)
+
+
 def run_single_config_point(
     cfg: dict,
     *,
@@ -55,21 +86,8 @@ def run_single_config_point(
         **layout,
     )
 
-    refresh_manager = (
-        ramulator.refresh_manager.AllBank()
-        if refresh_enabled
-        else ramulator.refresh_manager.NoRefresh()
-    )
-    scheduler_cls = getattr(ramulator.scheduler, cfg.get("scheduler_class", "FRFCFS"))
     ctrl_cls = getattr(ramulator.controller, cfg["controller_class"])
-    ctrl = ctrl_cls(
-        dram=dram,
-        scheduler=scheduler_cls(),
-        row_policy=ramulator.row_policy.Open(),
-        addr_mapper=ramulator.addr_mapper.PassThroughAddrMapper(),
-        refresh_manager=refresh_manager,
-        **cfg.get("controller_kwargs", {}),
-    )
+    ctrl = make_controller(ctrl_cls, cfg, dram, refresh_enabled)
 
     mem = ramulator.memory_system.GenericDRAM(
         clock_ratio=1,

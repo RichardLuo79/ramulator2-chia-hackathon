@@ -7,6 +7,8 @@
 
 namespace Ramulator {
 
+struct DRAMSpec;
+
 class IController {
   RAMULATOR_REGISTER_INTERFACE(IController, "controller");
 
@@ -29,6 +31,10 @@ class IController {
   virtual int get_tx_bytes() const = 0;
   virtual int get_num_levels() const = 0;
   virtual float get_tCK() const = 0;
+
+  // The DRAM spec this controller drives. Lets sub-components (e.g. addr
+  // mappers) query spec data without assuming a ControllerBase parent.
+  virtual const DRAMSpec* get_spec() const = 0;
 };
 
 struct ReqBuffer {
