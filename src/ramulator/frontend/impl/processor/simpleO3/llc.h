@@ -2,6 +2,7 @@
 #define RAMULATOR_FRONTEND_PROCESSOR_SIMPLEO3_LLC_H
 
 #include <list>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -34,6 +35,12 @@ class SimpleO3LLC {
   // Request that miss in the LLC with the clock cycle (current cycle + llc latency) that they
   // should be sent to the memory system
   std::list<std::pair<Clk_t, Request>> m_miss_list;
+
+  // Enqueue a full-line memory request, splitting it into linesize/tx_bytes
+  // transactions when the memory transaction is smaller than the cache line
+  // (e.g. 64B lines over 32B-tx LPDDR/HBM). The original completion fires
+  // once, when the last split transaction returns.
+  void enqueue_miss(Request req);
 
   // Request that hit in the LLC with the clock cycle (current cycle + llc latency) that they
   // should be sent back to the core (calls the callback)

@@ -145,11 +145,40 @@ bool SimpleO3LLC::send(Request& req) {
 
     // Add to the miss request list
     req.size_bytes = static_cast<int>(m_linesize_bytes);
-    m_miss_list.push_back(std::make_pair(m_clk + m_latency, req));
+    enqueue_miss(req);
 
     return true;
   }
 };
+
+void SimpleO3LLC::enqueue_miss(Request req) {
+  const int tx_bytes = m_memory_system->get_tx_bytes();
+  if (tx_bytes >= m_linesize_bytes) {
+    m_miss_list.push_back(std::make_pair(m_clk + m_latency, req));
+    return;
+  }
+
+  const int n = m_linesize_bytes / tx_bytes;
+  const Addr_t base = align(req.addr);
+  Request original = req;
+  std::function<void(Request&)> sub_callback = nullptr;
+  if (original.callback) {
+    auto remaining = std::make_shared<int>(n);
+    sub_callback = [remaining, original](Request&) mutable {
+      if (--(*remaining) == 0) {
+        Request completed = original;
+        original.callback(completed);
+      }
+    };
+  }
+  for (int i = 0; i < n; i++) {
+    Request sub = req;
+    sub.addr = base + static_cast<Addr_t>(i) * tx_bytes;
+    sub.size_bytes = tx_bytes;
+    sub.callback = sub_callback;
+    m_miss_list.push_back(std::make_pair(m_clk + m_latency, sub));
+  }
+}
 
 void SimpleO3LLC::receive(Request& req) {
   auto it = std::find_if(m_mshrs.begin(), m_mshrs.end(),
@@ -209,7 +238,7 @@ void SimpleO3LLC::evict_line(CacheSet_t& set, CacheSet_t::iterator victim_it) {
   if (victim_it->dirty) {
     Request writeback_req(victim_it->addr, Request::Type::Write);
     writeback_req.size_bytes = static_cast<int>(m_linesize_bytes);
-    m_miss_list.push_back(std::make_pair(m_clk + m_latency, writeback_req));
+    enqueue_miss(writeback_req);
 
     DEBUG_LOG(m_logger, "Writeback Request will be issued at Clk={}.", m_clk + m_latency);
   }
