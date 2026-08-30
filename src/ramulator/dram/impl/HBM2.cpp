@@ -23,7 +23,7 @@ namespace Ramulator {
 class HBM2 : public DRAMSpec {
  public:
   struct Level {
-    enum : int { Channel, PseudoChannel, BankGroup, Bank, Row, Column, COUNT };
+    enum : int { Channel, PseudoChannel, Sid, BankGroup, Bank, Row, Column, COUNT };
   };
   struct Command {
     enum : int { ACT, PREpb, PREab, RD, WR, RDA, WRA, REFab, REFpb, COUNT };
@@ -46,10 +46,12 @@ class HBM2 : public DRAMSpec {
       nCWL,
       nCCDS,
       nCCDL,
+      nCCDR,
       nRRDS,
       nRRDL,
       nWTRS,
       nWTRL,
+      nRTW,
       nFAW,
       nRFC,
       nRFCpb,
@@ -72,18 +74,20 @@ class HBM2 : public DRAMSpec {
     timing_count = Timing::COUNT;
 
     // String name maps + reverse lookup vectors
-    set_names(levels, level_names, {"Channel", "PseudoChannel", "BankGroup", "Bank", "Row", "Column"});
+    set_names(levels, level_names, {"Channel", "PseudoChannel", "Sid", "BankGroup", "Bank", "Row", "Column"});
     set_names(commands, command_names, {"ACT", "PREpb", "PREab", "RD", "WR", "RDA", "WRA", "REFab", "REFpb"});
     set_names(states, state_names, {"Opened", "Closed", "N_A"});
-    set_names(timings, timing_names, {"rate",  "nBL",   "nCL",  "nRCDRD", "nRCDWR", "nRP",   "nRAS",    "nRC",
-                                      "nWR",   "nRTPL", "nCWL", "nCCDS",  "nCCDL",  "nRRDS", "nRRDL",   "nWTRS",
-                                      "nWTRL", "nFAW",  "nRFC", "nRFCpb", "nRREFD", "nREFI", "nREFIpb", "tCK_ps"});
+    set_names(timings, timing_names,
+              {"rate",  "nBL",  "nCL",   "nRCDRD", "nRCDWR", "nRP",   "nRAS",    "nRC",   "nWR",
+               "nRTPL", "nCWL", "nCCDS", "nCCDL",  "nCCDR",  "nRRDS", "nRRDL",   "nWTRS", "nWTRL",
+               "nRTW",  "nFAW", "nRFC",  "nRFCpb", "nRREFD", "nREFI", "nREFIpb", "tCK_ps"});
 
     // Static spec data
     internal_prefetch_size = 4;
     init_states = {
         State::N_A,     // Channel
         State::N_A,     // PseudoChannel
+        State::N_A,     // Sid
         State::N_A,     // BankGroup
         State::Closed,  // Bank
         State::Closed,  // Row
