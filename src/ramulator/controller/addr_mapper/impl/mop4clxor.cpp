@@ -12,6 +12,9 @@ class MOP4CLXOR : public IAddrMapper, public AddrMapperBase {
 
 void MOP4CLXOR::init() {
   AddrMapperBase::init();
+  if (m_addr_bits[m_col_idx] < 2) {
+    throw std::runtime_error("MOP4CLXOR requires at least two post-prefetch column address bits");
+  }
 }
 
 void MOP4CLXOR::apply(Request& req) {
