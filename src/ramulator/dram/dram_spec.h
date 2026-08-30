@@ -51,9 +51,11 @@ struct TimingConsEntry {
   int window = 1;
   /// Whether this timing constraint is affecting siblings in the same level.
   bool sibling = false;
+  /// Shared command-history group for shared rolling-window constraints.
+  int history_group = -1;
 
-  TimingConsEntry(int cmd, int val, int window = 1, bool sibling = false)
-      : cmd(cmd), val(val), window(window), sibling(sibling) {
+  TimingConsEntry(int cmd, int val, int window = 1, bool sibling = false, int history_group = -1)
+      : cmd(cmd), val(val), window(window), sibling(sibling), history_group(history_group) {
     if (this->window < 0) {
       throw std::runtime_error("TimingConsEntry: window value < 0");
     }

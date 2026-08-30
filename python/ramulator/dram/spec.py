@@ -45,6 +45,11 @@ class TimingConstraint:
         latency: str,
         window: int = 1,
         sibling: bool = False,
+        # Specifies whether all preceding commands contribute to the same history
+        # window. Every following command is constrained by that shared history.
+        # Needed for, e.g., DDR5 ACT/RFMsb, LPDDR5 ACT1/REFpb, and HBM
+        # ACT/REFpb/RFMpb nFAW windows.
+        shared_window: bool = False,
     ):
         self.level = level
         self.preceding = list(preceding)
@@ -52,6 +57,7 @@ class TimingConstraint:
         self.latency = latency
         self.window = window
         self.sibling = sibling
+        self.shared_window = shared_window
 
     def __repr__(self):
         args = [repr(self.level), repr(self.preceding), repr(self.following), repr(self.latency)]
@@ -59,6 +65,8 @@ class TimingConstraint:
             args.append(f"window={self.window}")
         if self.sibling:
             args.append("sibling=True")
+        if self.shared_window:
+            args.append("shared_window=True")
         return f"TimingConstraint({', '.join(args)})"
 
 
@@ -227,9 +235,13 @@ class DRAMStandard(Component):
         # (+1), and for a 2-cycle following command it arrives 1 cycle later
         # (-1).  When both are the same cycle count the offsets cancel.
         constraints = []
+        history_group = 0
         for tc in cls.timing_constraints:
             nominal = cls._eval_expr(tc.latency, timing_dict)
             level = level_idx[tc.level]
+            shared_window_group = history_group if tc.shared_window else -1
+            if tc.shared_window:
+                history_group += 1
 
             # Group (preceding, following) pairs by adjusted latency
             lat_groups = {}  # adjusted_latency -> ([p_ids], set(f_ids))
@@ -237,7 +249,10 @@ class DRAMStandard(Component):
                 p_off = cmd_cycles.get(p_cmd, tick_mult) - 1
                 for f_cmd in tc.following:
                     f_off = cmd_cycles.get(f_cmd, tick_mult) - 1
-                    adjusted = nominal + p_off - f_off
+                    # Shared windows store command-completion clocks in a
+                    # shared history, so the preceding offset is already part
+                    # of the stored timestamp.
+                    adjusted = nominal - f_off if tc.shared_window else nominal + p_off - f_off
                     if adjusted not in lat_groups:
                         lat_groups[adjusted] = ([], set())
                     p_id = cmd_idx[p_cmd]
@@ -247,10 +262,12 @@ class DRAMStandard(Component):
 
             for latency, (p_ids, f_ids) in lat_groups.items():
                 entry = [level, p_ids, sorted(f_ids), latency]
-                if tc.window != 1 or tc.sibling:
+                if tc.window != 1 or tc.sibling or tc.shared_window:
                     entry.append(tc.window)
-                if tc.sibling:
-                    entry.append(True)
+                if tc.sibling or tc.shared_window:
+                    entry.append(tc.sibling)
+                if tc.shared_window:
+                    entry.append(shared_window_group)
                 constraints.append(entry)
 
         # Auto-generate bus occupancy constraints from command_cycles + bus
@@ -392,6 +409,13 @@ class DRAMStandard(Component):
             for c in tc.preceding + tc.following:
                 if c not in cmd_names:
                     raise ValueError(f"TimingConstraint references unknown command '{c}'")
+            if tc.shared_window and (tc.window <= 1 or len(tc.preceding) <= 1):
+                raise ValueError(
+                    "Shared-window TimingConstraint requires multiple preceding commands "
+                    "and a window greater than one"
+                )
+            if tc.shared_window and tc.sibling:
+                raise ValueError("Shared-window TimingConstraint cannot be a sibling constraint")
 
         # Validate supported_requests ordering: Read and Write remain the built-in
         # leading request names for controller compatibility.

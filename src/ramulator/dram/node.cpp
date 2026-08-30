@@ -7,15 +7,27 @@ DRAMNode::DRAMNode(DRAMSpec* spec, DRAMNode* parent, int level, int id)
   int num_cmds = spec->command_count;
   m_cmd_ready_clk.resize(num_cmds, -1);
   m_cmd_history.resize(num_cmds);
+  int shared_window_group_count = 0;
   for (int cmd = 0; cmd < num_cmds; cmd++) {
     int window = 0;
     for (const auto& t : spec->timing_cons[level][cmd]) {
       window = std::max(window, t.window);
+      if (t.history_group >= 0) {
+        shared_window_group_count = std::max(shared_window_group_count, t.history_group + 1);
+      }
     }
     if (window != 0) {
       m_cmd_history[cmd].resize(window, -1);
     } else {
       m_cmd_history[cmd].clear();
+    }
+  }
+  m_shared_window_history.resize(shared_window_group_count);
+  for (int cmd = 0; cmd < num_cmds; cmd++) {
+    for (const auto& t : spec->timing_cons[level][cmd]) {
+      if (t.history_group >= 0 && m_shared_window_history[t.history_group].size() < t.window) {
+        m_shared_window_history[t.history_group].resize(t.window, -1);
+      }
     }
   }
 
@@ -61,11 +73,24 @@ void DRAMNode::update_timing(int command, const AddrVec_t& addr_vec, Clk_t clk) 
     m_cmd_history[command].push_front(clk);
   }
 
+  std::vector<bool> shared_window_updated(m_shared_window_history.size(), false);
+  for (const auto& t : m_spec->timing_cons[m_level][command]) {
+    if (t.history_group < 0 || shared_window_updated[t.history_group]) {
+      continue;
+    }
+    auto& history = m_shared_window_history[t.history_group];
+    history.pop_back();
+    history.push_front(clk + m_spec->command_cycles[command] - 1);
+    shared_window_updated[t.history_group] = true;
+  }
+
   for (const auto& t : m_spec->timing_cons[m_level][command]) {
     if (t.sibling) {
       continue;
     }
-    Clk_t past = m_cmd_history[command][t.window - 1];
+    Clk_t past = t.history_group >= 0
+                     ? m_shared_window_history[t.history_group][t.window - 1]
+                     : m_cmd_history[command][t.window - 1];
     if (past < 0) {
       continue;
     }

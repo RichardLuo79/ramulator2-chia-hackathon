@@ -56,9 +56,11 @@ void DRAMSpec::load_config(const ConfigNode& config) {
     int latency = f[3].as<int>();
     int window = f.size() > 4 ? f[4].as<int>() : 1;
     bool sibling = f.size() > 5 ? f[5].as<bool>() : false;
+    int history_group = f.size() > 6 ? f[6].as<int>() : -1;
     for (const auto& p : f[1].seq()) {
       for (const auto& fc : f[2].seq()) {
-        timing_cons[level][p.as<int>()].push_back({fc.as<int>(), latency, window, sibling});
+        timing_cons[level][p.as<int>()].push_back(
+            {fc.as<int>(), latency, window, sibling, history_group});
       }
     }
   }
