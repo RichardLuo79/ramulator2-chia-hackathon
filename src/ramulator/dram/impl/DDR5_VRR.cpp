@@ -9,9 +9,13 @@
 #include "ramulator/dram/commands/ACT.h"
 #include "ramulator/dram/commands/PREab.h"
 #include "ramulator/dram/commands/PREpb.h"
+#include "ramulator/dram/commands/PREsb.h"
 #include "ramulator/dram/commands/RD.h"
 #include "ramulator/dram/commands/RDA.h"
 #include "ramulator/dram/commands/REFab.h"
+#include "ramulator/dram/commands/REFsb.h"
+#include "ramulator/dram/commands/RFMab.h"
+#include "ramulator/dram/commands/RFMsb.h"
 #include "ramulator/dram/commands/VRR.h"
 #include "ramulator/dram/commands/WR.h"
 #include "ramulator/dram/commands/WRA.h"
@@ -26,7 +30,7 @@ class DDR5_VRR : public DRAMSpec {
     enum : int { Channel, Rank, BankGroup, Bank, Row, Column, COUNT };
   };
   struct Command {
-    enum : int { ACT, PREpb, PREab, RD, WR, RDA, WRA, REFab, VRR, COUNT };
+    enum : int { ACT, PREpb, PREab, RD, WR, RDA, WRA, REFab, PREsb, REFsb, RFMab, RFMsb, VRR, COUNT };
   };
   struct State {
     enum : int { Opened, Closed, N_A, COUNT };
@@ -59,8 +63,12 @@ class DDR5_VRR : public DRAMSpec {
       nFAW,
       nRFC,
       nREFI,
+      nRFCsb,
       nCS,
       tCK_ps,
+      nRFM,
+      nRFMsb,
+      nREFSBRD,
       nVRR,
       COUNT
     };
@@ -68,7 +76,8 @@ class DDR5_VRR : public DRAMSpec {
 
   using CommandImpls =
       std::tuple<Cmd::ACT<DDR5_VRR>, Cmd::PREpb<DDR5_VRR>, Cmd::PREab<DDR5_VRR>, Cmd::RD<DDR5_VRR>, Cmd::WR<DDR5_VRR>,
-                 Cmd::RDA<DDR5_VRR>, Cmd::WRA<DDR5_VRR>, Cmd::REFab<DDR5_VRR>, Cmd::VRR<DDR5_VRR> >;
+                 Cmd::RDA<DDR5_VRR>, Cmd::WRA<DDR5_VRR>, Cmd::REFab<DDR5_VRR>, Cmd::PREsb<DDR5_VRR>,
+                 Cmd::REFsb<DDR5_VRR>, Cmd::RFMab<DDR5_VRR>, Cmd::RFMsb<DDR5_VRR>, Cmd::VRR<DDR5_VRR> >;
 
   DDR5_VRR(const ConfigNode& config) {
     // Counts
@@ -79,12 +88,14 @@ class DDR5_VRR : public DRAMSpec {
 
     // String name maps + reverse lookup vectors
     set_names(levels, level_names, {"Channel", "Rank", "BankGroup", "Bank", "Row", "Column"});
-    set_names(commands, command_names, {"ACT", "PREpb", "PREab", "RD", "WR", "RDA", "WRA", "REFab", "VRR"});
+    set_names(commands, command_names,
+              {"ACT", "PREpb", "PREab", "RD", "WR", "RDA", "WRA", "REFab", "PREsb", "REFsb", "RFMab", "RFMsb", "VRR"});
     set_names(states, state_names, {"Opened", "Closed", "N_A"});
     set_names(timings, timing_names,
-              {"rate",  "nBL",   "nCL",   "nRCD",     "nRP",      "nRAS",  "nRC",      "nWR",    "nRTP", "nCWL",
-               "nPPD",  "nCCDS", "nCCDL", "nCCDS_WR", "nCCDL_WR", "nCCDM", "nCCDM_WR", "nWTRM",  "nRTW", "nRRDS",
-               "nRRDL", "nWTRS", "nWTRL", "nFAW",     "nRFC",     "nREFI", "nCS",      "tCK_ps", "nVRR"});
+              {"rate", "nBL",    "nCL",   "nRCD",   "nRP",      "nRAS",     "nRC",   "nWR",      "nRTP",
+               "nCWL", "nPPD",   "nCCDS", "nCCDL",  "nCCDS_WR", "nCCDL_WR", "nCCDM", "nCCDM_WR", "nWTRM",
+               "nRTW", "nRRDS",  "nRRDL", "nWTRS",  "nWTRL",    "nFAW",     "nRFC",  "nREFI",    "nRFCsb",
+               "nCS",  "tCK_ps", "nRFM",  "nRFMsb", "nREFSBRD", "nVRR"});
 
     // Static spec data
     internal_prefetch_size = 16;

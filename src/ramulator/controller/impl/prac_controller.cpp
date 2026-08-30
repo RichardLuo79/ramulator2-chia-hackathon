@@ -36,13 +36,13 @@ class PRACController : public ControllerBase {
     if (!spec->has_command("RFMab")) {
       throw std::runtime_error(
           "PRACController requires a DRAM standard with RFMab command "
-          "(e.g., DDR5_RFM or HBM3)!");
+          "(e.g., DDR5)!");
     }
 
     m_cmd_act = spec->get_command_id("ACT");
     m_cmd_rfmab = spec->get_command_id("RFMab");
     m_cmd_preab = spec->get_command_id("PREab");
-    // bankgroup-scoped per-bank-group RFM
+    // Same-bank RFM targets one bank address across all bank groups.
     if (spec->has_command("RFMsb")) {
       m_cmd_rfmsb = spec->get_command_id("RFMsb");
     }
@@ -74,6 +74,9 @@ class PRACController : public ControllerBase {
     m_cmd_to_min_cycles[spec->get_command_id("RD")] = nRTP + nRP;
     m_cmd_to_min_cycles[spec->get_command_id("WR")] = write_to_pre_timing + nRP;
     m_cmd_to_min_cycles[m_cmd_rfmab] = spec->get_timing_value("nRFM");
+    if (m_cmd_rfmsb >= 0) {
+      m_cmd_to_min_cycles[m_cmd_rfmsb] = spec->get_timing_value("nRFMsb");
+    }
     if (spec->has_command("RFMpb")) {
       m_cmd_to_min_cycles[spec->get_command_id("RFMpb")] = spec->get_timing_value("nRFMpb");
     }
@@ -111,7 +114,7 @@ class PRACController : public ControllerBase {
   // Spec lookups
   int m_cmd_act = -1;
   int m_cmd_rfmab = -1;
-  int m_cmd_rfmsb = -1;  // -1 if spec doesn't have per-bank RFM (e.g. plain DDR5_RFM)
+  int m_cmd_rfmsb = -1;  // -1 if the spec does not support same-bank RFM
   int m_cmd_preab = -1;
   int m_rank_level = -1;
   int m_bankgroup_level = -1;
@@ -176,8 +179,8 @@ class PRACController : public ControllerBase {
 
   // Wildcard-bank dispatcher (matches upstream's update() shape):
   //   bank=-1 && bankgroup=-1: all bankgroups, all banks   (e.g. RFMab)
-  //   bank=*  && bankgroup=-1: same bank id in every bankgroup
-  //   bank=-1 && bankgroup=*:  all banks of one bankgroup  (e.g. RFMsb)
+  //   bank=*  && bankgroup=-1: same bank id in every bankgroup (e.g. RFMsb)
+  //   bank=-1 && bankgroup=*:  all banks of one bankgroup
   //   bank=*  && bankgroup=*:  single bank                 (e.g. ACT)
   void update_counters(const Request& req) {
     bool has_bank_wild = req.addr_vec[m_bank_level] == -1;
@@ -291,6 +294,10 @@ class PRACController : public ControllerBase {
   void inject_recovery_commands() {
     AddrVec_t addr(m_device.m_spec->level_count, 0);
     addr[0] = m_channel_id;
+    if (m_bankgroup_level >= 0) {
+      addr[m_bankgroup_level] = -1;
+    }
+    addr[m_bank_level] = -1;
     for (int r = 0; r < m_num_ranks; r++) {
       addr[m_rank_level] = r;
       Request prea(addr, Request::Cmd, m_cmd_preab);

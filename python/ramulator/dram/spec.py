@@ -47,7 +47,7 @@ class TimingConstraint:
         sibling: bool = False,
         # Specifies whether all preceding commands contribute to the same history
         # window. Every following command is constrained by that shared history.
-        # Needed for, e.g., DDR5 ACT/RFMsb, LPDDR5 ACT1/REFpb, and HBM
+        # Needed for, e.g., DDR5 ACT/REFsb/RFMsb, LPDDR5 ACT1/REFpb, and HBM
         # ACT/REFpb/RFMpb nFAW windows.
         shared_window: bool = False,
     ):

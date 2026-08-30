@@ -3,12 +3,13 @@
 // Tracks ACT counts per bank. When any bank's counter crosses
 // `rfm_thresh`, issues an RFM command and resets the relevant counters.
 // Dispatch mode is configurable:
-//   - "ab" (default): rank-scoped RFMab, resets ALL bank counters.
-//   - "pb":           per-bank RFMpb to the bank that crossed, resets
-//                     ONLY that bank's counter.
+//   - "ab" (default): all-bank RFMab, resets every targeted bank counter.
+//   - "sb":           same-bank RFMsb, resets the selected bank address
+//                     across all bank groups in the addressed scope.
+//   - "pb":           per-bank RFMpb, resets only the targeted bank counter.
 //
 // Requires a DRAM standard with the corresponding command(s) — RFMab for
-// "ab" mode, RFMpb for "pb" mode.
+// "ab" mode, RFMsb for "sb" mode, or RFMpb for "pb" mode.
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -50,9 +51,10 @@ class RFMManager : public IControllerPlugin, public Implementation {
     RAMULATOR_PARSE_PARAM(m_rfm_mode, std::string, "rfm_mode").default_val("ab");
     RAMULATOR_PARSE_PARAM(m_debug, bool, "debug").default_val(false);
 
-    if (m_rfm_mode != "ab" && m_rfm_mode != "pb") {
+    if (m_rfm_mode != "ab" && m_rfm_mode != "sb" && m_rfm_mode != "pb") {
       throw std::runtime_error(
-          "RFMManager: rfm_mode must be either 'ab' (all-bank) or 'pb' (per-bank); got '"
+          "RFMManager: rfm_mode must be 'ab' (all-bank), 'sb' (same-bank), "
+          "or 'pb' (per-bank); got '"
           + m_rfm_mode + "'");
     }
   }
@@ -61,11 +63,12 @@ class RFMManager : public IControllerPlugin, public Implementation {
     m_ctrl = cast_parent<ControllerBase>();
     auto* spec = m_ctrl->m_device.m_spec;
 
-    const std::string cmd_name = (m_rfm_mode == "ab") ? "RFMab" : "RFMpb";
+    const std::string cmd_name =
+        (m_rfm_mode == "ab") ? "RFMab" : (m_rfm_mode == "sb") ? "RFMsb" : "RFMpb";
     if (!spec->has_command(cmd_name)) {
       throw std::runtime_error(
           "RFMManager: rfm_mode='" + m_rfm_mode + "' requires DRAM standard with "
-          + cmd_name + " command (e.g., DDR5_RFM or HBM3)");
+          + cmd_name + " command");
     }
 
     m_rfm_cmd_id = spec->get_command_id(cmd_name);
@@ -104,26 +107,26 @@ class RFMManager : public IControllerPlugin, public Implementation {
     }
 
     AddrVec_t addr = req.addr_vec;
-    if (m_rfm_mode == "ab") {
-      // Rank-scoped
+    if (m_rfm_mode == "ab" || m_rfm_mode == "sb") {
+      // All-bank and same-bank commands span every bank group in scope.
       if (m_bankgroup_level >= 0) addr[m_bankgroup_level] = -1;
+    }
+    if (m_rfm_mode == "ab") {
       addr[m_bank_level] = -1;
     }
-    // For pb mode, addr already targets the specific bank that crossed.
+    // For sb and pb modes, the bank address remains the one that crossed.
 
     Request rfm_req(addr, Request::Cmd, m_rfm_cmd_id);
     if (!m_ctrl->priority_send(rfm_req)) {
       throw std::runtime_error(
           "RFMManager: priority_send failed for " +
-          std::string(m_rfm_mode == "ab" ? "RFMab" : "RFMpb") +
+          spec->command_names[m_rfm_cmd_id] +
           " (priority buffer full)");
     }
     s_rfm_counter++;
 
-    if (m_rfm_mode == "ab") {
-      for (auto& c : m_bank_ctrs) c = 0;
-    } else {
-      m_bank_ctrs[bank_id] = 0;
+    for (int target_bank_id : m_ctrl->m_device.get_target_banks(m_rfm_cmd_id, addr)) {
+      m_bank_ctrs[target_bank_id] = 0;
     }
   }
 };

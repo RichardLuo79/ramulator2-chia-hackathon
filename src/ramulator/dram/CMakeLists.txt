@@ -8,15 +8,15 @@ target_sources(
   func_types.h
 
   commands/ACT.h  commands/ACT1.h  commands/ACT2.h
-  commands/PREpb.h  commands/PREab.h
+  commands/PREpb.h  commands/PREab.h  commands/PREsb.h
   commands/RD.h   commands/WR.h
   commands/RDA.h  commands/WRA.h
   commands/RD_S.h   commands/WR_S.h
   commands/RDA_S.h  commands/WRA_S.h
   commands/RD_L.h   commands/WR_L.h
   commands/RDA_L.h  commands/WRA_L.h
-  commands/REFab.h  commands/REFpb.h
-  commands/RFMab.h  commands/RFMpb.h
+  commands/REFab.h  commands/REFpb.h  commands/REFsb.h
+  commands/RFMab.h  commands/RFMpb.h  commands/RFMsb.h
   commands/RCKSTRT.h  commands/RCKSTOP.h
   commands/CAS.h  commands/CAS_RD.h  commands/CAS_WR.h
   commands/VRR.h
@@ -26,8 +26,6 @@ target_sources(
   impl/DDR4.cpp
   impl/DDR4_VRR.cpp
   impl/DDR5.cpp
-  impl/DDR5_RFM.cpp
-  impl/DDR5_RFM_VRR.cpp
   impl/DDR5_VRR.cpp
   impl/HBM1.cpp
   impl/HBM2.cpp

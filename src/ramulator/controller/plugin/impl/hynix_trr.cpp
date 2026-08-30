@@ -8,9 +8,11 @@
 // row. On each RFM:
 //   - RFMab (rank-scoped): for every bank in the rank fire a VRR on the
 //     sampled row (if any) and clear the register.
+//   - RFMsb (same-bank): same, for the selected bank address in every bank
+//     group.
 //   - RFMpb (per-bank): same, but only for the targeted bank.
 //
-// Requires a DRAM spec with VRR and at least one of RFMab/RFMpb.
+// Requires a DRAM spec with VRR and at least one RFM command.
 #include <random>
 #include <stdexcept>
 #include <vector>
@@ -37,6 +39,7 @@ class HynixTRR : public IControllerPlugin, public Implementation {
   int m_act_cmd_id = -1;
   int m_vrr_cmd_id = -1;
   int m_rfm_ab_cmd_id = -1;
+  int m_rfm_sb_cmd_id = -1;
   int m_rfm_pb_cmd_id = -1;
 
   int m_rank_level = -1;
@@ -72,16 +75,18 @@ class HynixTRR : public IControllerPlugin, public Implementation {
 
     if (!spec->has_command("VRR")) {
       throw std::runtime_error(
-          "HynixTRR requires a DRAM standard with VRR command (e.g. DDR5_RFM_VRR)");
+          "HynixTRR requires a DRAM standard with VRR command (e.g. DDR5_VRR)");
     }
-    if (!spec->has_command("RFMab") && !spec->has_command("RFMpb")) {
+    if (!spec->has_command("RFMab") && !spec->has_command("RFMsb") &&
+        !spec->has_command("RFMpb")) {
       throw std::runtime_error(
-          "HynixTRR requires a DRAM standard with at least one of RFMab/RFMpb");
+          "HynixTRR requires a DRAM standard with at least one of RFMab/RFMsb/RFMpb");
     }
 
     m_act_cmd_id = spec->get_command_id("ACT");
     m_vrr_cmd_id = spec->get_command_id("VRR");
     if (spec->has_command("RFMab")) m_rfm_ab_cmd_id = spec->get_command_id("RFMab");
+    if (spec->has_command("RFMsb")) m_rfm_sb_cmd_id = spec->get_command_id("RFMsb");
     if (spec->has_command("RFMpb")) m_rfm_pb_cmd_id = spec->get_command_id("RFMpb");
 
     m_rank_level = spec->get_level_id("Rank");
@@ -103,20 +108,12 @@ class HynixTRR : public IControllerPlugin, public Implementation {
   }
 
   void on_issue(const Request& req) override {
-    if (req.command == m_rfm_ab_cmd_id) {
+    if (req.command == m_rfm_ab_cmd_id || req.command == m_rfm_sb_cmd_id ||
+        req.command == m_rfm_pb_cmd_id) {
       s_rfm_observed++;
-      int rank_id = req.addr_vec[m_rank_level];
-      int rank_start = rank_id * m_num_banks_per_rank;
-      int rank_end = rank_start + m_num_banks_per_rank;
-      for (int bank_id = rank_start; bank_id < rank_end; bank_id++) {
+      for (int bank_id : m_ctrl->m_device.get_target_banks(req.command, req.addr_vec)) {
         process_rfm_for_bank(req, bank_id);
       }
-      return;
-    }
-    if (req.command == m_rfm_pb_cmd_id) {
-      s_rfm_observed++;
-      int bank_id = m_ctrl->m_device.get_flat_bank_id(req.addr_vec);
-      process_rfm_for_bank(req, bank_id);
       return;
     }
     if (req.command != m_act_cmd_id) {

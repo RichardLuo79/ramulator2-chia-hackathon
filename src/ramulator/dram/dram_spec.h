@@ -20,7 +20,7 @@ namespace Ramulator {
 enum class BankTarget {
   Single,    // One specific bank (ACT, PREpb, RD, WR, RDA, WRA)
   All,       // All banks under scope (PREab, REFab, RFMab)
-  SameBank,  // Same bank ID in every bank group (PREsb, REFsb — DDR5)
+  SameBank,  // Same bank ID in every bank group (PREsb, REFsb, RFMsb — DDR5)
 };
 
 // Organization hierarchy of the device
