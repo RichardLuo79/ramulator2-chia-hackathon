@@ -8,7 +8,9 @@ DRAMStandard using plain Python data structures:
     states           — list[str]: device states (e.g. ["Opened", "Closed", "N_A"])
     timing_params    — list[str]: timing parameter names
     timing_constraints — list[TimingConstraint]
-    org_presets      — dict[str, dict]: org preset name → {density, dq, level counts}
+    org_presets      — dict[str, dict]: org preset name → {density metadata, dq,
+                       level counts}; density values are in Mbit and their keys
+                       identify the JEDEC scope (device, die, channel, etc.)
 
 Example:
     class DDR4(DRAMStandard):
@@ -110,6 +112,19 @@ class DRAMStandard(Component):
         """Fill derived timing values in-place. Subclasses override."""
         pass
 
+    @classmethod
+    def validate_organization(cls, org_dict):
+        """Validate a resolved organization. Subclasses may extend this."""
+        for level in cls.levels:
+            key = level.lower()
+            if level == "Channel" or key not in org_dict:
+                continue
+            count = org_dict[key]
+            if not isinstance(count, int) or count <= 0:
+                raise ValueError(
+                    f"{cls.name}: {key} count must be a positive integer, got {count}"
+                )
+
     def resolve(self):
         """Resolve preset names + overrides into (org_dict, timing_dict)."""
         cls = type(self)
@@ -130,11 +145,15 @@ class DRAMStandard(Component):
                 f"multi-channel is configured at the system level, "
                 f"not in the DRAM spec."
             )
-        # channel_width is an org-level param (alongside dq)
-        org_names = level_names | {"channel_width"}
+        # Any field declared by an organization preset may be overridden.
+        org_names = level_names | {
+            key for preset in cls.org_presets.values() for key in preset
+        }
         for name in list(overrides):
             if name in org_names:
                 org_dict[name] = overrides.pop(name)
+
+        cls.validate_organization(org_dict)
 
         # Build timing dict from preset
         timing_dict = dict(cls.timing_presets[self.timing_preset])
@@ -166,8 +185,10 @@ class DRAMStandard(Component):
         # Validate channel_width
         cw = org_dict["channel_width"]
         dq = org_dict["dq"]
-        if cw <= 0:
+        if not isinstance(cw, int) or cw <= 0:
             raise ValueError(f"{cls.name}: channel_width must be positive, got {cw}")
+        if not isinstance(dq, int) or dq <= 0:
+            raise ValueError(f"{cls.name}: dq must be positive, got {dq}")
         if cls.data_payload_bytes is None and (cw & (cw - 1)) != 0:
             raise ValueError(f"{cls.name}: channel_width must be a positive power of 2, got {cw}")
         if cw % dq != 0:

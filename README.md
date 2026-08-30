@@ -1083,6 +1083,35 @@ You define:
 - `timing_presets`
 - `resolve_secondary_timings()`
 
+Each timing parameter should have only one authoritative source. In Ramulator,
+we have the following general rules:
+
+1. If a JEDEC standard speed bin specifies a timing constraint, use the JEDEC
+   value.
+2. Otherwise, use values from publicly available vendor datasheets.
+3. Otherwise, Ramulator may provide "guesstimate" values. These values are
+   marked with comments.
+4. If no defensible value exists, use `-1`. Serialization then raises an error,
+   requiring the user to supply the missing timing explicitly.
+
+Organization density values are expressed in Mbit. Their field names identify
+the JEDEC scope, such as `device_density`, `die_density`, `channel_density`, or
+`subchannel_density`.
+
+The general rule for resolving organizations and timings is:
+
+1. Resolve the organization first. Start with the organization preset, then
+   apply user organization overrides.
+2. With the organization fully resolved, resolve the timings. Start with the
+   timing preset, then resolve secondary timings using the final organization,
+   including any user organization overrides.
+3. If the final organization selects a case not covered by the secondary timing
+   resolution rules, leave the corresponding timing at `-1`. Serialization
+   will then fail, making the user explicitly aware that a timing override is
+   required.
+4. Finally, apply user timing overrides. These overrides are the final resolved
+   values.
+
 Code generation imports modules under `python/ramulator/dram/`, discovers these classes, and generates the corresponding C++ implementation in `src/ramulator/dram/impl/`.
 
 ### 8.5 Adding a New Standard to Latency-Throughput
@@ -1193,8 +1222,9 @@ The model starts in Python, not in C++. Each DRAM standard is a `DRAMStandard` s
 `to_config()` is where that Python definition becomes runtime data. It does more work than its name might suggest:
 
 - Resolves the chosen organization and timing presets
-- Applies user overrides such as `rank=2`
+- Applies organization overrides such as `rank=2`
 - Computes derived timings in `resolve_secondary_timings()`
+- Applies user timing overrides
 - Evaluates timing expressions such as `nCL + nBL + 2 - nCWL`
 - Scales everything into simulation ticks when `tick_multiplier` is greater than 1
 - Expands each `TimingConstraint` into integer-indexed entries
