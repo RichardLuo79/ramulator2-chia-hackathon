@@ -107,7 +107,7 @@ def test_all_bank_refresh_accepts_debug_flag():
 @pytest.mark.parametrize(
     "dram",
     [
-        ramulator.dram.HBM3(org_preset="HBM3_8Gb_8hi", timing_preset="HBM3_6400Mbps", nREFI=2),
+        ramulator.dram.HBM3(org_preset="HBM3_16Gb_8hi", timing_preset="HBM3_6400Mbps", nREFI=2),
         ramulator.dram.HBM4(org_preset="HBM4_32Gb_8Hi", timing_preset="HBM4_8000Mbps", nREFI=2),
     ],
 )

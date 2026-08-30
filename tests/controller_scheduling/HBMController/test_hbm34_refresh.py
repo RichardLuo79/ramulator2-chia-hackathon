@@ -8,7 +8,7 @@ pytestmark = pytest.mark.controller_scheduling
 
 
 def _hbm3():
-    return ramulator.dram.HBM3(org_preset="HBM3_8Gb_8hi", timing_preset="HBM3_6400Mbps")
+    return ramulator.dram.HBM3(org_preset="HBM3_16Gb_8hi", timing_preset="HBM3_6400Mbps")
 
 
 def _hbm4_single_sid():

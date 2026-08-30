@@ -26,7 +26,7 @@ DRAM_PROFILES = {
     "GDDR7": _profile("GDDR7", "GDDR7_16Gb_x8", "GDDR7_28000_PAM3", "GDDR7"),
     "HBM1": _profile("HBM1", "HBM1_2Gb", "HBM1_2Gbps", "HBM12"),
     "HBM2": _profile("HBM2", "HBM2_2Gb", "HBM2_2000Mbps", "HBM12"),
-    "HBM3": _profile("HBM3", "HBM3_8Gb_8hi", "HBM3_6400Mbps", "HBM34"),
+    "HBM3": _profile("HBM3", "HBM3_16Gb_8hi", "HBM3_6400Mbps", "HBM34"),
     "HBM4": _profile("HBM4", "HBM4_32Gb_8Hi", "HBM4_8000Mbps", "HBM34"),
     "LPDDR5": _profile("LPDDR5", "LPDDR5_8Gb_x16", "LPDDR5_6400", "LPDDR5"),
     "LPDDR6": _profile("LPDDR6", "LPDDR6_16Gb_x12", "LPDDR6_10667_BL24", "LPDDR6"),

@@ -1,7 +1,7 @@
 config = {
     "name": "HBM3",
     "dram_class": "HBM3",
-    "org_preset": "HBM3_8Gb_8hi",
+    "org_preset": "HBM3_16Gb_8hi",
     "timing_preset": "HBM3_6400Mbps",
     "controller_class": "HBM34",
     "scheduler_class": "FRFCFSRowHit",

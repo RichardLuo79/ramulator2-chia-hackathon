@@ -29,6 +29,7 @@ class HBM34Controller final : public HBMControllerBase {
   int m_level_bank = -1;
   int m_bank_groups = -1;
   int m_banks_per_group = -1;
+  int m_rising_column_pc = -1;
 
   RisingEdgeCommandInfo m_rising_edge_cmd_info;
 
@@ -55,9 +56,12 @@ class HBM34Controller final : public HBMControllerBase {
     hbm_tick_prologue();
 
     bool rising_edge = is_rising_edge();
+    m_rising_column_pc = -1;
     if (rising_edge) {
       // Column commands can only be issued on the rising edge
-      try_issue_slot(SlotType::ColumnBus);
+      if (auto issued = try_issue_slot(SlotType::ColumnBus)) {
+        m_rising_column_pc = issued->addr_vec[m_level_pc];
+      }
     }
 
     // slot_matches() filter command is overloaded by HBM34Controller to apply
@@ -78,8 +82,16 @@ class HBM34Controller final : public HBMControllerBase {
    * for HBM3/4.
    */
   bool slot_matches(const Request& req, SlotType slot) const override {
-    // Rising edge: use normal HBM slot matching.
+    // Rising edge: an all-bank row command cannot be paired with a column
+    // command to the same pseudochannel.
     if (is_rising_edge()) {
+      if (slot == SlotType::RowBus && m_rising_column_pc >= 0 &&
+          is_all_bank_row_command(req.command)) {
+        int row_pc = req.addr_vec[m_level_pc];
+        if (row_pc < 0 || row_pc == m_rising_column_pc) {
+          return false;
+        }
+      }
       return HBMControllerBase::slot_matches(req, slot);
     }
 

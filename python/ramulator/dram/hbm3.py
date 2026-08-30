@@ -6,6 +6,7 @@ from ramulator.dram.spec import DRAMStandard, TimingConstraint
 class HBM3(DRAMStandard):
     name = "HBM3"
     internal_prefetch_size = 8       # BL8
+    data_payload_bytes = 32          # One pseudochannel
     tick_multiplier = 2              # 1 tick = half CK (models half-cycle row cmds)
     read_latency = "nCL + nBL"
 
@@ -49,7 +50,8 @@ class HBM3(DRAMStandard):
     timing_params = [
         "rate", "nBL", "nCL", "nRCDRD", "nRCDWR",
         "nRP", "nRAS", "nRC", "nWR", "nRTP", "nCWL",
-        "nCCDS", "nCCDL", "nCCDR", "nRRDS", "nRRDL",
+        "nCCDS", "nCCDL", "nCCDR",
+        "nRRDS", "nRRDL",
         "nWTRS", "nWTRL", "nRTW",
         "nFAW", "nPPD",
         "nRFC", "nRFCpb", "nRFMab", "nRFMpb",
@@ -59,10 +61,7 @@ class HBM3(DRAMStandard):
     ]
 
     # ---- External request types ----
-    supported_requests = {
-        "Read": "RD",
-        "Write": "WR",
-    }
+    supported_requests = {"Read": "RD", "Write": "WR"}
 
     # ---- Timing constraints ----
     # Helper lists for readability
@@ -87,11 +86,11 @@ class HBM3(DRAMStandard):
         # Write-to-read turnaround
         TimingConstraint(level="PseudoChannel", preceding=["WR", "WRA"], following=["RD", "RDA"], latency="nCWL + nBL + nWTRS"),
         # CAS to PREab
-        TimingConstraint(level="PseudoChannel", preceding=["RD"], following=["PREab"], latency="nRTP"),
-        TimingConstraint(level="PseudoChannel", preceding=["WR"], following=["PREab"], latency="nCWL + nBL + nWR"),
+        TimingConstraint(level="PseudoChannel", preceding=["RD", "RDA"], following=["PREab"], latency="nRTP"),
+        TimingConstraint(level="PseudoChannel", preceding=["WR", "WRA"], following=["PREab"], latency="nCWL + nBL + nWR"),
         # RAS timing
         TimingConstraint(level="PseudoChannel", preceding=["ACT"], following=["ACT"], latency="nRRDS"),
-        TimingConstraint(level="PseudoChannel", preceding=["ACT"], following=["ACT"], latency="nFAW", window=4),
+        TimingConstraint(level="PseudoChannel", preceding=["ACT", "REFpb", "RFMpb"], following=["ACT", "REFpb", "RFMpb"], latency="nFAW", window=4, shared_window=True),
         TimingConstraint(level="PseudoChannel", preceding=["ACT"], following=["PREab"], latency="nRAS"),
         TimingConstraint(level="PseudoChannel", preceding=["PREab"], following=["ACT"], latency="nRP"),
         # PRE-to-PRE delay (tPPD, new in HBM3)
@@ -101,20 +100,18 @@ class HBM3(DRAMStandard):
         TimingConstraint(level="PseudoChannel", preceding=["PREpb", "PREab"], following=["REFab"], latency="nRP"),
         TimingConstraint(level="PseudoChannel", preceding=["RDA"], following=["REFab"], latency="nRP + nRTP"),
         TimingConstraint(level="PseudoChannel", preceding=["WRA"], following=["REFab"], latency="nCWL + nBL + nWR + nRP"),
-        TimingConstraint(level="PseudoChannel", preceding=["REFab"], following=["ACT", "PREab"], latency="nRFC"),
-        # REFpb-to-REFpb and REFpb-to-ACT different bank (tRREFD)
-        TimingConstraint(level="PseudoChannel", preceding=["REFpb"], following=["REFpb"], latency="nRREFD"),
-        TimingConstraint(level="PseudoChannel", preceding=["REFpb"], following=["ACT"], latency="nRREFD"),
-        # ACT-to-REFpb different bank (same as tRRD)
+        # JESD238 Table 35.
+        TimingConstraint(level="PseudoChannel", preceding=["REFab"], following=["ACT", "PREab", "REFab", "REFpb", "RFMab", "RFMpb"], latency="nRFC"),
+        TimingConstraint(level="PseudoChannel", preceding=["REFpb"], following=["REFpb", "RFMpb", "ACT"], latency="nRREFD"),
+        TimingConstraint(level="PseudoChannel", preceding=["REFpb"], following=["REFab", "RFMab"], latency="nRFCpb"),
         TimingConstraint(level="PseudoChannel", preceding=["ACT"], following=["REFpb"], latency="nRRDS"),
-        # RFMab constraints (same structure as REFab)
         TimingConstraint(level="PseudoChannel", preceding=["ACT"], following=["RFMab"], latency="nRC"),
         TimingConstraint(level="PseudoChannel", preceding=["PREpb", "PREab"], following=["RFMab"], latency="nRP"),
         TimingConstraint(level="PseudoChannel", preceding=["RDA"], following=["RFMab"], latency="nRP + nRTP"),
         TimingConstraint(level="PseudoChannel", preceding=["WRA"], following=["RFMab"], latency="nCWL + nBL + nWR + nRP"),
-        TimingConstraint(level="PseudoChannel", preceding=["RFMab"], following=["ACT", "PREab"], latency="nRFMab"),
-        # RFMpb constraints (same structure as REFpb)
-        TimingConstraint(level="PseudoChannel", preceding=["RFMpb"], following=["ACT"], latency="nRREFD"),
+        TimingConstraint(level="PseudoChannel", preceding=["RFMab"], following=["ACT", "PREab", "REFab", "REFpb", "RFMab", "RFMpb"], latency="nRFMab"),
+        TimingConstraint(level="PseudoChannel", preceding=["RFMpb"], following=["REFpb", "RFMpb", "ACT"], latency="nRREFD"),
+        TimingConstraint(level="PseudoChannel", preceding=["RFMpb"], following=["REFab", "RFMab"], latency="nRFMpb"),
         TimingConstraint(level="PseudoChannel", preceding=["ACT"], following=["RFMpb"], latency="nRRDS"),
 
         # ============================================================
@@ -132,6 +129,8 @@ class HBM3(DRAMStandard):
         TimingConstraint(level="BankGroup", preceding=["WR", "WRA"], following=["RD", "RDA"], latency="nCWL + nBL + nWTRL"),
         # Same-group RAS timing
         TimingConstraint(level="BankGroup", preceding=["ACT"], following=["ACT"], latency="nRRDL"),
+        TimingConstraint(level="BankGroup", preceding=["ACT"], following=["REFpb", "RFMpb"], latency="nRRDL"),
+        TimingConstraint(level="BankGroup", preceding=["REFpb", "RFMpb"], following=["ACT"], latency="nRRDL"),
 
         # ============================================================
         # Bank — single-bank timing
@@ -147,12 +146,12 @@ class HBM3(DRAMStandard):
         TimingConstraint(level="Bank", preceding=["WRA"], following=["ACT"], latency="nCWL + nBL + nWR + nRP"),
 
         # Bank — per-bank refresh
-        TimingConstraint(level="Bank", preceding=["REFpb"], following=["ACT"], latency="nRFCpb"),
+        TimingConstraint(level="Bank", preceding=["REFpb"], following=["REFpb", "RFMpb", "ACT"], latency="nRFCpb"),
         TimingConstraint(level="Bank", preceding=["ACT"], following=["REFpb"], latency="nRC"),
         TimingConstraint(level="Bank", preceding=["PREpb"], following=["REFpb"], latency="nRP"),
 
         # Bank — per-bank refresh management
-        TimingConstraint(level="Bank", preceding=["RFMpb"], following=["ACT"], latency="nRFMpb"),
+        TimingConstraint(level="Bank", preceding=["RFMpb"], following=["REFpb", "RFMpb", "ACT"], latency="nRFMpb"),
         TimingConstraint(level="Bank", preceding=["ACT"], following=["RFMpb"], latency="nRC"),
         TimingConstraint(level="Bank", preceding=["PREpb"], following=["RFMpb"], latency="nRP"),
     ]
@@ -161,33 +160,96 @@ class HBM3(DRAMStandard):
     @classmethod
     def resolve_secondary_timings(cls, timing_dict, org_dict):
         tCK_ps = timing_dict["tCK_ps"]
-        density = org_dict["density"]
-        sid_count = org_dict.get("sid", 1)
-        channel_density = density / sid_count
-        timing_dict.setdefault("nRFC", cls._resolve_nRFC(channel_density, tCK_ps))
-        timing_dict.setdefault("nRFMab", timing_dict["nRFC"])     # RFMab = same as REFab
-        timing_dict.setdefault("nRFMpb", timing_dict["nRFCpb"])   # RFMpb = same as REFpb
-        timing_dict.setdefault("nRREFD", cls._resolve_nRREFD(tCK_ps))
-        timing_dict.setdefault("nREFI", cls._resolve_nREFI(tCK_ps))
-        timing_dict.setdefault(
-            "nREFIpb",
-            cls._resolve_nREFIpb(
-                tCK_ps,
-                org_dict.get("bank", 1),
-                org_dict.get("bankgroup", 1),
-                org_dict.get("sid", 1),
-            ),
+        channel_density = org_dict["channel_density"]
+        timing_dict["nRC"] = timing_dict["nRAS"] + timing_dict["nRP"]
+        timing_dict["nCCDL"] = max(4, math.ceil(2_500 / tCK_ps))
+        timing_dict["nCCDR"] = cls._resolve_nCCDR(
+            org_dict["sid"], timing_dict["nCCDS"]
+        )
+        timing_dict["nRTW"] = cls._resolve_nRTW(timing_dict, tCK_ps)
+        timing_dict["nRFC"] = cls._resolve_nRFC(
+            org_dict["die_density"],
+            org_dict["stack_height"],
+            channel_density,
+            tCK_ps,
+        )
+        timing_dict["nRFCpb"] = cls._resolve_nRFCpb(
+            org_dict["die_density"],
+            org_dict["stack_height"],
+            tCK_ps,
+        )
+        timing_dict["nRFMab"] = timing_dict["nRFC"]
+        timing_dict["nRFMpb"] = timing_dict["nRFCpb"]
+        timing_dict["nRREFD"] = cls._resolve_nRREFD(tCK_ps)
+        timing_dict["nREFI"] = cls._resolve_nREFI(tCK_ps)
+        timing_dict["nREFIpb"] = cls._resolve_nREFIpb(
+            tCK_ps,
+            org_dict["bank"],
+            org_dict["bankgroup"],
+            org_dict["sid"],
         )
 
     @staticmethod
-    def _resolve_nRFC(channel_density, tCK_ps):
-        # HBM3 tRFCab (all-bank) — channel density in Mb, derived from die density / SID count.
-        # Table 84 in JESD238
-        if channel_density <= 4096:     tRFC_ns = 260
-        elif channel_density <= 8192:   tRFC_ns = 350
-        elif channel_density <= 16384:  tRFC_ns = 450
-        else:                           tRFC_ns = 550
+    def _resolve_nCCDR(num_sids, nCCDS):
+        if num_sids == 1:
+            return nCCDS
+        return {
+            # === Ramulator Guesstimate ===
+            2: 3,
+            4: 3,
+            # =============================
+        }.get(num_sids, -1)
+
+    @staticmethod
+    def _resolve_nRTW(timing_dict, tCK_ps):
+        # JESD238 Tables 92 and 93, Note 18.
+        base_cycles = timing_dict["nCL"] + timing_dict["nBL"] - timing_dict["nCWL"]
+        analog_numerator = (
+            max(-2_000, -2 * tCK_ps) + 5 * tCK_ps + 10 * (2_500 + 20)
+        )
+        return base_cycles + math.ceil(analog_numerator / (10 * tCK_ps))
+
+    @staticmethod
+    def _resolve_nRFC(
+        die_density,
+        stack_height,
+        channel_density,
+        tCK_ps,
+    ):
+        # JESD238 Table 93.
+        tRFC_ns = {
+            (8192, 8, 4096): 260,
+            (8192, 12, 6144): 310,
+            (8192, 16, 8192): 350,
+            (16384, 4, 4096): 260,
+            (16384, 8, 8192): 350,
+            (16384, 12, 12288): 410,
+            (16384, 16, 16384): 450,
+            # === Ramulator Guesstimate ===
+            (32768, 8, 16384): 450,
+            (32768, 16, 32768): 550,
+            # =============================
+        }.get((die_density, stack_height, channel_density))
+        if tRFC_ns is None:
+            return -1
         return math.ceil(tRFC_ns * 1000 / tCK_ps)
+
+    @staticmethod
+    def _resolve_nRFCpb(die_density, stack_height, tCK_ps):
+        # JESD238 Table 93 defines 16 Gb/die.
+        if die_density == 16384:
+            tRFCpb_ns = 200
+        else:
+            tRFCpb_ns = {
+                # === Ramulator Guesstimate ===
+                (8192, 8): 200,
+                (32768, 8): 200,
+                (32768, 16): 200,
+                # =============================
+            }.get((die_density, stack_height))
+        if tRFCpb_ns is None:
+            return -1
+        return math.ceil(tRFCpb_ns * 1000 / tCK_ps)
 
     @staticmethod
     def _resolve_nRREFD(tCK_ps):
@@ -196,41 +258,43 @@ class HBM3(DRAMStandard):
 
     @staticmethod
     def _resolve_nREFI(tCK_ps):
-        # HBM3 tREFI = 3900 ns (3.9 us, 32 ms / 8192 rows)
-        return math.ceil(3_900_000 / tCK_ps)
+        # JESD238 Table 93 specifies a maximum interval of 3.9 us.
+        return 3_900_000 // tCK_ps
 
     @staticmethod
     def _resolve_nREFIpb(tCK_ps, num_banks, num_bankgroups, num_sids):
-        # HBM3 tREFIpb = tREFI / num_banks
-        trefi = 3_900_000  # ps
-        return math.ceil(trefi / num_banks / num_bankgroups / num_sids / tCK_ps)
+        # JESD238 Table 93: tREFIpb = tREFI / banks per pseudo-channel.
+        return 3_900_000 // (num_banks * num_bankgroups * num_sids * tCK_ps)
 
 
 # ---- HBM3 JEDEC data (Table 4 in JESD238) ----
 HBM3.org_presets = {
-    # die density = 4 Gb, channel density = 4 Gb
-    "HBM3_4Gb":  {"density": 4096, "dq": 32, "channel_width": 32, "pseudochannel": 2, "sid": 1, "bankgroup": 4, "bank": 4, "row": 1<<14, "column": (1<<5) << 3},  # HBM CA already takes BL into account
-    # die density = 8 Gb, channel density = 4 Gb
-    "HBM3_8Gb_8hi":  {"density": 8192, "dq": 32, "channel_width": 32, "pseudochannel": 2, "sid": 2, "bankgroup": 4, "bank": 4, "row": 1<<13, "column": (1<<5) << 3},  # HBM CA already takes BL into account
-    # die density = 16 Gb, channel density = 8 Gb
-    "HBM3_16Gb_8hi": {"density": 16384, "dq": 32, "channel_width": 32, "pseudochannel": 2, "sid": 2, "bankgroup": 4, "bank": 4, "row": 1<<14, "column": (1<<5) << 3},  # HBM CA already takes BL into account
-    # die density = 32 Gb, channel density = 16 Gb
-    "HBM3_32Gb_8hi": {"density": 32768, "dq": 32, "channel_width": 32, "pseudochannel": 2, "sid": 2, "bankgroup": 4, "bank": 4, "row": 1<<15, "column": (1<<5) << 3},  # HBM CA already takes BL into account
-    # die density = 32 Gb, channel density = 8 Gb
-    "HBM3_32Gb_16hi": {"density": 32768, "dq": 32, "channel_width": 32, "pseudochannel": 2, "sid": 4, "bankgroup": 4, "bank": 4, "row": 1<<15, "column": (1<<5) << 3},  # HBM CA already takes BL into account
+    # HBM CA already takes BL into account
+    # One preset is one 64-bit JEDEC channel split into two 32-bit
+    # pseudo-channels (JESD238 Table 4).
+    "HBM3_16Gb_4hi":  {"die_density": 16384, "channel_density": 4096,  "stack_height": 4,  "dq": 32, "channel_width": 64, "pseudochannel": 2, "sid": 1, "bankgroup": 4, "bank": 4, "row": 1 << 14, "column": (1 << 5) << 3},
+    "HBM3_8Gb_8hi":   {"die_density": 8192,  "channel_density": 4096,  "stack_height": 8,  "dq": 32, "channel_width": 64, "pseudochannel": 2, "sid": 2, "bankgroup": 4, "bank": 4, "row": 1 << 13, "column": (1 << 5) << 3},
+    "HBM3_16Gb_8hi":  {"die_density": 16384, "channel_density": 8192,  "stack_height": 8,  "dq": 32, "channel_width": 64, "pseudochannel": 2, "sid": 2, "bankgroup": 4, "bank": 4, "row": 1 << 14, "column": (1 << 5) << 3},
+    "HBM3_32Gb_8hi":  {"die_density": 32768, "channel_density": 16384, "stack_height": 8,  "dq": 32, "channel_width": 64, "pseudochannel": 2, "sid": 2, "bankgroup": 4, "bank": 4, "row": 1 << 15, "column": (1 << 5) << 3},
+    "HBM3_32Gb_16hi": {"die_density": 32768, "channel_density": 32768, "stack_height": 16, "dq": 32, "channel_width": 64, "pseudochannel": 2, "sid": 4, "bankgroup": 4, "bank": 4, "row": 1 << 15, "column": (1 << 5) << 3},
 }
 
-# Timing presets — CK cycles. Non-refresh timing values are supplied directly
-# here; refresh-related values may be supplied here or resolved below.
+# Backward-compatible alias for the 4 Gb-per-channel organization.
+HBM3.org_presets["HBM3_4Gb"] = HBM3.org_presets["HBM3_16Gb_4hi"]
+
+# Timing presets — CK cycles. Direct speed-bin timings are supplied here;
+# organization-dependent and derived refresh timings are resolved below.
 HBM3.timing_presets = {
     "HBM3_6400Mbps": {
-        "rate": 6400, "nBL": 2, "nCL": 20, "nRCDRD": 31, "nRCDWR": 15,
-        "nRP": 26, "nRAS": 45, "nRC": 72, "nWR": 33, "nRTP": 9, "nCWL": 10,
-        "nCCDS": 2, "nCCDL": 4, "nCCDR": 3,
+        "rate": 6400, "nBL": 2,
+        "nCCDS": 2,
+        # === Ramulator Guesstimate ===
+        "nCL": 20, "nRCDRD": 31, "nRCDWR": 15,
+        "nRP": 26, "nRAS": 45, "nWR": 33,
+        "nRTP": 9, "nCWL": 10,
         "nRRDS": 4, "nRRDL": 5, "nFAW": 24,
-        "nWTRS": 7, "nWTRL": 10, "nRTW": 20,
-        "nRFCpb": 320, "nRREFD": 8, "nREFI": 6240,
-        "nPPD": 2,
-        "tCK_ps": 625,
+        "nWTRS": 7, "nWTRL": 10,
+        # =============================
+        "nPPD": 2, "tCK_ps": 625,
     },
 }
