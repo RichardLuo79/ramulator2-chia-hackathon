@@ -42,6 +42,10 @@ AddrVec_t PerBankRefresh::build_addr_vec(DRAMNode* node) {
 void PerBankRefresh::init() {
   m_ctrl = cast_parent<ControllerBase>();
   const auto& info = *m_ctrl->m_device.m_spec;
+  if (info.standard_name == "HBM1" || info.has_level("PseudoChannel")) {
+    throw std::runtime_error(
+        "PerBank refresh does not support HBM or PseudoChannel standards; use HBMPerBankRefresh instead");
+  }
   m_cmd_refpb = info.get_command_id("REFpb");
   m_bank_level = info.get_level_id("Bank");
   m_nrefipb = info.get_timing_value("nREFIpb");

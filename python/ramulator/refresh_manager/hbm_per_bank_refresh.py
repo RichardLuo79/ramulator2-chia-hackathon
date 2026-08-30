@@ -9,5 +9,5 @@
 from ramulator.components import Component
 
 
-class HBM34PerBankRefresh(Component):
-    impl = "HBM34PerBankRefresh"
+class HBMPerBankRefresh(Component):
+    impl = "HBMPerBankRefresh"
