@@ -50,6 +50,7 @@ class HBM1 : public DRAMSpec {
       nRRDL,
       nWTRS,
       nWTRL,
+      nRTW,
       nFAW,
       nRFC,
       nRFCpb,
@@ -75,9 +76,10 @@ class HBM1 : public DRAMSpec {
     set_names(levels, level_names, {"Channel", "BankGroup", "Bank", "Row", "Column"});
     set_names(commands, command_names, {"ACT", "PREpb", "PREab", "RD", "WR", "RDA", "WRA", "REFab", "REFpb"});
     set_names(states, state_names, {"Opened", "Closed", "N_A"});
-    set_names(timings, timing_names, {"rate",  "nBL",   "nCL",  "nRCDRD", "nRCDWR", "nRP",   "nRAS",    "nRC",
-                                      "nWR",   "nRTPL", "nCWL", "nCCDS",  "nCCDL",  "nRRDS", "nRRDL",   "nWTRS",
-                                      "nWTRL", "nFAW",  "nRFC", "nRFCpb", "nRREFD", "nREFI", "nREFIpb", "tCK_ps"});
+    set_names(timings, timing_names,
+              {"rate",  "nBL",  "nCL",    "nRCDRD", "nRCDWR", "nRP",     "nRAS",  "nRC",   "nWR",
+               "nRTPL", "nCWL", "nCCDS",  "nCCDL",  "nRRDS",  "nRRDL",   "nWTRS", "nWTRL", "nRTW",
+               "nFAW",  "nRFC", "nRFCpb", "nRREFD", "nREFI",  "nREFIpb", "tCK_ps"});
 
     // Static spec data
     internal_prefetch_size = 2;
