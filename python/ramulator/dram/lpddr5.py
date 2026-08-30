@@ -38,23 +38,19 @@ class LPDDR5(DRAMStandard):
     timing_params = [
         # nBL_min = BL/n_min(BL16); nBL_max = BL/n_max(BL16)
         # (JESD209-5C Table 339).
-        "rate", "nBL_min", "nBL_max", "nCL", "nRCD", "nRP", "nRPab", "nRAS", "nRC",
+        "rate", "nBL_min", "nBL_max",
+        "nCL", "nRCD", "nRP", "nRPab", "nRAS", "nRC",
         "nWR", "nRTP", "nCWL", "nPPD",
         "nCCDS", "nCCDL", "nCCDS_WR", "nCCDL_WR",
-        "nRRDS", "nRRDL", "nWTRS", "nWTRL",
+        "nRRDS", "nRRDL",
+        "nWTRS", "nWTRL",
         "nFAW", "nRFC", "nRFCpb", "nREFI", "nREFIpb",
-        "nWCKPST",
-        "nCAS",
-        "nAAD",
-        "nCS", "tCK_ps",
+        "nWCKPST", "nCAS", "nAAD", "nCS", "tCK_ps",
         "nPBR2PBR", "nPBR2ACT",
     ]
 
     # ---- External request types ----
-    supported_requests = {
-        "Read": "RD",
-        "Write": "WR",
-    }
+    supported_requests = {"Read": "RD", "Write": "WR"}
 
     # ---- Timing constraints ----
     timing_constraints = [
@@ -83,13 +79,13 @@ class LPDDR5(DRAMStandard):
         TimingConstraint(level="Rank", preceding=["WR"], following=["PREab"], latency="nCWL + nBL_min + 1 + nWR"),
         # Rank — RAS timing (JESD209-5C Tables 237, 340-342, and 381).
         TimingConstraint(level="Rank", preceding=["ACT2"], following=["ACT2", "REFpb"], latency="nRRDS"),
-        TimingConstraint(level="Rank", preceding=["ACT1"], following=["ACT1"], latency="nFAW", window=4),
+        TimingConstraint(level="Rank", preceding=["ACT1", "REFpb"], following=["ACT1", "REFpb"], latency="nFAW", window=4, shared_window=True),
         TimingConstraint(level="Rank", preceding=["ACT2"], following=["PREab"], latency="nRAS"),
         TimingConstraint(level="Rank", preceding=["PREab"], following=["ACT2"], latency="nRPab"),
         # Rank — precharge-to-precharge delay (JESD209-5C Table 381 tPPD).
         TimingConstraint(level="Rank", preceding=["PREpb", "PREab"], following=["PREpb", "PREab"], latency="nPPD"),
         # Rank — refresh entry/recovery (JESD209-5C Tables 237 and 240).
-        TimingConstraint(level="Rank", preceding=["ACT2"], following=["REFab"], latency="nRC"),
+        TimingConstraint(level="Rank", preceding=["ACT2"], following=["REFab"], latency="nRAS + nRPab"),
         TimingConstraint(level="Rank", preceding=["PREpb"], following=["REFab"], latency="nRP"),
         TimingConstraint(level="Rank", preceding=["PREab"], following=["REFab", "REFpb"], latency="nRPab"),
         TimingConstraint(level="Rank", preceding=["RDA"], following=["REFab"], latency="nRP + nRTP"),
@@ -134,47 +130,77 @@ class LPDDR5(DRAMStandard):
     # ---- Secondary timing resolution ----
     @classmethod
     def resolve_secondary_timings(cls, timing_dict, org_dict):
-        timing_dict["nRRDS"] = cls._resolve_nRRDS(timing_dict["tCK_ps"])
-        timing_dict["nRRDL"] = cls._resolve_nRRDL(timing_dict["tCK_ps"])
-        timing_dict["nFAW"] = cls._resolve_nFAW(timing_dict["tCK_ps"])
+        bank_mode = {
+            (4, 4): "BG",
+            (1, 8): "8B",
+            (1, 16): "16B",
+        }.get((org_dict["bankgroup"], org_dict["bank"]))
+        timing_dict["nRRDS"] = cls._resolve_nRRDS(timing_dict["tCK_ps"], bank_mode)
+        timing_dict["nRRDL"] = cls._resolve_nRRDL(timing_dict["tCK_ps"], bank_mode)
+        timing_dict["nFAW"] = cls._resolve_nFAW(timing_dict["tCK_ps"], bank_mode)
         timing_dict["nRFC"] = cls._resolve_nRFC(org_dict["density"], timing_dict["tCK_ps"])
         timing_dict["nRFCpb"] = cls._resolve_nRFCpb(org_dict["density"], timing_dict["tCK_ps"])
         timing_dict["nREFI"] = cls._resolve_nREFI(timing_dict["tCK_ps"])
         timing_dict["nREFIpb"] = cls._resolve_nREFIpb(timing_dict["tCK_ps"])
         timing_dict["nPBR2PBR"] = cls._resolve_nPBR2PBR(org_dict["density"], timing_dict["tCK_ps"])
-        timing_dict["nPBR2ACT"] = cls._resolve_nPBR2ACT(timing_dict["tCK_ps"])
+        timing_dict["nPBR2ACT"] = cls._resolve_nPBR2ACT(timing_dict["tCK_ps"], bank_mode)
 
     @staticmethod
-    def _resolve_nRRDS(tCK_ps):
-        return max(4, math.ceil(5_000 / tCK_ps))
+    def _resolve_nRRDS(tCK_ps, bank_mode):
+        tRRD_ps = {"BG": 5_000, "8B": 10_000, "16B": 5_000}.get(bank_mode)
+        if tRRD_ps is None:
+            return -1
+        return max(2, math.ceil(tRRD_ps / tCK_ps))
 
     @staticmethod
-    def _resolve_nRRDL(tCK_ps):
-        return max(4, math.ceil(5_000 / tCK_ps))
+    def _resolve_nRRDL(tCK_ps, bank_mode):
+        tRRDL_ps = {"BG": 5_000, "8B": 10_000, "16B": 5_000}.get(bank_mode)
+        if tRRDL_ps is None:
+            return -1
+        return max(2, math.ceil(tRRDL_ps / tCK_ps))
 
     @staticmethod
-    def _resolve_nFAW(tCK_ps):
-        # JESD209-5C Table 381: LPDDR5 BG mode tFAW = 20 ns.
-        return math.ceil(20_000 / tCK_ps)
+    def _resolve_nFAW(tCK_ps, bank_mode):
+        # JESD209-5C Tables 381-383: tFAW is 20 ns for BG/16B and 40 ns for 8B.
+        tFAW_ps = {"BG": 20_000, "8B": 40_000, "16B": 20_000}.get(bank_mode)
+        if tFAW_ps is None:
+            return -1
+        return math.ceil(tFAW_ps / tCK_ps)
 
     @staticmethod
     def _resolve_nRFC(density, tCK_ps):
         # JESD209-5C Table 240: tRFCab, Enhanced DVFSC disabled.
-        if density <= 2048:    tRFC_ns = 130
-        elif density <= 4096:  tRFC_ns = 180
-        elif density <= 8192:  tRFC_ns = 210
-        elif density <= 16384: tRFC_ns = 280
-        else:                  tRFC_ns = 380
+        tRFC_ns = {
+            2048: 130,
+            3072: 180,
+            4096: 180,
+            6144: 210,
+            8192: 210,
+            12288: 280,
+            16384: 280,
+            24576: 380,
+            32768: 380,
+        }.get(density)
+        if tRFC_ns is None:
+            return -1
         return math.ceil(tRFC_ns * 1000 / tCK_ps)
 
     @staticmethod
     def _resolve_nRFCpb(density, tCK_ps):
         # JESD209-5C Table 240: tRFCpb, Enhanced DVFSC disabled.
-        if density <= 2048:    tRFC_ns = 60
-        elif density <= 4096:  tRFC_ns = 90
-        elif density <= 8192:  tRFC_ns = 120
-        elif density <= 16384: tRFC_ns = 140
-        else:                  tRFC_ns = 190
+        tRFC_ns = {
+            2048: 60,
+            3072: 90,
+            4096: 90,
+            6144: 120,
+            8192: 120,
+            12288: 140,
+            16384: 140,
+            24576: 190,
+            32768: 190,
+        }.get(density)
+        if tRFC_ns is None:
+            return -1
         return math.ceil(tRFC_ns * 1000 / tCK_ps)
 
     @staticmethod
@@ -190,14 +216,28 @@ class LPDDR5(DRAMStandard):
     @staticmethod
     def _resolve_nPBR2PBR(density, tCK_ps):
         # JESD209-5C Table 240: tpbR2pbR.
-        if density <= 2048: t_ns = 60
-        else:               t_ns = 90
+        t_ns = {
+            2048: 60,
+            3072: 90,
+            4096: 90,
+            6144: 90,
+            8192: 90,
+            12288: 90,
+            16384: 90,
+            24576: 90,
+            32768: 90,
+        }.get(density)
+        if t_ns is None:
+            return -1
         return math.ceil(t_ns * 1000 / tCK_ps)
 
     @staticmethod
-    def _resolve_nPBR2ACT(tCK_ps):
-        # JESD209-5C Table 240: tpbr2act for BG mode.
-        return math.ceil(7_500 / tCK_ps)
+    def _resolve_nPBR2ACT(tCK_ps, bank_mode):
+        # JESD209-5C Tables 240-241: tpbr2act is 7.5 ns for BG/16B and 10 ns for 8B.
+        tPBR2ACT_ps = {"BG": 7_500, "8B": 10_000, "16B": 7_500}.get(bank_mode)
+        if tPBR2ACT_ps is None:
+            return -1
+        return math.ceil(tPBR2ACT_ps / tCK_ps)
 
 
 # ---- LPDDR5 JESD209-5C preset data ----
@@ -213,20 +253,28 @@ LPDDR5.timing_presets = {
     # JESD209-5C Tables 225 and 340: nRTP = BL/n_min (2) + nRBTP (4).
     # LPDDR5-5500: x16 BG mode, CKR 4:1, RL Set 0, WL Set A
     "LPDDR5_5500": {
-        "rate": 5500, "nBL_min": 2, "nBL_max": 4, "nCL": 15, "nRCD": 13, "nRP": 13, "nRPab": 15,
+        "rate": 5500, "nBL_min": 2, "nBL_max": 4, "nCL": 15,
+        "nRCD": 13, "nRP": 13, "nRPab": 15,
         "nRAS": 29, "nRC": 42, "nWR": 24, "nRTP": 6, "nCWL": 8, "nPPD": 2,
         "nCCDS": 2, "nCCDL": 4, "nCCDS_WR": 2, "nCCDL_WR": 4,
         "nWTRS": 5, "nWTRL": 9, "nWCKPST": 1, "nCAS": 0,
-        "nAAD": 8, "nCS": 2, "tCK_ps": 1453,
+        # JESD209-5C Section 7.3.1: ACTIVATE-2 must follow within 8 nCK.
+        "nAAD": 8,
+        "nCS": 2,  # Ramulator guesstimate
+        "tCK_ps": 1453,
     },
     # LPDDR5-6400 (tCK = 1250 ps, CK = 800 MHz)
     "LPDDR5_6400": {
         # JESD209-5C Table 339: BG mode, CKR 4:1, WCK > 1600 MHz:
         # nBL_min = BL/n_min(BL16) = 2; nBL_max = BL/n_max(BL16) = 4.
-        "rate": 6400, "nBL_min": 2, "nBL_max": 4, "nCL": 17, "nRCD": 15, "nRP": 15, "nRPab": 17,
+        "rate": 6400, "nBL_min": 2, "nBL_max": 4, "nCL": 17,
+        "nRCD": 15, "nRP": 15, "nRPab": 17,
         "nRAS": 34, "nRC": 49, "nWR": 28, "nRTP": 6, "nCWL": 9, "nPPD": 2,
         "nCCDS": 2, "nCCDL": 4, "nCCDS_WR": 2, "nCCDL_WR": 4,
         "nWTRS": 5, "nWTRL": 10, "nWCKPST": 1, "nCAS": 0,
-        "nAAD": 8, "nCS": 2, "tCK_ps": 1250,
+        # JESD209-5C Section 7.3.1: ACTIVATE-2 must follow within 8 nCK.
+        "nAAD": 8,
+        "nCS": 2,  # Ramulator guesstimate
+        "tCK_ps": 1250,
     },
 }
