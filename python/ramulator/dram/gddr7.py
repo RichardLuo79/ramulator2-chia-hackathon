@@ -2,8 +2,6 @@
 GDDR7 DRAM.
 
 CK4 timing unit.
-Timing constraint values are from the JEDEC standard when available.
-Otherwise are "guesstimates".
 """
 
 import math
@@ -24,19 +22,11 @@ class GDDR7(DRAMStandard):
     }
 
     commands = [
-        "ACT",
-        "PREpb",
-        "PREab",
-        "RD",
-        "WR",
-        "RDA",
-        "WRA",
-        "REFab",
-        "REFpb",
-        "RFMab",
-        "RFMpb",
-        "RCKSTRT",
-        "RCKSTOP",
+        "ACT", "PREpb", "PREab",
+        "RD", "WR", "RDA", "WRA",
+        "REFab", "REFpb",
+        "RFMab", "RFMpb",
+        "RCKSTRT", "RCKSTOP",
     ]
 
     command_cycles = {
@@ -55,72 +45,24 @@ class GDDR7(DRAMStandard):
         "RFMab": 1,
     }
 
-    row_commands = [
-        "ACT",
-        "PREpb",
-        "PREab",
-        "REFab",
-        "REFpb",
-        "RFMab",
-        "RFMpb",
-    ]
-
-    column_commands = [
-        "RD",
-        "WR",
-        "RDA",
-        "WRA",
-        "RCKSTRT",
-        "RCKSTOP",
-    ]
+    row_commands = ["ACT", "PREpb", "PREab", "REFab", "REFpb", "RFMab", "RFMpb"]
+    column_commands = ["RD", "WR", "RDA", "WRA", "RCKSTRT", "RCKSTOP"]
 
     states = ["Opened", "Closed", "N_A"]
 
     timing_params = [
-        "rate",
-        "nBL",
-        "nRL",
-        "nWL",
-        "nDQERL",
-        "nRCDRD",
-        "nRCDWR",
-        "nRP",
-        "nRAS",
-        "nRC",
-        "nRRD",
-        "nRREFD",
-        "nRPD",
-        "nRTPSB",
-        "nPPD",
-        "nWR",
-        "nCCD",
-        "nCCDSB",
-        "nWTR",
-        "nWTRSB",
-        "nRTW",
-        "nREFI",
-        "nREFIpb",
-        "nRFCab",
-        "nRFCpb",
-        "nRDREFab",
-        "nRFMab",
-        "nRFMpb",
-        "nRCKSTRT2RD",
-        "nRD2RCKSTOP",
-        "nRCKSP2ST",
-        "nRCKST2SP",
-        "nRCKSTOP_LAT",
-        "nRCKEN",
-        "nRCK_LS",
-        "nRCKPST",
-        "nRCK_HS",
+        "rate", "nBL", "nRL", "nWL", "nDQERL",
+        "nRCDRD", "nRCDWR", "nRP", "nRAS", "nRC",
+        "nRRD", "nRREFD", "nRPD", "nRTPSB", "nPPD", "nWR",
+        "nCCD", "nCCDSB",
+        "nWTR", "nWTRSB", "nRTW",
+        "nREFI", "nREFIpb", "nRFCab", "nRFCpb", "nRDREFab", "nRFMab", "nRFMpb",
+        "nRCKSTRT2RD", "nRD2RCKSTOP", "nRCKSP2ST", "nRCKST2SP",
+        "nRCKSTOP_LAT", "nRCKEN", "nRCK_LS", "nRCKPST",
         "tCK_ps",
     ]
 
-    supported_requests = {
-        "Read": "RD",
-        "Write": "WR",
-    }
+    supported_requests = {"Read": "RD", "Write": "WR"}
 
     timing_constraints = [
         # Column-to-column spacing, different bank.
@@ -144,37 +86,38 @@ class GDDR7(DRAMStandard):
         TimingConstraint("Bank", ["ACT"], ["WR", "WRA"], "nRCDWR"),
         TimingConstraint("Bank", ["ACT"], ["PREpb"], "nRAS"),
         TimingConstraint("Bank", ["PREpb"], ["ACT"], "nRP"),
-        TimingConstraint("Bank", ["PREpb"], ["ACT", "REFpb"], "nRPD", sibling=True),
+        TimingConstraint("Bank", ["PREpb"], ["ACT", "REFpb", "RFMpb"], "nRPD", sibling=True),
 
         # Explicit precharge and auto-precharge follow-up.
         TimingConstraint("Bank", ["RD"], ["PREpb"], "nRTPSB"),
         TimingConstraint("Bank", ["WR"], ["PREpb"], "nWL + nBL + nWR"),
+        TimingConstraint("Channel", ["RD", "RDA"], ["PREab"], "nRTPSB"),
+        TimingConstraint("Channel", ["WR", "WRA"], ["PREab"], "nWL + nBL + nWR"),
         TimingConstraint("Bank", ["RDA"], ["ACT", "REFpb", "RFMpb"], "nRTPSB + nRP"),
         TimingConstraint("Bank", ["WRA"], ["ACT", "REFpb", "RFMpb"], "nWL + nBL + nWR + nRP"),
 
         # All-bank refresh. Conservative: block normal row traffic at Channel level.
-        TimingConstraint("Channel", ["ACT"], ["REFab"], "nRC"),
-        TimingConstraint("Channel", ["RD", "RDA"], ["REFab"], "nRDREFab"),
-        TimingConstraint("Channel", ["PREpb", "PREab"], ["REFab"], "nRP"),
-        TimingConstraint("Channel", ["RDA"], ["REFab"], "nRTPSB + nRP"),
-        TimingConstraint("Channel", ["WRA"], ["REFab"], "nWL + nBL + nWR + nRP"),
-        TimingConstraint("Channel", ["REFab"], ["ACT", "PREab", "REFab", "REFpb"], "nRFCab"),
+        TimingConstraint("Channel", ["ACT"], ["REFab", "RFMab"], "nRC"),
+        TimingConstraint("Channel", ["RD", "RDA"], ["REFab", "RFMab"], "nRDREFab"),
+        TimingConstraint("Channel", ["PREpb", "PREab"], ["REFab", "RFMab"], "nRP"),
+        TimingConstraint("Channel", ["RDA"], ["REFab", "RFMab"], "nRTPSB + nRP"),
+        TimingConstraint("Channel", ["WRA"], ["REFab", "RFMab"], "nWL + nBL + nWR + nRP"),
+        TimingConstraint("Channel", ["REFab"], ["ACT", "PREab", "REFab", "REFpb", "RFMab", "RFMpb"], "nRFCab"),
 
         # Per-bank refresh.
-        TimingConstraint("Channel", ["REFpb"], ["REFpb", "ACT"], "nRREFD"),
-        TimingConstraint("Channel", ["REFpb"], ["REFab"], "nRFCpb"),
-        TimingConstraint("Channel", ["ACT"], ["REFpb"], "nRRD"),
-        TimingConstraint("Bank", ["REFpb"], ["ACT", "REFpb"], "nRFCpb"),
-        TimingConstraint("Bank", ["ACT"], ["REFpb"], "nRC"),
-        TimingConstraint("Bank", ["PREpb"], ["REFpb"], "nRP"),
+        TimingConstraint("Channel", ["REFpb"], ["REFpb", "RFMpb", "ACT"], "nRREFD"),
+        TimingConstraint("Channel", ["REFpb"], ["REFab", "RFMab"], "nRFCpb"),
+        TimingConstraint("Channel", ["ACT"], ["REFpb", "RFMpb"], "nRRD"),
+        TimingConstraint("Channel", ["PREab"], ["REFpb", "RFMpb"], "nRP"),
+        TimingConstraint("Bank", ["REFpb"], ["ACT", "REFpb", "RFMpb"], "nRFCpb"),
+        TimingConstraint("Bank", ["ACT"], ["REFpb", "RFMpb"], "nRC"),
+        TimingConstraint("Bank", ["PREpb"], ["REFpb", "RFMpb"], "nRP"),
 
-        # RFM command plumbing only. No RFM policy in this model.
+        # JESD239D Section 6.13 applies the refresh separation rules to RFM.
         TimingConstraint("Channel", ["RFMab"], ["ACT", "PREab", "REFab", "REFpb", "RFMab", "RFMpb"], "nRFMab"),
+        TimingConstraint("Channel", ["RFMpb"], ["REFpb", "RFMpb", "ACT"], "nRREFD"),
+        TimingConstraint("Channel", ["RFMpb"], ["REFab", "RFMab"], "nRFMpb"),
         TimingConstraint("Bank", ["RFMpb"], ["ACT", "REFpb", "RFMpb"], "nRFMpb"),
-        TimingConstraint("Channel", ["ACT"], ["RFMab"], "nRC"),
-        TimingConstraint("Bank", ["ACT"], ["RFMpb"], "nRC"),
-        TimingConstraint("Channel", ["PREpb", "PREab"], ["RFMab"], "nRP"),
-        TimingConstraint("Bank", ["PREpb"], ["RFMpb"], "nRP"),
 
         # RCK start/stop command timing.
         TimingConstraint("Channel", ["RCKSTRT"], ["RD", "RDA"], "nRCKSTRT2RD"),
@@ -186,64 +129,106 @@ class GDDR7(DRAMStandard):
     @classmethod
     def resolve_secondary_timings(cls, timing_dict, org_dict):
         tCK = timing_dict["tCK_ps"]
+        device_density = org_dict["device_density"]
+        rate = timing_dict["rate"]
 
-        timing_dict["rate"] = round(cls.internal_prefetch_size * 1_000_000 / (timing_dict["nBL"] * tCK))
-
-        # Fixed/derived GDDR7 values.
-        timing_dict.setdefault("nCCD", timing_dict["nBL"])
-        timing_dict.setdefault("nCCDSB", 4)
-        timing_dict.setdefault("nPPD", 2)
-        timing_dict.setdefault("nRPD", timing_dict["nPPD"])
-        timing_dict.setdefault("nREFI", math.floor(1_900_000 / tCK))
-        timing_dict.setdefault("nREFIpb", max(1, math.floor(timing_dict["nREFI"] / 16)))
-
-        # GDDR7 formulas that depend on resolved latency fields.
-        timing_dict.setdefault(
-            "nRTW",
-            max(1, timing_dict["nRL"] + timing_dict["nDQERL"] + timing_dict["nBL"] + 3 - timing_dict["nWL"] + 1),
+        # JESD239D Table 150.
+        timing_dict["nCCD"] = timing_dict["nBL"]
+        timing_dict["nCCDSB"] = 4
+        timing_dict["nPPD"] = 2
+        timing_dict["nRPD"] = timing_dict["nPPD"]
+        timing_dict["nREFI"] = cls._resolve_nREFI(tCK)
+        timing_dict["nREFIpb"] = cls._resolve_nREFIpb(org_dict["bank"], tCK)
+        timing_dict["nRC"] = cls._resolve_nRC(
+            timing_dict["nRAS"], timing_dict["nRP"]
         )
-        timing_dict.setdefault(
-            "nRDREFab",
-            timing_dict["nRL"] + timing_dict["nDQERL"] + timing_dict["nBL"] + 2,
+        timing_dict["nRTW"] = cls._resolve_nRTW(
+            timing_dict["nRL"],
+            timing_dict["nDQERL"],
+            timing_dict["nBL"],
+            timing_dict["nWL"],
+        )
+        timing_dict["nRFCab"] = cls._resolve_nRFCab(device_density, rate)
+        timing_dict["nRFCpb"] = cls._resolve_nRFCpb(device_density, rate)
+        timing_dict["nRDREFab"] = cls._resolve_nRDREFab(
+            timing_dict["nRL"], timing_dict["nDQERL"], timing_dict["nBL"]
+        )
+        # === Ramulator Guesstimate ===
+        timing_dict["nRFMab"] = timing_dict["nRFCab"]
+        timing_dict["nRFMpb"] = timing_dict["nRFCpb"]
+        # =============================
+
+        timing_dict["nRCKSTRT2RD"] = 2
+        timing_dict["nRCKPST"] = 2
+        timing_dict["nRD2RCKSTOP"] = cls._resolve_nRD2RCKSTOP(
+            timing_dict["nRL"],
+            timing_dict["nDQERL"],
+            timing_dict["nBL"],
+            timing_dict["nRCKPST"],
+            timing_dict["nRCKSTOP_LAT"],
+        )
+        timing_dict["nRCKST2SP"] = cls._resolve_nRCKST2SP(
+            timing_dict["nRL"], timing_dict["nRCKSTRT2RD"]
         )
 
-        # RCK defaults.
-        timing_dict.setdefault("nRCKSTRT2RD", 2)
-        timing_dict.setdefault("nRCKPST", 2)
-        timing_dict.setdefault("nRCKEN", 6)
-        timing_dict.setdefault("nRCKSTOP_LAT", 10)
-        timing_dict.setdefault("nRCK_LS", 2)
-        timing_dict.setdefault(
-            "nRCK_HS",
-            max(0, timing_dict["nRL"] + timing_dict["nRCKSTRT2RD"] - timing_dict["nRCKEN"] - timing_dict["nRCK_LS"]),
-        )
-        timing_dict.setdefault(
-            "nRD2RCKSTOP",
-            max(
-                1,
-                timing_dict["nRL"]
-                + timing_dict["nDQERL"]
-                + timing_dict["nBL"]
-                + timing_dict["nRCKPST"]
-                - timing_dict["nRCKSTOP_LAT"],
-            ),
-        )
-        # JESD239D marks tRCKSP2ST vendor-specific; use a conservative simulator floor.
-        timing_dict.setdefault("nRCKSP2ST", max(8, timing_dict["nRCKEN"] + timing_dict["nRCK_LS"]))
-        timing_dict.setdefault("nRCKST2SP", timing_dict["nRCKEN"] + timing_dict["nRCK_LS"] + timing_dict["nRCK_HS"])
+    @staticmethod
+    def _resolve_nREFI(tCK_ps):
+        return math.floor(1_900_000 / tCK_ps)
 
-        # RFM command-plumbing defaults. These are simulator placeholders, not JEDEC equality rules.
-        timing_dict.setdefault("nRFMab", timing_dict["nRFCab"])
-        timing_dict.setdefault("nRFMpb", timing_dict["nRFCpb"])
+    @staticmethod
+    def _resolve_nREFIpb(bank, tCK_ps):
+        if bank != 16:
+            return -1
+        return max(1, math.floor(1_900_000 / (16 * tCK_ps)))
 
-        for name in cls.timing_params:
-            if name not in timing_dict:
-                raise ValueError(f"GDDR7: timing {name} remains unresolved")
+    @staticmethod
+    def _resolve_nRC(nRAS, nRP):
+        return nRAS + nRP
+
+    @staticmethod
+    def _resolve_nRTW(nRL, nDQERL, nBL, nWL):
+        bus_turnaround = 1  # Ramulator guesstimate
+        return max(1, nRL + nDQERL + nBL + 3 - nWL + bus_turnaround)
+
+    # === Ramulator Guesstimate ===
+    @staticmethod
+    def _resolve_nRFCab(device_density, rate):
+        # JESD239D Table 150 leaves tRFCab vendor-specific; Table 144 supplies
+        # IDD test conditions, not functional AC minima.
+        return {
+            (16384, 28000): 315,
+        }.get((device_density, rate), -1)
+
+    @staticmethod
+    def _resolve_nRFCpb(device_density, rate):
+        # JESD239D Table 150 leaves tRFCpb vendor-specific; Table 144 supplies
+        # IDD test conditions, not functional AC minima.
+        return {
+            (16384, 28000): 105,
+        }.get((device_density, rate), -1)
+    # =============================
+
+    @staticmethod
+    def _resolve_nRDREFab(nRL, nDQERL, nBL):
+        return nRL + nDQERL + nBL + 2
+
+    @staticmethod
+    def _resolve_nRD2RCKSTOP(nRL, nDQERL, nBL, nRCKPST, nRCKSTOP_LAT):
+        return max(1, nRL + nDQERL + nBL + nRCKPST - nRCKSTOP_LAT)
+
+    @staticmethod
+    def _resolve_nRCKST2SP(nRL, nRCKSTRT2RD):
+        # JESD239D Table 150, Note 24, Start-with-RCKSTRT mode.
+        return nRL + nRCKSTRT2RD
 
 
+# One Ramulator GDDR7 instance models one channel; channels_per_device
+# identifies the physical device's channel mode.
 GDDR7.org_presets = {
     "GDDR7_16Gb_x8": {
-        "density": 4096,
+        "device_density": 16384,
+        "channel_density": 4096,
+        "channels_per_device": 4,
         "dq": 8,
         "channel_width": 8,
         "bank": 16,
@@ -251,7 +236,9 @@ GDDR7.org_presets = {
         "column": (1 << 6) << 5,
     },
     "GDDR7_32Gb_x8": {
-        "density": 8192,
+        "device_density": 32768,
+        "channel_density": 8192,
+        "channels_per_device": 4,
         "dq": 8,
         "channel_width": 8,
         "bank": 16,
@@ -259,7 +246,9 @@ GDDR7.org_presets = {
         "column": (1 << 6) << 5,
     },
     "GDDR7_64Gb_x8": {
-        "density": 16384,
+        "device_density": 65536,
+        "channel_density": 16384,
+        "channels_per_device": 4,
         "dq": 8,
         "channel_width": 8,
         "bank": 16,
@@ -271,25 +260,19 @@ GDDR7.org_presets = {
 
 GDDR7.timing_presets = {
     "GDDR7_28000_PAM3": {
-        # CI/smoke/regression only. This is not a vendor timing table.
-        "nBL": 2,
-        "nRL": 24,
-        "nWL": 6,
-        "nDQERL": 0,
-        "nRCDRD": 30,
-        "nRCDWR": 19,
-        "nRP": 30,
-        "nRAS": 60,
-        "nRC": 90,
-        "nWR": 30,
-        "nRTPSB": 4,
-        "nRRD": 4,
-        "nRREFD": 21,
-        "nWTR": 9,
-        "nWTRSB": 11,
-        "nRTW": 12,
-        "nRFCab": 315,
-        "nRFCpb": 105,
+        # JESD239D Tables 1, 2, and 150; 4-channel mode at 28 Gb/s PAM3.
+        # Density-dependent refresh and RFM timings are resolved separately.
+        "rate": 28000, "nBL": 2,
+        # === Ramulator Guesstimate ===
+        "nRL": 24, "nWL": 6, "nDQERL": 0,
+        "nRCDRD": 30, "nRCDWR": 19,
+        "nRP": 30, "nRAS": 60,
+        "nWR": 30, "nRTPSB": 4,
+        "nRRD": 4, "nRREFD": 21,
+        "nWTR": 9, "nWTRSB": 11,
+        "nRCKEN": 6, "nRCKSTOP_LAT": 10,
+        "nRCK_LS": 2, "nRCKSP2ST": 8,
+        # =============================
         "tCK_ps": 571,
     },
 }

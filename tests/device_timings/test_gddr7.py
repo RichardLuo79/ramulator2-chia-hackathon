@@ -41,11 +41,20 @@ def all_bank_addr(dut):
     return dut.addr_vec(Channel=0, Bank=dut.ALL, Row=dut.ALL, Column=0)
 
 
-def test_gddr7_resolver_preserves_explicit_timings_and_derives_secondary_values():
-    timing = dict(GDDR7.timing_presets["GDDR7_28000_PAM3"])
-    timing["nRL"] = 42
-    timing["nRFCpb"] = 77
-    GDDR7.resolve_secondary_timings(timing, {})
+def refresh_addr(dut, command, *, bank):
+    if command in {"REFab", "RFMab"}:
+        return all_bank_addr(dut)
+    return addr(dut, bank=bank)
+
+
+def test_gddr7_user_overrides_are_final_after_secondary_timing_resolution():
+    dram = ramulator.dram.GDDR7(
+        org_preset="GDDR7_16Gb_x8",
+        timing_preset="GDDR7_28000_PAM3",
+        nRL=42,
+        nRFCpb=77,
+    )
+    timing = dict(zip(GDDR7.timing_params, dram.to_config()["timing"]))
 
     assert timing["nRL"] == 42
     assert timing["nRFCpb"] == 77
@@ -57,16 +66,15 @@ def test_gddr7_resolver_preserves_explicit_timings_and_derives_secondary_values(
     assert timing["nRCKEN"] == 6
     assert timing["nRCKSTOP_LAT"] == 10
     assert timing["nRCK_LS"] == 2
-    assert timing["nRCK_HS"] == 36
-    assert timing["nRCKST2SP"] == 44
-    assert timing["nRFMpb"] == 77
+    assert timing["nRCKST2SP"] == 26
+    assert timing["nRFMpb"] == 105
 
 
 def test_gddr7_resolver_derives_preset_owned_rck_timings():
     timing = dict(GDDR7.timing_presets["GDDR7_28000_PAM3"])
-    GDDR7.resolve_secondary_timings(timing, {})
+    org = dict(GDDR7.org_presets["GDDR7_16Gb_x8"])
+    GDDR7.resolve_secondary_timings(timing, org)
 
-    assert timing["nRCK_HS"] == 18
     assert timing["nRCKST2SP"] == 26
     assert timing["nRD2RCKSTOP"] == 18
     assert timing["nRCKSTRT2RD"] == 2
@@ -77,14 +85,12 @@ def test_gddr7_explicit_dependent_rck_timing_overrides_are_honored():
     dram = ramulator.dram.GDDR7(
         org_preset="GDDR7_16Gb_x8",
         timing_preset="GDDR7_28000_PAM3",
-        nRCK_HS=7,
         nRCKST2SP=19,
         nRD2RCKSTOP=23,
         nRCKSP2ST=11,
     )
     timing = dict(zip(GDDR7.timing_params, dram.to_config()["timing"]))
 
-    assert timing["nRCK_HS"] == 7
     assert timing["nRCKST2SP"] == 19
     assert timing["nRD2RCKSTOP"] == 23
     assert timing["nRCKSP2ST"] == 11
@@ -246,6 +252,34 @@ def test_gddr7_refresh_and_rfm_require_closed_banks():
     closed.issue("RFMpb", b, 0)
     t_act = first_cycle_gap("RFMpb", "ACT", closed.timings["nRFMpb"])
     closed.assert_earliest_ready_at("ACT", b, t_act)
+
+
+@pytest.mark.parametrize(
+    "preceding,following,same_bank,timing",
+    [
+        ("REFab", "RFMab", False, "nRFCab"),
+        ("REFab", "RFMpb", False, "nRFCab"),
+        ("RFMab", "REFab", False, "nRFMab"),
+        ("RFMab", "REFpb", False, "nRFMab"),
+        ("REFpb", "RFMab", False, "nRFCpb"),
+        ("RFMpb", "REFab", False, "nRFMpb"),
+        ("RFMpb", "RFMab", False, "nRFMpb"),
+        ("REFpb", "RFMpb", False, "nRREFD"),
+        ("RFMpb", "REFpb", False, "nRREFD"),
+        ("REFpb", "REFpb", True, "nRFCpb"),
+        ("RFMpb", "REFpb", True, "nRFMpb"),
+        ("RFMpb", "RFMpb", True, "nRFMpb"),
+        ("RFMpb", "RFMpb", False, "nRREFD"),
+    ],
+)
+def test_gddr7_refresh_rfm_command_spacing(preceding, following, same_bank, timing):
+    dut = make_dut()
+    preceding_addr = refresh_addr(dut, preceding, bank=0)
+    following_addr = refresh_addr(dut, following, bank=0 if same_bank else 1)
+
+    dut.issue(preceding, preceding_addr, clk=0)
+
+    dut.assert_earliest_ready_at(following, following_addr, dut.timings[timing])
 
 
 def test_gddr7_start_with_read_rckstop_timing():

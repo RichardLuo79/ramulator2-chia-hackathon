@@ -73,7 +73,6 @@ class GDDR7 : public DRAMSpec {
       nRCKEN,
       nRCK_LS,
       nRCKPST,
-      nRCK_HS,
       tCK_ps,
       COUNT
     };
@@ -101,7 +100,7 @@ class GDDR7 : public DRAMSpec {
                "nRAS",         "nRC",      "nRRD",    "nRREFD",  "nRPD",        "nRTPSB",      "nPPD",      "nWR",
                "nCCD",         "nCCDSB",   "nWTR",    "nWTRSB",  "nRTW",        "nREFI",       "nREFIpb",   "nRFCab",
                "nRFCpb",       "nRDREFab", "nRFMab",  "nRFMpb",  "nRCKSTRT2RD", "nRD2RCKSTOP", "nRCKSP2ST", "nRCKST2SP",
-               "nRCKSTOP_LAT", "nRCKEN",   "nRCK_LS", "nRCKPST", "nRCK_HS",     "tCK_ps"});
+               "nRCKSTOP_LAT", "nRCKEN",   "nRCK_LS", "nRCKPST", "tCK_ps"});
 
     // Static spec data
     internal_prefetch_size = 32;

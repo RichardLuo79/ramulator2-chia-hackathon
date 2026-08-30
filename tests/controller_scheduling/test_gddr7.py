@@ -276,9 +276,10 @@ def test_gddr7_manual_rfm_commands_use_device_command_plumbing():
 
     dut.priority_send("RFMpb", _addr(dut, bank=0))
     dut.priority_send("RFMab", _all_bank_addr(dut))
-    history = dut.run_until_idle(max_ticks=16)
+    history = dut.run_until_idle(max_ticks=dut.timing("nRFMpb") + 16)
 
     assert [item.command for item in history] == ["RFMpb", "RFMab"]
+    assert history[1].clk - history[0].clk >= dut.timing("nRFMpb")
 
 
 def test_gddr7_always_on_rejects_manual_rck_commands():
