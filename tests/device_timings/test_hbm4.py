@@ -27,6 +27,19 @@ def _addr(dut, *, sid, bankgroup, bank, row):
     )
 
 
+def _refresh_addr(dut, command, *, bank):
+    if command in {"REFab", "RFMab"}:
+        return dut.addr_vec(
+            PseudoChannel=0,
+            Sid=dut.ALL,
+            BankGroup=dut.ALL,
+            Bank=dut.ALL,
+            Row=dut.ALL,
+            Column=dut.ALL,
+        )
+    return _addr(dut, sid=0, bankgroup=0, bank=bank, row=0)
+
+
 def _issue_two_acts_then_col(dut, command, a0, a1, *, act_gap_timing):
     """Issue ACT to two banks, then RD on a0 at the earliest cycle both ACTs allow.
 
@@ -85,3 +98,31 @@ def test_hbm4_diff_sid_write_column_spacing_uses_nccds():
     nccd = dut.timings["nCCDS"]
 
     dut.assert_earliest_ready_at("WR", a1, wr_clk + nccd)
+
+
+@pytest.mark.parametrize(
+    "preceding,following,same_bank,timing",
+    [
+        ("REFab", "RFMab", False, "nRFC"),
+        ("REFab", "RFMpb", False, "nRFC"),
+        ("RFMab", "REFab", False, "nRFMab"),
+        ("RFMab", "REFpb", False, "nRFMab"),
+        ("REFpb", "RFMab", False, "nRFCpb"),
+        ("RFMpb", "REFab", False, "nRFMpb"),
+        ("RFMpb", "RFMab", False, "nRFMpb"),
+        ("REFpb", "RFMpb", False, "nRREFD"),
+        ("RFMpb", "REFpb", False, "nRREFD"),
+        ("REFpb", "REFpb", True, "nRFCpb"),
+        ("RFMpb", "REFpb", True, "nRFMpb"),
+        ("RFMpb", "RFMpb", True, "nRFMpb"),
+        ("RFMpb", "RFMpb", False, "nRREFD"),
+    ],
+)
+def test_hbm4_refresh_rfm_command_spacing(preceding, following, same_bank, timing):
+    dut = make_dut()
+    preceding_addr = _refresh_addr(dut, preceding, bank=0)
+    following_addr = _refresh_addr(dut, following, bank=0 if same_bank else 1)
+
+    dut.issue(preceding, preceding_addr, clk=0)
+
+    dut.assert_earliest_ready_at(following, following_addr, dut.timings[timing])
