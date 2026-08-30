@@ -11,17 +11,21 @@ class DDR5_VRR(DDR5):
 
     timing_params = DDR5.timing_params + ["nVRR"]
     timing_constraints = DDR5.timing_constraints + [
-        TimingConstraint(level="Bank", preceding=["VRR"], following=["ACT"], latency="nVRR"),
+        TimingConstraint(level="Bank", preceding=["VRR"], following=["ACT", "VRR"], latency="nVRR"),
         TimingConstraint(level="Bank", preceding=["ACT"], following=["VRR"], latency="nRC"),
         TimingConstraint(level="Rank", preceding=["PREpb", "PREab", "PREsb"], following=["VRR"], latency="nRP"),
     ]
 
+    @classmethod
+    def resolve_secondary_timings(cls, timing_dict, org_dict):
+        super().resolve_secondary_timings(timing_dict, org_dict)
+        timing_dict["nVRR"] = cls._resolve_nVRR(timing_dict["tCK_ps"])
 
-# Inherit all DDR5 presets, adding nVRR timing
+    @staticmethod
+    def _resolve_nVRR(tCK_ps):
+        return math.ceil(280_000 / tCK_ps)  # Ramulator guesstimate
+
+
+# Inherit all DDR5 presets; nVRR is resolved from tCK_ps.
 DDR5_VRR.org_presets = DDR5.org_presets
-DDR5_VRR.timing_presets = {}
-for _name, _timings in DDR5.timing_presets.items():
-    _vrr_timings = dict(_timings)
-    # nVRR ~ 70ns * RH_radius(2) * 2 = 280ns, converted to cycles
-    _vrr_timings["nVRR"] = math.ceil(280_000 / _timings["tCK_ps"])
-    DDR5_VRR.timing_presets[_name] = _vrr_timings
+DDR5_VRR.timing_presets = DDR5.timing_presets
