@@ -61,8 +61,8 @@ def test_lpddr6_payload_transaction_size_is_32_bytes():
     assert dut.org["channel_width"] == 12
     assert dut.timing("nBL_min") == 6
     assert dut.timing("nBL_max") == 12
-    assert dut.timing("nRTW_S") == 41
-    assert dut.timing("nRTW_L") == 47
+    assert dut.timing("nRTW_S") == 48
+    assert dut.timing("nRTW_L") == 54
     assert dut.timing("nRFC") == 1014
 
 
@@ -138,7 +138,7 @@ def test_lpddr6_same_bg_read_to_write_uses_nrtw_l():
 
     dut.assert_commands(["RD_S", "WR_S"], history=history)
     dut.assert_gap(0, 1, dut.timing("nRTW_L"), history=history)
-    assert dut.timing("nRTW_L") == 47
+    assert dut.timing("nRTW_L") == 54
 
 
 def test_lpddr6_same_bg_write_to_read_uses_array_cycle_time():
@@ -173,8 +173,8 @@ def test_lpddr6_long_burst_quantities_match_table_381():
     assert dut.timing("nCCDL_L") == 22
     assert dut.timing("nRTP_L") == 26
     # Read-to-write turnaround, per preceding burst length (JESD209-6 Tables 389-390).
-    assert dut.timing("nRTW_S_L") == 53
-    assert dut.timing("nRTW_L_L") == 59
+    assert dut.timing("nRTW_S_L") == 60
+    assert dut.timing("nRTW_L_L") == 66
 
 
 def test_lpddr6_long_read_to_precharge_uses_nrtp_l():

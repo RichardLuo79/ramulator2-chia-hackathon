@@ -48,16 +48,15 @@ class LPDDR6(DRAMStandard):
         "nRCDr", "nRCDw", "nRP", "nRPab", "nRAS", "nRC",
         "nWTP", "nRTP", "nRTP_L", "nPPD",
         "nCCDS", "nCCDL", "nCCDL_L", "nCCDS_WR", "nCCDL_WR", "nCCDL_WR_L",
-        "nRRD", "nWTRS", "nWTRL", "nRTW_S", "nRTW_L", "nRTW_S_L", "nRTW_L_L",
+        "nRRD",
+        "nWTRS", "nWTRL",
+        "nRTW_S", "nRTW_L", "nRTW_S_L", "nRTW_L_L",
         "nWCK2DQO", "nRPST", "nODTLon", "nODTon_min",
         "nFAW", "nRFC", "nREFI",
         "nWCKPST", "nCAS", "nAAD", "nCS", "tCK_ps",
     ]
 
-    supported_requests = {
-        "Read": "RD_S",
-        "Write": "WR_S",
-    }
+    supported_requests = {"Read": "RD_S", "Write": "WR_S"}
 
     timing_constraints = [
         # Channel — DQ-bus occupancy (JESD209-6 Table 381 BL/n_min).
@@ -104,7 +103,7 @@ class LPDDR6(DRAMStandard):
         TimingConstraint(level="Rank", preceding=["PREpb", "PREab"], following=["PREpb", "PREab"], latency="nPPD"),
 
         # Rank — all-bank refresh timing (JESD209-6 Figure 111 and Tables 300-302, 414).
-        TimingConstraint(level="Rank", preceding=["ACT2"], following=["REFab"], latency="nRC"),
+        TimingConstraint(level="Rank", preceding=["ACT2"], following=["REFab"], latency="nRAS + nRPab"),
         TimingConstraint(level="Rank", preceding=["PREpb"], following=["REFab"], latency="nRP"),
         TimingConstraint(level="Rank", preceding=["PREab"], following=["REFab"], latency="nRPab"),
         TimingConstraint(level="Rank", preceding=["RDA_S"], following=["REFab"], latency="nRP + nRTP"),
@@ -149,83 +148,218 @@ class LPDDR6(DRAMStandard):
 
     @classmethod
     def resolve_secondary_timings(cls, timing_dict, org_dict):
+        rate = timing_dict["rate"]
         tCK_ps = timing_dict["tCK_ps"]
-        cls._resolve_burst_quantities(timing_dict)
-        timing_dict["nACU"] = timing_dict.get("nACU", cls._resolve_nACU(tCK_ps))
-        timing_dict["nRAS"] = timing_dict.get("nRAS", max(math.ceil(20_000 / tCK_ps), 4))
-        timing_dict["nRP"] = timing_dict.get("nRP", timing_dict["nACU"] + max(math.ceil(18_000 / tCK_ps), 4))
-        timing_dict["nRPab"] = timing_dict.get("nRPab", timing_dict["nACU"] + max(math.ceil(21_000 / tCK_ps), 4))
-        timing_dict["nRC"] = timing_dict.get("nRC", timing_dict["nRAS"] + timing_dict["nRPab"])
-        cls._resolve_read_to_write_timings(timing_dict, org_dict)
-        timing_dict["nRFC"] = cls._resolve_nRFC(org_dict["refresh_density_per_2_subchannels"], timing_dict["tCK_ps"])
-        timing_dict["nREFI"] = cls._resolve_nREFI(timing_dict["tCK_ps"])
-
-    @staticmethod
-    def _resolve_nACU(tCK_ps):
-        # JESD209-6 Tables 414-415: nACU = RU(tACU/tCK), tACU = 22 ns.
-        return math.ceil(22_000 / tCK_ps)
-
-    @staticmethod
-    def _resolve_burst_quantities(timing_dict):
-        # JESD209-6 Tables 381-382: BL48 nBL_min includes the 48-UI transfer
-        # plus the mandatory 24-beat segment gap.
-        timing_dict["nBL_min"] = timing_dict.get("nBL_min", 6)
-        timing_dict["nBL_max"] = timing_dict.get("nBL_max", 12)
-        timing_dict["nBL_min_L"] = timing_dict.get("nBL_min_L", 12 + 6)
-        timing_dict["nBL_max_L"] = timing_dict.get("nBL_max_L", 24)
-        timing_dict["nCCDL_L"] = timing_dict.get("nCCDL_L", 12 + timing_dict["nCCDL"])
-        timing_dict["nCCDL_WR_L"] = timing_dict.get("nCCDL_WR_L", 12 + timing_dict["nCCDL_WR"])
-        # JESD209-6 Tables 269-272: nRTP(BL48) = nRTP(BL24) +
-        # (nBL_min_L - nBL_min) for verified MR-table rows. Derived default;
-        # presets should still pin the table value per bin.
-        timing_dict["nRTP_L"] = timing_dict.get(
-            "nRTP_L", timing_dict["nRTP"] + timing_dict["nBL_min_L"] - timing_dict["nBL_min"]
+        timing_dict["nBL_max"] = cls._resolve_nBL_max(rate)
+        timing_dict["nBL_min_L"] = cls._resolve_nBL_min_L(rate)
+        timing_dict["nBL_max_L"] = cls._resolve_nBL_max_L(rate)
+        timing_dict["nCCDL_L"] = cls._resolve_nCCDL_L(
+            rate, timing_dict["nCCDL"]
+        )
+        timing_dict["nCCDL_WR_L"] = cls._resolve_nCCDL_WR_L(
+            rate, timing_dict["nCCDL_WR"]
+        )
+        timing_dict["nACU"] = cls._resolve_nACU(rate)
+        timing_dict["nRAS"] = cls._resolve_nRAS(tCK_ps)
+        timing_dict["nRP"] = cls._resolve_nRP(timing_dict["nACU"], tCK_ps)
+        timing_dict["nRPab"] = cls._resolve_nRPab(timing_dict["nACU"], tCK_ps)
+        timing_dict["nRC"] = cls._resolve_nRC(
+            timing_dict["nRAS"], timing_dict["nRP"]
         )
 
-    @staticmethod
-    def _resolve_read_to_write_timings(timing_dict, org_dict):
-        # Read-to-write turnaround (tRTW), JESD209-6 Tables 389
-        # (same-BG: BL/n_max) and 390 (different-BG: BL/n_min), evaluated per
-        # preceding-burst length.
-        odt_enabled = org_dict.get("odt_enabled", True)
-        n_wck2dqo = timing_dict["nWCK2DQO"]
-        if odt_enabled:
-            common = n_wck2dqo + timing_dict["nRPST"] - timing_dict["nODTLon"] - timing_dict["nODTon_min"] + 1
-        else:
-            common = n_wck2dqo - timing_dict["nWL"]
-
         nRL = timing_dict["nRL"]
-        timing_dict["nRTW_S"] = timing_dict.get("nRTW_S", nRL + timing_dict["nBL_min"] + common)
-        timing_dict["nRTW_L"] = timing_dict.get("nRTW_L", nRL + timing_dict["nBL_max"] + common)
-        timing_dict["nRTW_S_L"] = timing_dict.get("nRTW_S_L", nRL + timing_dict["nBL_min_L"] + common)
-        timing_dict["nRTW_L_L"] = timing_dict.get("nRTW_L_L", nRL + timing_dict["nBL_max_L"] + common)
+        nWCK2DQO = timing_dict["nWCK2DQO"]
+        nRPST = timing_dict["nRPST"]
+        nODTLon = timing_dict["nODTLon"]
+        nODTon_min = timing_dict["nODTon_min"]
+        nWL = timing_dict["nWL"]
+        odt_enabled = org_dict["odt_enabled"]
+        timing_dict["nRTW_S"] = cls._resolve_nRTW_S(
+            timing_dict["nBL_min"],
+            nRL, nWCK2DQO, nRPST, nODTLon, nODTon_min, nWL, odt_enabled,
+        )
+        timing_dict["nRTW_L"] = cls._resolve_nRTW_L(
+            timing_dict["nBL_max"],
+            nRL, nWCK2DQO, nRPST, nODTLon, nODTon_min, nWL, odt_enabled,
+        )
+        timing_dict["nRTW_S_L"] = cls._resolve_nRTW_S_L(
+            timing_dict["nBL_min_L"],
+            nRL, nWCK2DQO, nRPST, nODTLon, nODTon_min, nWL, odt_enabled,
+        )
+        timing_dict["nRTW_L_L"] = cls._resolve_nRTW_L_L(
+            timing_dict["nBL_max_L"],
+            nRL, nWCK2DQO, nRPST, nODTLon, nODTon_min, nWL, odt_enabled,
+        )
+        timing_dict["nRFC"] = cls._resolve_nRFC(
+            org_dict["die_density"], tCK_ps
+        )
+        timing_dict["nREFI"] = cls._resolve_nREFI(tCK_ps)
 
     @staticmethod
-    def _resolve_nRFC(refresh_density_per_2_subchannels, tCK_ps):
-        # JESD209-6 Table 302 defines density per 2 sub-channels.
-        if refresh_density_per_2_subchannels <= 4096:
-            raise ValueError("LPDDR6: JESD209-6 Table 302 tRFCab is TBD for 4Gb per 2 sub-channels")
-        elif refresh_density_per_2_subchannels <= 8192:
-            tRFC_ns = 210
-        elif refresh_density_per_2_subchannels <= 16384:
-            tRFC_ns = 280
-        elif refresh_density_per_2_subchannels <= 32768:
-            tRFC_ns = 380
+    def _lookup_speed_grade(rate, table):
+        # LPDDR6 speed-grade rows use lower-exclusive, upper-inclusive bounds.
+        for (lower_rate, upper_rate), value in table.items():
+            if lower_rate < rate <= upper_rate:
+                return value
+        return -1
+
+    @classmethod
+    def _resolve_nACU(cls, rate):
+        # JESD209-6 Tables 414-415: nACU for each defined speed-grade range.
+        return cls._lookup_speed_grade(rate, {
+            (80, 1067): 6,
+            (1067, 1600): 9,
+            (1600, 2133): 12,
+            (2133, 2750): 16,
+            (2750, 3200): 18,
+            (3200, 3750): 21,
+            (3750, 4267): 24,
+            (4267, 4800): 27,
+            (4800, 5500): 31,
+            (5500, 6400): 36,
+            (6400, 7500): 42,
+            (7500, 8533): 47,
+            (8533, 9600): 53,
+            (9600, 10667): 59,
+        })
+
+    @staticmethod
+    def _resolve_nRAS(tCK_ps):
+        return max(math.ceil(20_000 / tCK_ps), 4)
+
+    @staticmethod
+    def _resolve_nRP(nACU, tCK_ps):
+        if nACU == -1:
+            return -1
+        return nACU + max(math.ceil(18_000 / tCK_ps), 4)
+
+    @staticmethod
+    def _resolve_nRPab(nACU, tCK_ps):
+        if nACU == -1:
+            return -1
+        return nACU + max(math.ceil(21_000 / tCK_ps), 4)
+
+    @staticmethod
+    def _resolve_nRC(nRAS, nRP):
+        if nRAS == -1 or nRP == -1:
+            return -1
+        return nRAS + nRP
+
+    # JESD209-6 Tables 381-382: remaining BL24 and BL48 quantities.
+    @classmethod
+    def _resolve_nBL_max(cls, rate):
+        return cls._lookup_speed_grade(rate, {
+            (80, 3200): 6,
+            (3200, 10667): 12,
+        })
+
+    @classmethod
+    def _resolve_nBL_min_L(cls, rate):
+        return cls._lookup_speed_grade(rate, {
+            (80, 3200): 12,
+            (3200, 10667): 18,
+        })
+
+    @classmethod
+    def _resolve_nBL_max_L(cls, rate):
+        return cls._lookup_speed_grade(rate, {
+            (80, 3200): 12,
+            (3200, 10667): 24,
+        })
+
+    @classmethod
+    def _resolve_nCCDL_L(cls, rate, nCCDL):
+        return cls._lookup_speed_grade(rate, {
+            (80, 3200): 12,
+            (3200, 10667): 12 + nCCDL,
+        })
+
+    @classmethod
+    def _resolve_nCCDL_WR_L(cls, rate, nCCDL_WR):
+        return cls._lookup_speed_grade(rate, {
+            (80, 3200): 12,
+            (3200, 10667): 12 + nCCDL_WR,
+        })
+
+    # JESD209-6 Tables 389-390: read-to-write gaps are rounded to even nCK.
+    @staticmethod
+    def _resolve_nRTW_S(
+        nBL_min, nRL, nWCK2DQO, nRPST, nODTLon, nODTon_min, nWL, odt_enabled
+    ):
+        if odt_enabled is True:
+            value = nRL + nBL_min + nWCK2DQO + nRPST - nODTLon - nODTon_min + 1
+        elif odt_enabled is False:
+            value = nRL + nBL_min + nWCK2DQO - nWL
         else:
-            raise ValueError("LPDDR6: JESD209-6 Table 302 tRFCab is TBD above 32Gb per 2 sub-channels")
+            return -1
+        return value + value % 2
+
+    @staticmethod
+    def _resolve_nRTW_L(
+        nBL_max, nRL, nWCK2DQO, nRPST, nODTLon, nODTon_min, nWL, odt_enabled
+    ):
+        if odt_enabled is True:
+            value = nRL + nBL_max + nWCK2DQO + nRPST - nODTLon - nODTon_min + 1
+        elif odt_enabled is False:
+            value = nRL + nBL_max + nWCK2DQO - nWL
+        else:
+            return -1
+        return value + value % 2
+
+    @staticmethod
+    def _resolve_nRTW_S_L(
+        nBL_min_L, nRL, nWCK2DQO, nRPST, nODTLon, nODTon_min, nWL, odt_enabled
+    ):
+        if odt_enabled is True:
+            value = nRL + nBL_min_L + nWCK2DQO + nRPST - nODTLon - nODTon_min + 1
+        elif odt_enabled is False:
+            value = nRL + nBL_min_L + nWCK2DQO - nWL
+        else:
+            return -1
+        return value + value % 2
+
+    @staticmethod
+    def _resolve_nRTW_L_L(
+        nBL_max_L, nRL, nWCK2DQO, nRPST, nODTLon, nODTon_min, nWL, odt_enabled
+    ):
+        if odt_enabled is True:
+            value = nRL + nBL_max_L + nWCK2DQO + nRPST - nODTLon - nODTon_min + 1
+        elif odt_enabled is False:
+            value = nRL + nBL_max_L + nWCK2DQO - nWL
+        else:
+            return -1
+        return value + value % 2
+
+    @staticmethod
+    def _resolve_nRFC(die_density, tCK_ps):
+        # JESD209-6 Table 302 defines density per 2 sub-channels.
+        tRFC_ns = {
+            4096: None,
+            6144: 210,
+            8192: 210,
+            12288: 280,
+            16384: 280,
+            24576: 380,
+            32768: 380,
+            49152: None,
+            65536: None,
+        }.get(die_density)
+        if tRFC_ns is None:
+            return -1
         return math.ceil(tRFC_ns * 1000 / tCK_ps)
 
     @staticmethod
     def _resolve_nREFI(tCK_ps):
-        # JESD209-6 Table 302: tREFI = 3906 ns.
-        return math.ceil(3_906_000 / tCK_ps)
+        # JESD209-6 Table 302: tREFI = 3906 ns maximum average interval.
+        return 3_906_000 // tCK_ps
 
 
 LPDDR6.org_presets = {
     "LPDDR6_16Gb_x12": {
-        "density": 16384,
-        # JESD209-6 Table 302 density is per 2 sub-channels: 2 * 16Gb = 32Gb.
-        "refresh_density_per_2_subchannels": 32768,
+        # JESD209-6 Tables 2 and 302: one modeled x12 sub-channel is 16 Gb;
+        # the corresponding two-sub-channel die is 32 Gb.
+        "subchannel_density": 16384,
+        "die_density": 32768,
         "dq": 12,
         "channel_width": 12,
         "odt_enabled": True,
@@ -245,33 +379,23 @@ LPDDR6.timing_presets = {
         # nBL_max / nBL_min_L / nBL_max_L / nCCDL_L / nCCDL_WR_L are derived per
         # the selected burst timing in resolve_secondary_timings.
         "nBL_min": 6,
-        "nRL": 56,
-        "nWL": 26,
-        "nRCDr": 48,
-        "nRCDw": 22,
-        "nWTP": 32,
-        "nRTP": 14,
+        "nRL": 56, "nWL": 26,
+        "nRCDr": 48, "nRCDw": 22,
+        "nWTP": 32, "nRTP": 14,
         # JESD209-6 Tables 269-272: nRTP(BL48) column at the RL=56 row.
         "nRTP_L": 26,
         "nPPD": 4,
-        "nCCDS": 6,
-        "nCCDL": 10,
-        "nCCDS_WR": 6,
-        "nCCDL_WR": 10,
-        "nRRD": 10,
-        "nWTRS": 17,
-        "nWTRL": 32,
-        # ODT-on read-to-write model. These values preserve the current 10667
-        # BL24 timing while making the ODT assumption explicit.
+        "nCCDS": 6, "nCCDL": 10, "nCCDS_WR": 6, "nCCDL_WR": 10,
+        "nRRD": 10, "nWTRS": 17, "nWTRL": 32,
+        # JESD209-6 Tables 319-320 and 477: ODT-enabled, high-frequency mode.
         "nWCK2DQO": 5,
-        "nRPST": 0,
-        "nODTLon": 27,
-        "nODTon_min": 0,
+        "nODTLon": 16, "nODTon_min": 4,
         "nFAW": 40,
-        "nWCKPST": 3,
-        "nCAS": 2,
-        "nAAD": 8,
-        "nCS": 2,
+        "nWCKPST": 3, "nCAS": 2,
+        # === Ramulator Guesstimate ===
+        "nRPST": 0,
+        "nAAD": 8, "nCS": 2,
+        # =============================
         "tCK_ps": 375,
     },
 }
