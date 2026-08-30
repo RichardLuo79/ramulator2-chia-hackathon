@@ -223,6 +223,44 @@ def test_hbm34_falling_edge_pre_allowed_when_not_in_pair_window():
     assert rec.clk % 2 == 0
 
 
+def test_hbm3_rfmab_spans_and_resets_every_sid_in_the_selected_pseudochannel():
+    dut = cs.ControllerUnderTest.make_hbm34(
+        _hbm3(),
+        refresh_manager=ramulator.refresh_manager.NoRefresh(),
+        controller_plugins=[
+            ramulator.controller_plugin.RFMManager(rfm_thresh=2, rfm_mode="ab")
+        ],
+    )
+    sid0 = _addr(dut, pc=0, sid=0, bankgroup=0, bank=0, row=0)
+    sid1 = _addr(dut, pc=0, sid=1, bankgroup=0, bank=0, row=0)
+
+    def activate_and_close(address):
+        start = len(dut.history)
+        dut.priority_send("ACT", address)
+        issued = dut.run_until_idle(max_ticks=4096)
+        if not any(item.command == "RFMab" for item in issued):
+            dut.priority_send("PREpb", address)
+            dut.run_until_idle(max_ticks=4096)
+        return dut.history[start:]
+
+    activate_and_close(sid0)
+    activate_and_close(sid1)
+    triggering = activate_and_close(sid1)
+
+    preab = next(item for item in triggering if item.command == "PREab")
+    rfmab = next(item for item in triggering if item.command == "RFMab")
+    pc_level = dut.level_names.index("PseudoChannel")
+    assert preab.addr_vec[pc_level] == 0
+    assert rfmab.addr_vec[pc_level] == 0
+    for level in ("Sid", "BankGroup", "Bank"):
+        level_id = dut.level_names.index(level)
+        assert preab.addr_vec[level_id] == dut.ALL
+        assert rfmab.addr_vec[level_id] == dut.ALL
+
+    activate_and_close(sid0)
+    assert [item.command for item in dut.history].count("RFMab") == 1
+
+
 @pytest.mark.parametrize("dram_factory", [_hbm3, _hbm4])
 @pytest.mark.parametrize("falling_command", ["PREpb", "PREab"])
 @pytest.mark.parametrize("rising_command", ["PREab", "REFab", "RFMab"])

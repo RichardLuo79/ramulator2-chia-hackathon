@@ -35,6 +35,7 @@ class RFMManager : public IControllerPlugin, public Implementation {
 
   int m_rfm_cmd_id = -1;  // resolved at setup based on rfm_mode
   int m_rank_level = -1;
+  int m_all_bank_scope_level = -1;
   int m_bank_level = -1;
   int m_row_level = -1;
   int m_bankgroup_level = -1;
@@ -72,7 +73,14 @@ class RFMManager : public IControllerPlugin, public Implementation {
     }
 
     m_rfm_cmd_id = spec->get_command_id(cmd_name);
-    m_rank_level = spec->get_level_id("Rank");
+    if (spec->has_level("Rank")) {
+      m_rank_level = spec->get_level_id("Rank");
+    }
+    m_all_bank_scope_level =
+        m_rank_level >= 0 ? m_rank_level
+                          : spec->has_level("PseudoChannel")
+                                ? spec->get_level_id("PseudoChannel")
+                                : spec->get_level_id("Channel");
     m_bank_level = spec->get_level_id("Bank");
     m_row_level = spec->get_level_id("Row");
     if (spec->has_level("BankGroup")) {
@@ -94,7 +102,9 @@ class RFMManager : public IControllerPlugin, public Implementation {
     m_bank_ctrs[bank_id]++;
 
     if (m_debug) {
-      std::cout << "Rank     : " << req.addr_vec[m_rank_level] << std::endl;
+      if (m_rank_level >= 0) {
+        std::cout << "Rank     : " << req.addr_vec[m_rank_level] << std::endl;
+      }
       std::cout << "Bank     : " << req.addr_vec[m_bank_level] << std::endl;
       if (m_bankgroup_level >= 0) {
         std::cout << "BankGroup: " << req.addr_vec[m_bankgroup_level] << std::endl;
@@ -112,7 +122,9 @@ class RFMManager : public IControllerPlugin, public Implementation {
       if (m_bankgroup_level >= 0) addr[m_bankgroup_level] = -1;
     }
     if (m_rfm_mode == "ab") {
-      addr[m_bank_level] = -1;
+      for (int level = m_all_bank_scope_level + 1; level <= m_bank_level; level++) {
+        addr[level] = -1;
+      }
     }
     // For sb and pb modes, the bank address remains the one that crossed.
 
