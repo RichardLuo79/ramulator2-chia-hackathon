@@ -115,7 +115,7 @@ def test_gddr6_read_write_turnarounds_respect_direction_and_bankgroup():
 
     t_wr = max(
         t_act1 + read_to_write_dut.timings["nRCDWR"],
-        t_rd + read_to_write_dut.timings["nCL"] + 1,
+        t_rd + read_to_write_dut.timings["nRTW"],
     )
     read_to_write_dut.assert_earliest_ready_at("WR", a1, t_wr)
     read_to_write_dut.issue("WR", a1, t_wr)
@@ -161,6 +161,25 @@ def test_gddr6_activate_window_blocks_fifth_activate():
         dut.issue("ACT", banks[idx], clk=idx * dut.timings["nRRDS"])
 
     dut.assert_earliest_ready_at("ACT", banks[4], dut.timings["nFAW"])
+
+
+def test_gddr6_per_bank_refresh_does_not_consume_the_activate_window():
+    dut = make_dut(
+        nFAW=60,
+        nRRDS=1,
+        nRRDL=1,
+        nRREFD=1,
+        nRFCpb=1,
+    )
+    refresh_banks = [
+        addr(dut, bankgroup=index, bank=0)
+        for index in range(4)
+    ]
+    for clk, address in enumerate(refresh_banks):
+        dut.issue("REFpb", address, clk=clk)
+
+    following = addr(dut, bankgroup=0, bank=1)
+    dut.assert_earliest_ready_at("ACT", following, 4)
 
 
 def test_gddr6_refresh_delays_same_and_different_banks():

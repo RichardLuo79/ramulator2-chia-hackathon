@@ -50,10 +50,12 @@ class GDDR6 : public DRAMSpec {
       nRRDL,
       nWTRS,
       nWTRL,
+      nRTW,
       nFAW,
       nRFCpb,
       nRREFD,
       nREFI,
+      nREFIpb,
       tCK_ps,
       nRFCab,
       nPPD,
@@ -75,9 +77,10 @@ class GDDR6 : public DRAMSpec {
     set_names(levels, level_names, {"Channel", "BankGroup", "Bank", "Row", "Column"});
     set_names(commands, command_names, {"ACT", "PREab", "PREpb", "RD", "WR", "RDA", "WRA", "REFab", "REFpb"});
     set_names(states, state_names, {"Opened", "Closed", "N_A"});
-    set_names(timings, timing_names, {"rate",  "nBL",  "nCL",    "nRCDRD", "nRCDWR", "nRP",    "nRAS",   "nRC",
-                                      "nWR",   "nRTP", "nCWL",   "nCCDS",  "nCCDL",  "nRRDS",  "nRRDL",  "nWTRS",
-                                      "nWTRL", "nFAW", "nRFCpb", "nRREFD", "nREFI",  "tCK_ps", "nRFCab", "nPPD"});
+    set_names(timings, timing_names,
+              {"rate", "nBL",    "nCL",    "nRCDRD", "nRCDWR",  "nRP",    "nRAS",   "nRC",   "nWR",
+               "nRTP", "nCWL",   "nCCDS",  "nCCDL",  "nRRDS",   "nRRDL",  "nWTRS",  "nWTRL", "nRTW",
+               "nFAW", "nRFCpb", "nRREFD", "nREFI",  "nREFIpb", "tCK_ps", "nRFCab", "nPPD"});
 
     // Static spec data
     internal_prefetch_size = 16;

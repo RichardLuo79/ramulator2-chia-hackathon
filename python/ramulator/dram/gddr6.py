@@ -27,10 +27,8 @@ class GDDR6(DRAMStandard):
 
 
     # Commands
-    #TODO: Add REFp2b
     commands = [
-        "ACT",
-        "PREab", "PREpb",
+        "ACT", "PREab", "PREpb",
         "RD", "WR", "RDA", "WRA",
         "REFab", "REFpb",
     ]
@@ -45,42 +43,44 @@ class GDDR6(DRAMStandard):
 
     # Timing Parameters
     timing_params = [
-        "rate", "nBL", "nCL", "nRCDRD", "nRCDWR",
-        "nRP", "nRAS", "nRC", "nWR", "nRTP", "nCWL",
-        "nCCDS", "nCCDL", "nRRDS", "nRRDL",
-        "nWTRS", "nWTRL",
-        "nFAW", "nRFCpb", "nRREFD",
-        "nREFI", # Refresh
+        "rate", "nBL",
+        "nCL", "nRCDRD", "nRCDWR", "nRP", "nRAS", "nRC",
+        "nWR", "nRTP", "nCWL",
+        "nCCDS", "nCCDL",
+        "nRRDS", "nRRDL",
+        "nWTRS", "nWTRL", "nRTW",
+        "nFAW",
+        "nRFCpb", "nRREFD", "nREFI", "nREFIpb",  # Refresh
         "tCK_ps",
         "nRFCab",
-        "nPPD"
+        "nPPD",
     ]
 
 
-    supported_requests = {
-        "Read": "RD",
-        "Write": "WR",
-    }
+    supported_requests = {"Read": "RD", "Write": "WR"}
 
 
     timing_constraints = [
         # Channel
-        # Not needed. See page 90 in JEDEC JESD218. nCCDS and nCCDL are the constraints that enforce the BL timing, not nBL itself.
-        # We keep it here for documentation purposes, but it doesn't actually affect the simulation since the nCCDS and nCCDL constraints are more restrictive.
+        # JESD250C Section 4.3, Figure 9, and Section 6.4 define the burst and
+        # column-command spacing. nCCDS equals nBL for the modeled presets.
         TimingConstraint(level="Channel", preceding=["RD", "RDA"], following=["RD", "RDA"], latency="nBL"),
         TimingConstraint(level="Channel", preceding=["WR", "WRA"], following=["WR", "WRA"], latency="nBL"),
 
         # Channel
         TimingConstraint(level="Channel", preceding=["RD", "RDA"], following=["RD", "RDA"], latency="nCCDS"),
         TimingConstraint(level="Channel", preceding=["WR", "WRA"], following=["WR", "WRA"], latency="nCCDS"),
-        # Per spec, RTW = is nCL + bus turnaround and we assume nTurnaround to be 1 cycle. This parameter can be set individually if needed, but we keep it as a function of nCL for simplicity.
-        TimingConstraint(level="Channel", preceding=["RD", "RDA"], following=["WR", "WRA"], latency="nCL + 1"),
-        TimingConstraint(level="Channel", preceding=["WR", "WRA"], following=["RD", "RDA"], latency="nCWL + nBL + nWTRS"),
-        TimingConstraint(level="Channel", preceding=["RD"], following=["PREab"], latency="nRTP"),
-        TimingConstraint(level="Channel", preceding=["WR"], following=["PREab"], latency="nCWL + nBL + nWR"),
+        TimingConstraint(level="Channel", preceding=["RD", "RDA"], following=["WR", "WRA"], latency="nRTW"),
+        TimingConstraint(
+            level="Channel",
+            preceding=["WR", "WRA"],
+            following=["RD", "RDA"],
+            latency="nCWL + nBL + nWTRS",
+        ),
+        TimingConstraint(level="Channel", preceding=["RD", "RDA"], following=["PREab"], latency="nRTP"),
+        TimingConstraint(level="Channel", preceding=["WR", "WRA"], following=["PREab"], latency="nCWL + nBL + nWR"),
         TimingConstraint(level="Channel", preceding=["ACT"], following=["ACT"], latency="nRRDS"),
         TimingConstraint(level="Channel", preceding=["ACT"], following=["ACT", "REFpb"], latency="nFAW", window=4),
-        TimingConstraint(level="Channel", preceding=["REFpb"], following=["ACT", "REFpb"], latency="nFAW", window=4),
         TimingConstraint(level="Channel", preceding=["ACT"], following=["PREab"], latency="nRAS"),
         TimingConstraint(level="Channel", preceding=["PREab"], following=["ACT"], latency="nRP"),
         TimingConstraint(level="Channel", preceding=["PREab", "PREpb"], following=["PREab", "PREpb"], latency="nPPD"),
@@ -94,13 +94,6 @@ class GDDR6(DRAMStandard):
             "ACT", "PREab", "PREpb", "RD", "WR", "RDA", "WRA", "REFab", "REFpb",
         ], latency="nRFCab"),
 
-        # RAS <-> REFp2b
-        #TimingConstraint(level="Channel", preceding=["ACT"], following=["REFp2b"], latency="nRRDL"),
-        #TimingConstraint(level="Channel", preceding=["PREab"], following=["REFp2b"], latency="nRP"),
-        #TimingConstraint(level="Channel", preceding=["RDA"], following=["REFp2b"], latency="nRP + nRTP"),
-        #TimingConstraint(level="Channel", preceding=["WRA"], following=["REFp2b"], latency="nCWL + nBL + nWR + nRP"),
-        #TimingConstraint(level="Channel", preceding=["REFp2b"], following=["ACT"], latency="nRREFD"),
-
         # RAS <-> REFpb
         TimingConstraint(level="Channel", preceding=["ACT"], following=["REFpb"], latency="nRRDS"),
         TimingConstraint(level="Channel", preceding=["PREab"], following=["REFpb"], latency="nRP"),
@@ -113,7 +106,12 @@ class GDDR6(DRAMStandard):
         # Same Bank Group
         TimingConstraint(level="BankGroup", preceding=["RD", "RDA"], following=["RD", "RDA"], latency="nCCDL"),
         TimingConstraint(level="BankGroup", preceding=["WR", "WRA"], following=["WR", "WRA"], latency="nCCDL"),
-        TimingConstraint(level="BankGroup", preceding=["WR", "WRA"], following=["RD", "RDA"], latency="nCWL + nBL + nWTRL"),
+        TimingConstraint(
+            level="BankGroup",
+            preceding=["WR", "WRA"],
+            following=["RD", "RDA"],
+            latency="nCWL + nBL + nWTRL",
+        ),
         TimingConstraint(level="BankGroup", preceding=["ACT"], following=["ACT", "REFpb"], latency="nRRDL"),
 
         # Bank
@@ -137,30 +135,66 @@ class GDDR6(DRAMStandard):
 
     ]
 
-    # Uses timings from Samsung GDDR6 8 Gb 16 banks datasheet
     @classmethod
     def resolve_secondary_timings(cls, timing_dict, org_dict):
-        tCK = timing_dict["tCK_ps"]
+        tCK_ps = timing_dict["tCK_ps"]
+        device_density = org_dict["device_density"]
+        timing_dict["nRTW"] = cls._resolve_nRTW(
+            timing_dict["nCL"], timing_dict["nBL"], timing_dict["nCWL"]
+        )
+        timing_dict["nRFCpb"] = cls._resolve_nRFCpb(
+            device_density, tCK_ps
+        )
+        timing_dict["nREFI"] = cls._resolve_nREFI(tCK_ps)
+        timing_dict["nREFIpb"] = cls._resolve_nREFIpb(
+            org_dict["bankgroup"], org_dict["bank"], tCK_ps
+        )
+        timing_dict["nRFCab"] = cls._resolve_nRFCab(
+            device_density, tCK_ps
+        )
 
-        derived_rate = round(cls.internal_prefetch_size * 1_000_000 / (timing_dict["nBL"] * tCK))
-        timing_dict.setdefault("rate", derived_rate)
+    @staticmethod
+    def _resolve_nRTW(nCL, nBL, nCWL):
+        # Samsung K4Z80325BC Rev. 1.3 Tables 92 and 93 define tRTW;
+        # JESD250C Table 73 Note 38 leaves only bus turnaround to the system.
+        bus_turnaround = 0  # Ramulator guesstimate
+        return nCL + 2 * nBL - nCWL + 3 + bus_turnaround
 
-        timing_dict["nRRDS"] = timing_dict.get("nRRDS", max(math.ceil(4_000 / tCK), 2))
-        timing_dict["nRRDL"] = timing_dict.get("nRRDL", max(math.ceil(4_000 / tCK), 2))
+    @staticmethod
+    def _resolve_nRFCpb(device_density, tCK_ps):
+        # Samsung K4Z80325BC Rev. 1.3 Tables 92 and 93 (8 Gb device).
+        tRFCpb_ps = {8192: 60_000}.get(device_density)
+        if tRFCpb_ps is None:
+            return -1
+        return math.ceil(tRFCpb_ps / tCK_ps)
 
-        timing_dict["nFAW"] = timing_dict.get("nFAW", max(math.ceil(16_000 / tCK), 8))
+    @staticmethod
+    def _resolve_nREFI(tCK_ps):
+        return math.floor(1_900_000 / tCK_ps)
 
-        timing_dict["nRFCpb"] = timing_dict.get("nRFCpb", math.ceil(60_000 / tCK))
-        timing_dict["nRREFD"] = timing_dict.get("nRREFD", max(math.ceil(16_000 / tCK), 2))
+    @staticmethod
+    def _resolve_nREFIpb(bankgroup, bank, tCK_ps):
+        # JESD250C Section 7.17 and Table 73: REFpb uses tREFI / 16.
+        bank_count = bankgroup * bank
+        if bank_count != 16:
+            return -1
+        return math.floor(1_900_000 / (bank_count * tCK_ps))
 
-        timing_dict["nREFI"] = timing_dict.get("nREFI", math.floor(1_900_000 / tCK))
+    @staticmethod
+    def _resolve_nRFCab(device_density, tCK_ps):
+        # Samsung K4Z80325BC Rev. 1.3 Tables 92 and 93 (8 Gb device).
+        tRFCab_ps = {8192: 120_000}.get(device_density)
+        if tRFCab_ps is None:
+            return -1
+        return math.ceil(tRFCab_ps / tCK_ps)
 
-
-
-
+# JESD250C Table 19 defines two channels per GDDR6 device. One Ramulator
+# GDDR6 instance models one channel; channels_per_device describes the device.
 GDDR6.org_presets = {
     "GDDR6_8Gb_x8": {
-        "density": 8192,
+        "device_density": 8192,
+        "channel_density": 4096,
+        "channels_per_device": 2,
         "dq": 8,
         "channel_width": 16,
         "bankgroup": 4,
@@ -169,7 +203,9 @@ GDDR6.org_presets = {
         "column": 1<<11,
     },
     "GDDR6_8Gb_x16": {
-        "density": 8192,
+        "device_density": 8192,
+        "channel_density": 4096,
+        "channels_per_device": 2,
         "dq": 16,
         "channel_width": 16,
         "bankgroup": 4,
@@ -178,7 +214,9 @@ GDDR6.org_presets = {
         "column": 1<<10,
     },
     "GDDR6_16Gb_x8": {
-        "density": 16384,
+        "device_density": 16384,
+        "channel_density": 8192,
+        "channels_per_device": 2,
         "dq": 8,
         "channel_width": 16,
         "bankgroup": 4,
@@ -187,7 +225,9 @@ GDDR6.org_presets = {
         "column": 1<<11,
     },
     "GDDR6_16Gb_x16": {
-        "density": 16384,
+        "device_density": 16384,
+        "channel_density": 8192,
+        "channels_per_device": 2,
         "dq": 16,
         "channel_width": 16,
         "bankgroup": 4,
@@ -196,7 +236,9 @@ GDDR6.org_presets = {
         "column": 1<<11,
     },
     "GDDR6_32Gb_x8": {
-        "density": 32768,
+        "device_density": 32768,
+        "channel_density": 16384,
+        "channels_per_device": 2,
         "dq": 8,
         "channel_width": 16,
         "bankgroup": 4,
@@ -205,7 +247,9 @@ GDDR6.org_presets = {
         "column": 1<<11,
     },
     "GDDR6_32Gb_x16": {
-        "density": 32768,
+        "device_density": 32768,
+        "channel_density": 16384,
+        "channels_per_device": 2,
         "dq": 16,
         "channel_width": 16,
         "bankgroup": 4,
@@ -215,6 +259,7 @@ GDDR6.org_presets = {
     },
 }
 GDDR6.timing_presets = {
+    # Samsung K4Z80325BC Rev. 1.3, Tables 27, 91, and 92 (8 Gb, DDR WCK).
     "GDDR6_14000_1350mV_double": {
         "rate": 14000, "nBL": 2, "nCL": 24,
         "nRCDRD": 27, "nRCDWR": 16,
@@ -222,49 +267,24 @@ GDDR6.timing_presets = {
         "nWR": 27, "nRTP": 4, "nCWL": 6,
         "nCCDS": 2, "nCCDL": 4,
         "nRRDS": 8, "nRRDL": 8,
-        "nWTRS": 9, "nWTRL": 11,
+        "nWTRS": 10, "nWTRL": 12,
         "nFAW": 29,
-        "nRFCpb": 106,
-        "nRREFD": 15, "nREFI": 3333,
-        "tCK_ps": 570, "nRFCab": 211, "nPPD": 1
+        "nRREFD": 15,
+        "tCK_ps": 572,
+        "nPPD": 1,
     },
-    "GDDR6_14000_1250mV_double": { # Used in Tests
+    # Samsung K4Z80325BC Rev. 1.3, Tables 27, 91, and 93 (8 Gb, DDR WCK).
+    "GDDR6_14000_1250mV_double": {  # Used in Tests
         "rate": 14000, "nBL": 2, "nCL": 24,
         "nRCDRD": 30, "nRCDWR": 20,
         "nRP": 30, "nRAS": 60, "nRC": 90,
         "nWR": 30, "nRTP": 4, "nCWL": 6,
         "nCCDS": 2, "nCCDL": 4,
         "nRRDS": 11, "nRRDL": 11,
-        "nWTRS": 9, "nWTRL": 11,
+        "nWTRS": 10, "nWTRL": 12,
         "nFAW": 43,
-        "nRFCpb": 106,
-        "nRREFD": 22, "nREFI": 3333,
-        "tCK_ps": 570, "nRFCab": 211, "nPPD": 2
-    },
-    "GDDR6_14000_1350mV_quad": {
-        "rate": 14000, "nBL": 2, "nCL": 24,
-        "nRCDRD": 27, "nRCDWR": 16,
-        "nRP": 27, "nRAS": 53, "nRC": 79,
-        "nWR": 27, "nRTP": 4, "nCWL": 6,
-        "nCCDS": 2, "nCCDL": 4,
-        "nRRDS": 8, "nRRDL": 8,
-        "nWTRS": 9, "nWTRL": 11,
-        "nFAW": 29,
-        "nRFCpb": 106,
-        "nRREFD": 15, "nREFI": 3333,
-        "tCK_ps": 570, "nRFCab": 211, "nPPD": 1
-    },
-    "GDDR6_14000_1250mV_quad": {
-        "rate": 14000, "nBL": 2, "nCL": 24,
-        "nRCDRD": 30, "nRCDWR": 20,
-        "nRP": 30, "nRAS": 60, "nRC": 90,
-        "nWR": 30, "nRTP": 4, "nCWL": 6,
-        "nCCDS": 2, "nCCDL": 4,
-        "nRRDS": 11, "nRRDL": 11,
-        "nWTRS": 9, "nWTRL": 11,
-        "nFAW": 43,
-        "nRFCpb": 106,
-        "nRREFD": 22, "nREFI": 3333,
-        "tCK_ps": 570, "nRFCab": 211, "nPPD": 2
+        "nRREFD": 22,
+        "tCK_ps": 572,
+        "nPPD": 2,
     },
 }
