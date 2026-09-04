@@ -35,6 +35,16 @@ class IController {
   // The DRAM spec this controller drives. Lets sub-components (e.g. addr
   // mappers) query spec data without assuming a ControllerBase parent.
   virtual const DRAMSpec* get_spec() const = 0;
+
+  // Tick-elision support. idle_ticks(): number of upcoming ticks guaranteed
+  // to perform no observable action (0 = must be ticked next cycle).
+  // fast_forward(k): advance state by k ticks; requires k <= idle_ticks().
+  // Cycle-level controllers keep the defaults and are ticked every cycle.
+  virtual Clk_t idle_ticks() {
+    return 0;
+  }
+  virtual void fast_forward(Clk_t ticks) {
+  }
 };
 
 struct ReqBuffer {

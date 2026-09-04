@@ -1,6 +1,7 @@
 #ifndef RAMULATOR_BASE_REQUEST_H
 #define RAMULATOR_BASE_REQUEST_H
 
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <utility>
@@ -24,6 +25,14 @@ struct Request {
   int type_id = -1;        // Request type. -1 is the convention for internal maintenance/direct-command requests.
   int source_id = -1;      // Source identifier (e.g., which core)
   int ingress_id = -1;     // External ingress identifier (e.g., gem5 memory port)
+
+  // Stable trace identity. Frontends set frontend_id once for a logical
+  // request and retain it across backpressure retries. frontend_sub_id
+  // distinguishes memory transactions split from that request. The memory
+  // system assigns admission_ordinal on successful controller admission.
+  std::int64_t frontend_id = -1;
+  std::int64_t frontend_sub_id = 0;
+  std::int64_t admission_ordinal = -1;
 
   int size_bytes = -1;     // Request size in bytes. Must be set explicitly by the frontend.
 

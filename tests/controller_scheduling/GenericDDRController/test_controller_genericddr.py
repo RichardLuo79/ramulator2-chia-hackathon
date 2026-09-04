@@ -38,6 +38,19 @@ def test_row_miss_emits_act_then_rd():
     dut.assert_gap(0, 1, dut.timings["nRCD"], history=history)
 
 
+def test_out_of_range_source_id_is_not_used_as_a_per_core_stat_index():
+    dut = make_dut()
+    address = dut.addr_vec(Rank=0, BankGroup=0, Bank=0, Row=0, Column=0)
+
+    dut.send_request("Read", address, source_id=17)
+    history = dut.run_until_idle(max_ticks=128)
+
+    assert any(item.command == "RD" and item.source_id == 17 for item in history)
+    stats = dut.stats()
+    assert stats["read_row_misses"] == 1
+    assert stats["read_row_misses_core_0"] == 0
+
+
 def test_row_hit_follow_up_emits_only_rd():
     dut = make_dut()
     a = dut.addr_vec(Rank=0, BankGroup=0, Bank=0, Row=0, Column=0)

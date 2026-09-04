@@ -1,6 +1,7 @@
 #include "ramulator/controller/controller_base.h"
 
 #include <algorithm>
+#include <cmath>
 #include <stdexcept>
 #include <fmt/format.h>
 
@@ -49,6 +50,20 @@ void ControllerBase::init_base() {
   RAMULATOR_PARSE_PARAM(m_write_buffer_size, int, "write_buffer_size").default_val(32);
   // 1568 = 49 banks (4 BG × 4 banks × ~3 ranks) × 32 entries — large enough for all-bank refresh
   RAMULATOR_PARSE_PARAM(m_priority_buffer_size, int, "priority_buffer_size").default_val(1568);
+
+  if (m_read_buffer_size <= 0 || m_write_buffer_size <= 0 ||
+      m_priority_buffer_size < 0) {
+    throw std::runtime_error(
+        "ControllerBase: read/write buffer sizes must be positive and "
+        "priority buffer size must be non-negative");
+  }
+  if (!std::isfinite(m_wr_low_watermark) ||
+      !std::isfinite(m_wr_high_watermark) ||
+      m_wr_low_watermark < 0.0f || m_wr_high_watermark > 1.0f ||
+      m_wr_low_watermark > m_wr_high_watermark) {
+    throw std::runtime_error(
+        "ControllerBase: watermarks must satisfy 0 <= low <= high <= 1");
+  }
 
   m_read_buffer.max_size = m_read_buffer_size;
   m_write_buffer.max_size = m_write_buffer_size;
@@ -132,6 +147,13 @@ void ControllerBase::setup_base(IFrontEnd* frontend, IMemorySystem* memory_syste
 // ── IController overrides ───────────────────────────────────────────────
 
 bool ControllerBase::send(Request& req) {
+  if (req.type_id != Request::Type::Read &&
+      req.type_id != Request::Type::Write) {
+    throw std::runtime_error(fmt::format(
+        "ControllerBase only supports Read (0) and Write (1) request types, got type_id {}",
+        req.type_id));
+  }
+
   // Address mapping: addr mapper populates addr_vec from intra_channel_addr.
   // PassThroughAddrMapper is a no-op (addr_vec already set by frontend).
   m_addr_mapper->apply(req);
@@ -145,7 +167,8 @@ bool ControllerBase::send(Request& req) {
       // The request will depart at the next cycle
       req.arrive = m_clk;
       req.depart = m_clk + 1;
-      m_pending.push_back(req);
+      m_pending.push(PendingRead{req.depart, m_pending_sequence++, req});
+      notify_departure_scheduled(req);
       s_num_read_reqs++;
       s_num_read_reqs_forwarded++;
       return true;
@@ -157,10 +180,13 @@ bool ControllerBase::send(Request& req) {
   req.arrive = m_clk;
   if (req.type_id == Request::Type::Read) {
     is_success = m_read_buffer.enqueue(req);
-  } else if (req.type_id == Request::Type::Write) {
+  } else {
     // Coalesce: if a write to the same address is already buffered, absorb this one
     // immediately instead of occupying another buffer slot.
     if (m_buffered_write_addrs.count(req.addr)) {
+      Request completed = req;
+      completed.depart = m_clk;
+      notify_departure_scheduled(completed);
       if (req.callback) {
         req.callback(req);
       }
@@ -170,9 +196,6 @@ bool ControllerBase::send(Request& req) {
     }
     is_success = m_write_buffer.enqueue(req);
     if (is_success) m_buffered_write_addrs.insert(req.addr);
-  } else {
-    throw std::runtime_error(fmt::format(
-        "ControllerBase only supports Read (0) and Write (1) request types, got type_id {}", req.type_id));
   }
   if (!is_success) {
     req.arrive = -1;
@@ -230,12 +253,15 @@ void ControllerBase::retire_request(ReqBuffer::iterator& req_it, ReqBuffer& buff
   if (req_it->type_id == Request::Type::Read) {
     // Read: completion with read latency
     req_it->depart = m_clk + m_device.m_spec->read_latency;
-    m_pending.push_back(*req_it);
-    s_num_read_reqs_served++;
+    m_pending.push(PendingRead{req_it->depart, m_pending_sequence++, *req_it});
+    notify_departure_scheduled(*req_it);
   } else if (req_it->type_id == Request::Type::Write) {
     // Write: For now we call the callback here.
     // TODO: We could also do it after a write_latency (e.g., nCWL+nBL)
     // similarily as reads
+    Request completed = *req_it;
+    completed.depart = m_clk;
+    notify_departure_scheduled(completed);
     if (req_it->callback) {
       req_it->callback(*req_it);
     }
@@ -245,6 +271,12 @@ void ControllerBase::retire_request(ReqBuffer::iterator& req_it, ReqBuffer& buff
   }
   // Maintenance/direct-command requests are removed once their terminal command issues.
   buffer.remove(req_it);
+}
+
+void ControllerBase::notify_departure_scheduled(const Request& req) {
+  for (auto* plugin : m_plugins) {
+    plugin->on_request_departure_scheduled(req);
+  }
 }
 
 void ControllerBase::promote_to_active(ReqBuffer::iterator& req_it, ReqBuffer& buffer) {
@@ -349,22 +381,25 @@ void ControllerBase::update_request_stats(ReqBuffer::iterator& req) {
   req->is_stat_updated = true;
 
   if (req->type_id == Request::Type::Read) {
+    const bool has_core_stat =
+        req->source_id >= 0 &&
+        static_cast<size_t>(req->source_id) < s_read_row_hits_per_core.size();
     if (m_device.check_rowbuffer_hit(req->final_command, req->addr_vec, m_clk)) {
       s_read_row_hits++;
       s_row_hits++;
-      if (req->source_id != -1) {
+      if (has_core_stat) {
         s_read_row_hits_per_core[req->source_id]++;
       }
     } else if (m_device.check_node_open(req->final_command, req->addr_vec, m_clk)) {
       s_read_row_conflicts++;
       s_row_conflicts++;
-      if (req->source_id != -1) {
+      if (has_core_stat) {
         s_read_row_conflicts_per_core[req->source_id]++;
       }
     } else {
       s_read_row_misses++;
       s_row_misses++;
-      if (req->source_id != -1) {
+      if (has_core_stat) {
         s_read_row_misses_per_core[req->source_id]++;
       }
     }
@@ -383,20 +418,23 @@ void ControllerBase::update_request_stats(ReqBuffer::iterator& req) {
 }
 
 void ControllerBase::serve_completed_reads() {
-  // Drain all pending requests whose depart time has been reached.
-  // The deque is sorted by depart time (m_clk is monotonic, send() runs
-  // before tick(), and read_latency > 1), so we can stop at the first
-  // request that isn't ready yet.
-  while (m_pending.size()) {
-    auto& req = m_pending.front();
-    if (req.depart > m_clk) {
+  // Drain all requests whose scheduled departure has arrived. Forwarded
+  // reads can be inserted behind ordinary reads while having an earlier
+  // departure, so this must be ordered by (depart, insertion sequence).
+  while (!m_pending.empty()) {
+    if (m_pending.top().depart > m_clk) {
       break;
     }
+    Request req = m_pending.top().req;
+    m_pending.pop();
     s_read_latency += req.depart - req.arrive;
+    // Count reads at their common externally visible completion event.  This
+    // includes write-forwarded reads and excludes terminal RD commands that
+    // remain in flight when a measured epoch ends.
+    s_num_read_reqs_served++;
     if (req.callback) {
       req.callback(req);
     }
-    m_pending.pop_front();
   }
 }
 
@@ -406,7 +444,13 @@ void ControllerBase::set_write_mode() {
       m_is_write_mode = true;
     }
   } else {
-    if ((m_write_buffer.size() < m_wr_low_watermark * m_write_buffer.max_size) && m_read_buffer.size() != 0) {
+    // At low=0 the strict oracle-compatible inequality can never hold, but
+    // an empty write queue is the physical end of the episode. Without the
+    // explicit empty terminal, reads can remain blocked forever.
+    if ((m_write_buffer.size() == 0 ||
+         m_write_buffer.size() <
+             m_wr_low_watermark * m_write_buffer.max_size) &&
+        m_read_buffer.size() != 0) {
       m_is_write_mode = false;
     }
   }

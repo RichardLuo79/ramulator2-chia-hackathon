@@ -13,3 +13,4 @@ from ramulator.param import Param
 class External(Component):
     impl = "External"
     clock_ratio = Param(int, required=True, cpp_type="unsigned int")
+    num_cores = Param(int, default=1)

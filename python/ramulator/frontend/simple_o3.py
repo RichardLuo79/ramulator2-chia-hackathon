@@ -22,4 +22,6 @@ class SimpleO3(Component):
     llc_associativity = Param(int, default=8)
     llc_capacity_per_core = Param(str, default='2MB')
     llc_num_mshr_per_core = Param(int, default=16)
+    crit_trace_path = Param(str, default='')
+    request_trace_path = Param(str, default='')
     translation = Child("translation")

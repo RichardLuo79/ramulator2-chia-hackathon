@@ -10,11 +10,15 @@ class ControllerBase;
 
 // Controller plugin interface — observe and react to the controller's command lifecycle.
 //
-// Three hooks, all with default no-op implementations:
+// Four hooks, all with default no-op implementations:
 //
 //   pre_schedule():           Things that is better to happen in the same tick
 //
 //   on_issue(req):            Be notified about the command issued to DRAM
+//
+//   on_request_departure_scheduled(req):
+//                             Be notified exactly once when an external
+//                             request's completion time becomes final
 //
 //   post_schedule():          Things that happens at the end of memory controller tick
 class IControllerPlugin {
@@ -23,6 +27,8 @@ class IControllerPlugin {
   virtual void pre_schedule() {
   }
   virtual void on_issue(const Request& req) {
+  }
+  virtual void on_request_departure_scheduled(const Request& req) {
   }
   virtual void post_schedule() {
   }

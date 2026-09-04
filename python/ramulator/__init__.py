@@ -62,4 +62,35 @@ class Simulation:
         return self._sim.get_stats_yaml()
 
 
-__all__ = ['dram', 'addr_mapper', 'channel_mapper', 'controller', 'controller_plugin', 'frontend', 'memory_system', 'refresh_manager', 'row_policy', 'scheduler', 'translation', 'gem5', 'Simulation']
+class BatchSim:
+    """Serve a request array through the memory system with no frontend loop.
+
+    Requests are flat addresses with non-decreasing arrival ticks in the
+    controller clock; run() returns per-request depart ticks (-1 for writes).
+    """
+
+    def __init__(self, memory_system):
+        from ramulator._ramulator import BatchSim as _CppBatchSim
+
+        ms_config = (
+            memory_system.to_config() if isinstance(memory_system, Component) else memory_system
+        )
+        config = {
+            "frontend": {"impl": "External", "clock_ratio": 1},
+            "memory_system": ms_config,
+        }
+        self._sim = _CppBatchSim(config)
+
+    def run(self, addrs, types, arrives):
+        return self._sim.run(list(addrs), list(types), list(arrives))
+
+    def finalize(self):
+        """Finalize the batch simulation and flush final outputs."""
+        self._sim.finalize()
+
+    @property
+    def stats(self):
+        return self._sim.get_stats()
+
+
+__all__ = ['dram', 'addr_mapper', 'channel_mapper', 'controller', 'controller_plugin', 'frontend', 'memory_system', 'refresh_manager', 'row_policy', 'scheduler', 'translation', 'gem5', 'Simulation', 'BatchSim']

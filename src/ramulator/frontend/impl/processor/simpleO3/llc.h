@@ -1,9 +1,15 @@
 #ifndef RAMULATOR_FRONTEND_PROCESSOR_SIMPLEO3_LLC_H
 #define RAMULATOR_FRONTEND_PROCESSOR_SIMPLEO3_LLC_H
 
+#include <cstdint>
+#include <fstream>
+#include <functional>
+#include <limits>
 #include <list>
 #include <memory>
+#include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "ramulator/base/debug.h"
@@ -15,6 +21,35 @@ namespace Ramulator {
 
 class SimpleO3LLC {
   friend class SimpleO3;
+  enum class LogicalPath : int {
+    Hit = 0,
+    MSHRMerge = 1,
+    MissOwner = 2,
+  };
+
+  struct LogicalKey {
+    int source_id;
+    std::int64_t frontend_id;
+    std::int64_t frontend_sub_id;
+
+    bool operator==(const LogicalKey& other) const {
+      return source_id == other.source_id && frontend_id == other.frontend_id &&
+             frontend_sub_id == other.frontend_sub_id;
+    }
+  };
+
+  struct LogicalKeyHash {
+    size_t operator()(const LogicalKey& key) const;
+  };
+
+  struct LogicalRequest {
+    Request req;
+    Clk_t arrive;
+    int original_type;
+    std::int64_t admission_ordinal;
+    LogicalPath path;
+  };
+
   struct Line {
     Addr_t addr = -1;
     Addr_t tag = -1;
@@ -30,7 +65,8 @@ class SimpleO3LLC {
   using MSHREntry_t = std::pair<Addr_t, CacheSet_t::iterator>;
   using MSHR_t = std::vector<MSHREntry_t>;
   MSHR_t m_mshrs;
-  std::unordered_map<Addr_t, std::vector<Request>> m_receive_requests;
+  std::unordered_map<Addr_t, std::vector<LogicalRequest>> m_receive_requests;
+  std::unordered_set<LogicalKey, LogicalKeyHash> m_live_logical_ids;
 
   // Request that miss in the LLC with the clock cycle (current cycle + llc latency) that they
   // should be sent to the memory system
@@ -44,7 +80,11 @@ class SimpleO3LLC {
 
   // Request that hit in the LLC with the clock cycle (current cycle + llc latency) that they
   // should be sent back to the core (calls the callback)
-  std::list<std::pair<Clk_t, Request>> m_hit_list;
+  std::list<std::pair<Clk_t, LogicalRequest>> m_hit_list;
+
+  std::ofstream m_request_trace_file;
+  std::function<void(const LogicalRequest&)> m_hit_completion_callback;
+  std::int64_t m_next_logical_admission_ordinal = 0;
 
   IMemorySystem* m_memory_system;
 
@@ -68,16 +108,48 @@ class SimpleO3LLC {
   int s_llc_write_misses = 0;
   int s_llc_eviction = 0;
   int s_llc_mshr_unavailable = 0;
+  std::int64_t s_logical_requests_completed = 0;
+  std::int64_t s_logical_requests_live = 0;
+  std::int64_t s_logical_requests_peak = 0;
+  std::int64_t s_logical_requests_hit = 0;
+  std::int64_t s_logical_requests_mshr_merge = 0;
+  std::int64_t s_logical_requests_miss_owner = 0;
+  std::int64_t s_internal_writebacks_generated = 0;
+  std::int64_t s_internal_writebacks_completed = 0;
+  std::int64_t s_internal_writebacks_live = 0;
 
  public:
   SimpleO3LLC(const Clk_t& clk, int latency, int size_bytes, int linesize_bytes, int associativity, int num_mshrs);
+  SimpleO3LLC(const Clk_t& clk, int latency, int size_bytes, int linesize_bytes, int associativity, int num_mshrs,
+              const std::string& request_trace_path);
   void connect_memory_system(IMemorySystem* memory_system) {
     m_memory_system = memory_system;
   };
 
   void tick();
+
+  // Tick-elision support: earliest cycle at which tick() would do work.
+  // 0 = busy now (a memory-rejected miss is retrying every cycle).
+  Clk_t next_event() const {
+    Clk_t next = std::numeric_limits<Clk_t>::max();
+    for (const auto& e : m_miss_list) {
+      if (e.first <= m_clk) {
+        return 0;
+      }
+      next = std::min(next, e.first);
+    }
+    for (const auto& e : m_hit_list) {
+      if (e.first <= m_clk) {
+        return 0;
+      }
+      next = std::min(next, e.first);
+    }
+    return next;
+  }
   bool send(Request& req);
   void receive(Request& req);
+  bool is_quiescent() const;
+  void finalize();
 
   void serialize(std::string serialization_filename);
   void deserialize(std::string serialization_filename);
@@ -101,6 +173,12 @@ class SimpleO3LLC {
 
   CacheSet_t::iterator check_set_hit(CacheSet_t& set, Addr_t addr);
   MSHR_t::iterator check_mshr_hit(Addr_t addr);
+
+  LogicalKey logical_key(const Request& req) const;
+  void validate_logical_identity(const Request& req) const;
+  LogicalRequest begin_logical_request(const Request& req, int original_type, LogicalPath path);
+  void complete_logical_request(const LogicalRequest& logical, Clk_t depart);
+  std::vector<LogicalRequest> take_receive_requests(Addr_t addr);
 };
 
 }  // namespace Ramulator

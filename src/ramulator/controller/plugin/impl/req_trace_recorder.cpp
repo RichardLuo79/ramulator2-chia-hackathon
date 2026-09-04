@@ -9,12 +9,11 @@
 
 namespace Ramulator {
 
-/// Records one line per completed read/write request at final-command issue.
+/// Records one line per accepted read/write request when its departure is final.
 ///
 /// CSV per channel (path suffixed ".ch0", ".ch1", ...):
-///   arrive, depart, type, source, addr_vec...
-/// depart for reads = issue_clk + read_latency (same formula as
-/// ControllerBase::retire_request); for writes = issue_clk (fire-and-forget).
+///   arrive, depart, type, source, addr, frontend_id, frontend_sub_id,
+///   admission_ordinal, addr_vec...
 ///
 /// Example config (Python):
 ///   ramulator.controller_plugin.ReqTraceRecorder(path="reqs.csv")
@@ -30,22 +29,22 @@ class ReqTraceRecorder : public IControllerPlugin, public Implementation {
     m_ctrl = cast_parent<ControllerBase>();
     const auto& spec = *m_ctrl->get_spec();
     m_level_count = spec.level_count;
-    m_read_latency = spec.read_latency;
 
     m_file.open(fmt::format("{}.ch{}", m_path, m_ctrl->m_channel_id));
-    m_file << "arrive,depart,type,source";
+    m_file << "arrive,depart,type,source,addr,frontend_id,frontend_sub_id,admission_ordinal";
     for (const auto& name : spec.level_names) {
       m_file << "," << name;
     }
     m_file << "\n";
   }
 
-  void on_issue(const Request& req) override {
-    if (req.command != req.final_command || req.type_id < 0) {
+  void on_request_departure_scheduled(const Request& req) override {
+    if (req.type_id < 0) {
       return;
     }
-    Clk_t depart = (req.type_id == Request::Type::Read) ? m_ctrl->m_clk + m_read_latency : m_ctrl->m_clk;
-    m_file << req.arrive << "," << depart << "," << req.type_id << "," << req.source_id;
+    m_file << req.arrive << "," << req.depart << "," << req.type_id << ","
+           << req.source_id << "," << req.addr << "," << req.frontend_id << ","
+           << req.frontend_sub_id << "," << req.admission_ordinal;
     for (int i = 0; i < m_level_count; i++) {
       m_file << "," << req.addr_vec[i];
     }
@@ -62,7 +61,6 @@ class ReqTraceRecorder : public IControllerPlugin, public Implementation {
   ControllerBase* m_ctrl = nullptr;
   std::string m_path;
   int m_level_count = 0;
-  Clk_t m_read_latency = 0;
   std::ofstream m_file;
 };
 

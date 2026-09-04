@@ -56,6 +56,13 @@ class IMemorySystem : public TopLevel<IMemorySystem> {
   virtual bool send(Request& req) = 0;
   virtual void tick() = 0;
 
+  // Tick-elision support (see IController): defaults mean "tick every cycle".
+  virtual Clk_t idle_ticks() {
+    return 0;
+  }
+  virtual void fast_forward(Clk_t ticks) {
+  }
+
   // Returns the clock ratio for the memory system (forwarded from controllers).
   virtual int get_clock_ratio() = 0;
 

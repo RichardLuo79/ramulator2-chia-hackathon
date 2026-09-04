@@ -1,7 +1,9 @@
 #ifndef RAMULATOR_CONTROLLER_CONTROLLER_BASE_H
 #define RAMULATOR_CONTROLLER_CONTROLLER_BASE_H
 
-#include <deque>
+#include <cstdint>
+#include <functional>
+#include <queue>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -65,7 +67,17 @@ class ControllerBase : public IController, public Implementation {
   std::vector<IControllerPlugin*> m_plugins;
 
   // Request buffers
-  std::deque<Request> m_pending;
+  struct PendingRead {
+    Clk_t depart;
+    std::uint64_t sequence;
+    Request req;
+
+    bool operator>(const PendingRead& other) const {
+      return depart != other.depart ? depart > other.depart : sequence > other.sequence;
+    }
+  };
+  std::priority_queue<PendingRead, std::vector<PendingRead>, std::greater<PendingRead>> m_pending;
+  std::uint64_t m_pending_sequence = 0;
   ReqBuffer m_active_buffer;
   ReqBuffer m_priority_buffer;
   ReqBuffer m_read_buffer;
@@ -137,6 +149,10 @@ class ControllerBase : public IController, public Implementation {
 
   // Final command done — move to pending (reads) or remove (writes/maintenance).
   void retire_request(ReqBuffer::iterator& req_it, ReqBuffer& buffer);
+
+  // Notify lifecycle observers exactly once after an external request's
+  // final departure has been determined.
+  void notify_departure_scheduled(const Request& req);
 
   // Opening command done — move request from source buffer to active buffer.
   void promote_to_active(ReqBuffer::iterator& req_it, ReqBuffer& buffer);

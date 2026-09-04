@@ -160,6 +160,33 @@ class LatencyThroughputTrace : public IFrontEnd, public Implementation {
     }
   }
 
+  // Tick-elision: number of upcoming ticks that provably perform no send
+  // attempt or warmup reset. Simulates the pure NOP/probe-flag machine on
+  // shadow state; supported for the random-probe sweep mode only (streaming
+  // modes send every tick).
+  Clk_t idle_ticks(Clk_t max_useful) override {
+    if (m_streaming_only || m_latency_measure_mode != LatencyMeasureMode::RandomProbe) {
+      return 0;
+    }
+    if (m_retry_stream_req || m_retry_probe_req) {
+      return 0;
+    }
+    int curr_nop = m_curr_nop;
+    bool issue_probe = m_issue_probe;
+    Clk_t k = 0;
+    while (k < max_useful && idle_step(m_clk + k + 1, curr_nop, issue_probe)) {
+      k++;
+    }
+    return k;
+  }
+
+  void fast_forward(Clk_t ticks) override {
+    for (Clk_t i = 0; i < ticks; i++) {
+      m_clk++;
+      idle_step(m_clk, m_curr_nop, m_issue_probe);
+    }
+  }
+
   bool is_finished() override {
     if (m_warmup_enabled && !m_warmup_reset_done) {
       return false;
@@ -240,6 +267,36 @@ class LatencyThroughputTrace : public IFrontEnd, public Implementation {
     m_warmup_reset_done = true;
     reset_stats_recursive();
     m_memory_system->reset_stats_recursive();
+  }
+
+  // One tick of the pure tick() control flow with no send attempt: mutates
+  // only (curr_nop, issue_probe). Returns false when the tick at clk_now
+  // would attempt a send or fire the warmup reset — i.e. must run for real.
+  // Mirrors tick()/tick_nop()/tick_probe() exactly.
+  bool idle_step(Clk_t clk_now, int& curr_nop, bool& issue_probe) const {
+    if (m_warmup_enabled && !m_warmup_reset_done && clk_now > m_warmup_cycles) {
+      return false;  // warmup reset fires this tick
+    }
+    if (!issue_probe) {
+      bool is_nop = (m_nop_counter > 1 && curr_nop != 0);
+      curr_nop = (curr_nop + 1) % m_nop_counter;
+      if (is_nop) {
+        issue_probe = true;
+        return true;
+      }
+      return false;  // stream send attempt
+    }
+    if (m_probe_inflight) {
+      issue_probe = false;
+      return true;
+    }
+    bool want_probe =
+        ((!m_warmup_enabled || m_warmup_reset_done) && s_probes_completed < m_latency_sample_count);
+    if (!want_probe) {
+      issue_probe = false;
+      return true;
+    }
+    return false;  // probe send attempt
   }
 
   // Returns true if this tick should be skipped (NOP rate-limiting).

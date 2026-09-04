@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <cstdint>
+#include <limits>
 #include <stdexcept>
 
 #include <fmt/format.h>
@@ -16,6 +19,7 @@ class GenericDRAMSystem final : public IMemorySystem, public Implementation {
  protected:
   IChannelMapper* m_channel_mapper;
   std::vector<IController*> m_controllers;
+  std::vector<std::int64_t> m_next_admission_ordinal;
   unsigned int m_clock_ratio = 1;
   int m_tx_bytes = 0;
 
@@ -33,6 +37,7 @@ class GenericDRAMSystem final : public IMemorySystem, public Implementation {
     if (m_controllers.empty()) {
       throw std::runtime_error("GenericDRAM requires at least one controller");
     }
+    m_next_admission_ordinal.assign(m_controllers.size(), 0);
     for (size_t i = 0; i < m_controllers.size(); i++) {
       dynamic_cast<Implementation*>(m_controllers[i])->set_id(fmt::format("Channel {}", i));
       m_controllers[i]->set_channel_id(static_cast<int>(i));
@@ -62,7 +67,15 @@ class GenericDRAMSystem final : public IMemorySystem, public Implementation {
     // Controller::send() handles address mapping internally.
     m_channel_mapper->apply(req);
     int channel_id = req.addr_vec[0];
+    // Allocate before send so every attempt has a unique candidate. Rejected
+    // attempts leave holes by design; the caller-visible request is reset so
+    // a retry cannot accidentally retain a non-admitted ordinal.
+    req.admission_ordinal = m_next_admission_ordinal[channel_id]++;
     bool is_success = m_controllers[channel_id]->send(req);
+
+    if (!is_success) {
+      req.admission_ordinal = -1;
+    }
 
     if (is_success) {
       switch (req.type_id) {
@@ -84,6 +97,20 @@ class GenericDRAMSystem final : public IMemorySystem, public Implementation {
       controller->tick();
     }
   };
+
+  Clk_t idle_ticks() override {
+    Clk_t idle = std::numeric_limits<Clk_t>::max();
+    for (auto controller : m_controllers) {
+      idle = std::min(idle, controller->idle_ticks());
+    }
+    return idle;
+  }
+
+  void fast_forward(Clk_t ticks) override {
+    for (auto controller : m_controllers) {
+      controller->fast_forward(ticks);
+    }
+  }
 
   void reset_stats() override {
     s_num_read_requests = 0;
