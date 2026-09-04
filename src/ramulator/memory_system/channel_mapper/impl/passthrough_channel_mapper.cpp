@@ -15,6 +15,11 @@ class PassThroughChannelMapper final : public IChannelMapper, public Implementat
   void setup(int num_channels, int tx_offset) override {}
 
   void apply(Request& req) const override {
+    if (req.addr_vec.empty()) {
+      req.addr_vec.resize(1, 0);
+    } else if (req.addr_vec[0] < 0) {
+      req.addr_vec[0] = 0;
+    }
     req.intra_channel_addr = req.addr;
   }
 };

@@ -52,6 +52,7 @@ target_sources(
   plugin/impl/live_trace_streamer.cpp
 
   impl/generic_ddr_controller.cpp
+  impl/atomic_controller.cpp
   impl/fixed_lat_controller.cpp
   impl/md1_controller.cpp
   impl/wmg1_controller.cpp
