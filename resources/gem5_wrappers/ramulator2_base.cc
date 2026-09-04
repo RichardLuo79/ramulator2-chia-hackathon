@@ -1,6 +1,7 @@
 #include "mem/ramulator2/ramulator2_base.hh"
 
 #include <fstream>
+#include <limits>
 
 #include "base/callback.hh"
 #include "base/output.hh"
@@ -19,6 +20,7 @@
 #include "ramulator/base/request.h"
 #include "ramulator/frontend/i_frontend.h"
 #include "ramulator/memory_system/i_memory_system.h"
+#include "mem/ramulator2/ramulator2_identity.hh"
 
 #pragma pop_macro("warn")
 
@@ -36,7 +38,8 @@ Ramulator2Base::Ramulator2Base(const AbstractMemoryParams& p,
     ramulator2_frontend(nullptr), ramulator2_memorysystem(nullptr),
     ramulator2_finalized(false),
     startTick(0),
-    nbrOutstandingReads(0), nbrOutstandingWrites(0),
+    nextAdmissionToken(1),
+    admissionInProgress(false), drainSignalDeferred(false),
     tickEvent([this]{ tick(); }, name())
 {
     for (size_t i = 0; i < num_ports; ++i) {
@@ -157,8 +160,8 @@ Ramulator2Base::sendResponse(PortID port_id)
     if (success) {
         state.responseQueue.pop_front();
 
-        DPRINTF(Ramulator2, "Have %d read, %d write, %d responses outstanding\n",
-                nbrOutstandingReads, nbrOutstandingWrites,
+        DPRINTF(Ramulator2, "Have %zu read, %zu write, %zu responses outstanding\n",
+                outstandingReads.size(), outstandingWrites.size(),
                 state.responseQueue.size());
 
         if (!state.responseQueue.empty() &&
@@ -166,8 +169,7 @@ Ramulator2Base::sendResponse(PortID port_id)
             schedule(state.sendResponseEvent, curTick());
         }
 
-        if (nbrOutstanding() == 0)
-            signalDrainDone();
+        maybeSignalDrainDone();
     } else {
         state.retryResp = true;
 
@@ -180,11 +182,59 @@ Ramulator2Base::sendResponse(PortID port_id)
 unsigned int
 Ramulator2Base::nbrOutstanding() const
 {
-    unsigned int outstanding = nbrOutstandingReads + nbrOutstandingWrites;
+    size_t outstanding = outstandingReads.size() + outstandingWrites.size();
     for (const auto& state : portStates) {
         outstanding += state->responseQueue.size();
     }
-    return outstanding;
+    panic_if(outstanding > std::numeric_limits<unsigned int>::max(),
+             "Ramulator2 outstanding-request count overflow\n");
+    return static_cast<unsigned int>(outstanding);
+}
+
+Ramulator2Base::AdmissionToken
+Ramulator2Base::allocateAdmissionToken()
+{
+    panic_if(nextAdmissionToken ==
+                 std::numeric_limits<AdmissionToken>::max(),
+             "Ramulator2 admission-token space exhausted\n");
+    return nextAdmissionToken++;
+}
+
+void
+Ramulator2Base::beginAdmission()
+{
+    panic_if(admissionInProgress,
+             "Ramulator2 does not support nested request admission\n");
+    admissionInProgress = true;
+}
+
+void
+Ramulator2Base::endAdmission()
+{
+    assert(admissionInProgress);
+    admissionInProgress = false;
+
+    if (drainSignalDeferred) {
+        drainSignalDeferred = false;
+        if (nbrOutstanding() == 0)
+            signalDrainDone();
+    }
+}
+
+void
+Ramulator2Base::maybeSignalDrainDone()
+{
+    if (nbrOutstanding() != 0)
+        return;
+
+    // Atomic/coalesced writes may invoke their completion callback inside
+    // receive_external_requests(). Defer the signal until accessAndRespond()
+    // has either queued a response or installed pendingDelete.
+    if (admissionInProgress) {
+        drainSignalDeferred = true;
+        return;
+    }
+    signalDrainDone();
 }
 
 void
@@ -258,64 +308,97 @@ Ramulator2Base::recvTimingReq(PacketPtr pkt, PortID port_id)
 
     bool enqueue_success = false;
     const int ingress_id = getIngressId(port_id);
+    const bool has_context_id = pkt->req->hasContextId();
+    const auto context_id = has_context_id ? pkt->req->contextId() : 0;
+    const int source_id = ramulator2SourceId(has_context_id, context_id);
+    // Hardware prefetches are eligible only when gem5 propagated the
+    // originating demand instruction sequence through their lineage.
+    const bool has_stable_seq = pkt->req->hasInstSeqNum() &&
+                                !pkt->req->isInstFetch();
+    const auto inst_seq = has_stable_seq ? pkt->req->getReqInstSeqNum() : 0;
+    const bool ramulator_write = !pkt->isRead();
+    const auto identity = ramulator2RequestIdentity(
+        source_id, has_stable_seq, inst_seq, pkt->getAddr(),
+        ramulator_write, pkt->requestorId(),
+        ramulator2_memorysystem->get_tx_bytes());
+
+    beginAdmission();
     if (pkt->isRead())
     {
-        // Generate ramulator READ request and try to send to ramulator's memory system
+        const AdmissionToken token = allocateAdmissionToken();
+        const bool inserted = outstandingReads.emplace(
+            token, OutstandingRead{pkt, port_id}).second;
+        panic_if(!inserted,
+                 "Ramulator2 reused read admission token %llu\n",
+                 static_cast<unsigned long long>(token));
+
+        // Generate a Ramulator READ and bind completion to this exact Packet.
         enqueue_success = ramulator2_frontend->
-            receive_external_requests(0, pkt->getAddr(), 0, ingress_id,
-            [this, port_id](Ramulator::Request& req) {
+            receive_external_requests(0, pkt->getAddr(), identity.sourceId,
+            ingress_id, identity.frontendId, identity.frontendSubId,
+            [this, token](Ramulator::Request& req) {
                 DPRINTF(Ramulator2, "Read to %ld completed.\n", req.addr);
-                auto& pkt_q = outstandingReads.find(req.addr)->second;
-                PacketPtr pkt = pkt_q.front();
-                pkt_q.pop_front();
-                if (!pkt_q.size())
-                    outstandingReads.erase(req.addr);
-
-                --nbrOutstandingReads;
-
-                accessAndRespond(pkt, port_id);
+                auto completion = outstandingReads.find(token);
+                panic_if(completion == outstandingReads.end(),
+                         "Ramulator2 completed unknown read token %llu\n",
+                         static_cast<unsigned long long>(token));
+                const PacketPtr completed_packet = completion->second.packet;
+                const PortID completed_port = completion->second.portId;
+                outstandingReads.erase(completion);
+                accessAndRespond(completed_packet, completed_port);
+                maybeSignalDrainDone();
             },
             pkt->getSize());
 
-        if (enqueue_success)
+        if (!enqueue_success)
         {
-            outstandingReads[pkt->getAddr()].push_back(pkt);
-
-            // we count a transaction as outstanding until it has left the
-            // queue in the controller, and the response has been sent
-            // back, note that this will differ for reads and writes
-            ++nbrOutstandingReads;
-        }
-        else
-        {
+            const size_t erased = outstandingReads.erase(token);
+            panic_if(erased != 1,
+                     "Ramulator2 rejected read token %llu after completion\n",
+                     static_cast<unsigned long long>(token));
             state.retryReq = true;
         }
     } else if (pkt->isWrite()) {
+        // Account before admission because Atomic and coalesced writes may
+        // complete synchronously inside receive_external_requests().
+        const AdmissionToken token = allocateAdmissionToken();
+        const bool inserted = outstandingWrites.insert(token).second;
+        panic_if(!inserted,
+                 "Ramulator2 reused write admission token %llu\n",
+                 static_cast<unsigned long long>(token));
         enqueue_success = ramulator2_frontend->
-            receive_external_requests(1, pkt->getAddr(), 0, ingress_id,
-            [this](Ramulator::Request& req) {
+            receive_external_requests(1, pkt->getAddr(), identity.sourceId,
+            ingress_id, identity.frontendId, identity.frontendSubId,
+            [this, token](Ramulator::Request& req) {
                 DPRINTF(Ramulator2, "Write to %ld completed.\n", req.addr);
-                --nbrOutstandingWrites;
-                if (nbrOutstanding() == 0)
-                    signalDrainDone();
+                const size_t erased = outstandingWrites.erase(token);
+                panic_if(erased != 1,
+                         "Ramulator2 completed unknown write token %llu\n",
+                         static_cast<unsigned long long>(token));
+                maybeSignalDrainDone();
             },
             pkt->getSize());
 
         if (enqueue_success)
         {
             accessAndRespond(pkt, port_id);
-            ++nbrOutstandingWrites;
         }
         else
         {
+            const size_t erased = outstandingWrites.erase(token);
+            panic_if(erased != 1,
+                     "Ramulator2 rejected write token %llu after completion\n",
+                     static_cast<unsigned long long>(token));
             state.retryReq = true;
         }
     } else {
         // keep it simple and just respond if necessary
         accessAndRespond(pkt, port_id);
+        endAdmission();
         return true;
     }
 
+    endAdmission();
     return enqueue_success;
 }
 

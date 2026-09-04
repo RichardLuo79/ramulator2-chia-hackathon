@@ -1,10 +1,12 @@
 #ifndef __MEM_RAMULATOR2_BASE_HH__
 #define __MEM_RAMULATOR2_BASE_HH__
 
+#include <cstdint>
 #include <deque>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "mem/abstract_mem.hh"
@@ -76,10 +78,20 @@ class Ramulator2Base : public AbstractMemory
     bool ramulator2_finalized;
 
     Tick startTick;
-    std::unordered_map<Addr, std::deque<PacketPtr>> outstandingReads;
+    struct OutstandingRead
+    {
+        PacketPtr packet;
+        PortID portId;
+    };
+    using AdmissionToken = std::uint64_t;
 
-    unsigned int nbrOutstandingReads;
-    unsigned int nbrOutstandingWrites;
+    // Exact, bounded completion state: only accepted requests awaiting their
+    // Ramulator callback have entries. The monotonic scalar is not a history.
+    std::unordered_map<AdmissionToken, OutstandingRead> outstandingReads;
+    std::unordered_set<AdmissionToken> outstandingWrites;
+    AdmissionToken nextAdmissionToken;
+    bool admissionInProgress;
+    bool drainSignalDeferred;
 
     Ramulator2Base(const AbstractMemoryParams& p,
                    const std::string& ramulator_config,
@@ -88,6 +100,10 @@ class Ramulator2Base : public AbstractMemory
 
     void initRamulator();
     unsigned int nbrOutstanding() const;
+    AdmissionToken allocateAdmissionToken();
+    void beginAdmission();
+    void endAdmission();
+    void maybeSignalDrainDone();
 
     virtual MemorySystemPort& getMemoryPort(PortID port_id) = 0;
     virtual AddrRange getPortRange(PortID port_id) const = 0;
