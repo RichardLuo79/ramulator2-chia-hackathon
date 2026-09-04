@@ -42,6 +42,11 @@ struct DRAMNode {
   void update_timing(int command, const AddrVec_t& addr_vec, Clk_t clk);
   bool check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk);
 
+  // Earliest clock at which check_timing(command, addr_vec, clk) can pass.
+  // This is a read-only timing probe used by immediate-response models; it
+  // follows the same hierarchy as check_timing without mutating DRAM state.
+  Clk_t earliest_ready(int command, const AddrVec_t& addr_vec) const;
+
   // Generic level traversal — visit all descendants at target_level
   template <typename Func>
   void for_each_at_level(int target_level, Func&& fn) {

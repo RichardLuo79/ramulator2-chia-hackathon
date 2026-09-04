@@ -5,6 +5,7 @@ target_sources(
   i_translation.h
 
   impl/no_translation.cpp
+  impl/random_translation.cpp
 )
 
 target_link_libraries(

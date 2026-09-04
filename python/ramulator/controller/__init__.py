@@ -5,12 +5,16 @@
 # Regenerate:   python -m ramulator codegen
 ###############################################################################
 from .block_hammer import BlockHammer
+from .fixed_lat import FixedLat
 from .gddr7 import GDDR7
 from .generic_ddr import GenericDDR
 from .hbm12 import HBM12
 from .hbm34 import HBM34
 from .lpddr5 import LPDDR5
 from .lpddr6 import LPDDR6
+from .md1 import MD1
+from .mess import Mess
 from .prac import PRAC
+from .wmg1 import WMG1
 
-__all__ = ['BlockHammer', 'GDDR7', 'GenericDDR', 'HBM12', 'HBM34', 'LPDDR5', 'LPDDR6', 'PRAC']
+__all__ = ['BlockHammer', 'FixedLat', 'GDDR7', 'GenericDDR', 'HBM12', 'HBM34', 'LPDDR5', 'LPDDR6', 'MD1', 'Mess', 'PRAC', 'WMG1']

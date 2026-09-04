@@ -8,6 +8,7 @@ target_sources(
   impl/memory_trace/loadstore_trace.cpp
   impl/memory_trace/readwrite_trace.cpp
   impl/memory_trace/latency_throughput_trace.cpp
+  impl/memory_trace/synthetic_pattern.cpp
 
   impl/processor/simpleO3/simpleO3.cpp
   impl/processor/simpleO3/core.h      impl/processor/simpleO3/core.cpp

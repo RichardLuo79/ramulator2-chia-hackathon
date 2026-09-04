@@ -116,6 +116,24 @@ void DRAMNode::update_timing(int command, const AddrVec_t& addr_vec, Clk_t clk) 
   }
 }
 
+Clk_t DRAMNode::earliest_ready(int command, const AddrVec_t& addr_vec) const {
+  Clk_t ready = m_cmd_ready_clk[command];
+
+  if (m_child_nodes.empty()) {
+    return ready;
+  }
+
+  const int child_id = addr_vec[m_level + 1];
+  if (child_id == -1) {
+    for (const auto& child : m_child_nodes) {
+      ready = std::max(ready, child->earliest_ready(command, addr_vec));
+    }
+  } else {
+    ready = std::max(ready, m_child_nodes[child_id]->earliest_ready(command, addr_vec));
+  }
+  return ready;
+}
+
 bool DRAMNode::check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk) {
   if (m_cmd_ready_clk[command] != -1 && clk < m_cmd_ready_clk[command]) {
     return false;

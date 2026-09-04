@@ -5,5 +5,6 @@
 # Regenerate:   python -m ramulator codegen
 ###############################################################################
 from .no_translation import NoTranslation
+from .random_translation import RandomTranslation
 
-__all__ = ['NoTranslation']
+__all__ = ['NoTranslation', 'RandomTranslation']

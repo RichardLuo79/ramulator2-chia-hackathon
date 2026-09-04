@@ -52,6 +52,10 @@ target_sources(
   plugin/impl/live_trace_streamer.cpp
 
   impl/generic_ddr_controller.cpp
+  impl/fixed_lat_controller.cpp
+  impl/md1_controller.cpp
+  impl/wmg1_controller.cpp
+  impl/mess_controller.cpp
   impl/lpddr_controller_base.h
   impl/lpddr_controller_base.cpp
   impl/lpddr5_controller.cpp

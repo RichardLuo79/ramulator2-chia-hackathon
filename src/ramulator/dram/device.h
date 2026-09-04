@@ -38,6 +38,11 @@ class DRAMDevice {
   // Timing-only check — hierarchical (walks node tree)
   bool check_timing(int command, const AddrVec_t& addr_vec, Clk_t clk);
 
+  // Read-only counterpart to check_timing used by analytical controllers.
+  Clk_t earliest_ready(int command, const AddrVec_t& addr_vec) const {
+    return m_root->earliest_ready(command, addr_vec);
+  }
+
   // Prerequisite check — flat bank dispatch
   int get_preq_command(int command, const AddrVec_t& addr_vec, Clk_t clk);
 
