@@ -1,0 +1,13 @@
+split,model,n_workloads,cycle_macro_mae_pct,cycle_worst_core_abs_pct,wall_s,oracle_wall_s,speedup_vs_oracle,request_macro_mae_over_L,request_macro_abs_signed_drift_over_L,request_worst_paired_p99_over_L,request_most_negative_over_L,request_most_positive_over_L,request_coverage
+training,seed,2,68.1471,68.4904,4.492,18.707,4.164,0.62909,0.62907,3.85,-7.54787,0.25775,exact_bidirectional_stable_id
+training,fixedlat,2,45.9576,51.6286,6.018,18.707,3.109,0.41762,0.3171,2.5124,-6.63877,1.69854,exact_bidirectional_stable_id
+training,md1,2,51.7233,58.6299,4.849,18.707,3.858,0.44683,0.42094,3.4962,-7.39571,0.72913,exact_bidirectional_stable_id
+training,wmg1,2,48.8042,58.464,5.476,18.707,3.416,0.44197,0.37036,2.9618,-7.17986,2.48461,exact_bidirectional_stable_id
+training,mess,2,16.2011,19.1296,5.134,18.707,3.644,0.31261,0.0179,2.8391,-6.65039,1.25159,exact_bidirectional_stable_id
+training,pro,2,34.54,46.5816,5.282,18.707,3.541,0.45601,0.19789,2.2364,-6.06873,2.64947,exact_bidirectional_stable_id
+test,seed,4,57.5687,65.4992,3.691,13.917,3.771,0.55802,0.55802,7.0965,-11.58899,0.34479,exact_bidirectional_stable_id
+test,fixedlat,4,49.5404,58.9715,2.98,13.917,4.67,0.48042,0.44595,5.7348,-11.47837,2.03106,exact_bidirectional_stable_id
+test,md1,4,53.6997,61.6059,2.978,13.917,4.674,0.51149,0.49684,6.3764,-11.56687,0.89384,exact_bidirectional_stable_id
+test,wmg1,4,53.4973,61.6013,3.034,13.917,4.587,0.51297,0.49016,6.1186,-11.56687,5.06216,exact_bidirectional_stable_id
+test,mess,4,9.1322,18.7321,2.936,13.917,4.741,0.36997,0.09931,5.8764,-10.40753,1.31864,exact_bidirectional_stable_id
+test,pro,4,36.0566,49.5959,3.72,13.917,3.741,0.41766,0.2752,5.5445,-11.36332,3.8276,exact_bidirectional_stable_id

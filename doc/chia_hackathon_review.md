@@ -3,6 +3,11 @@
 Updated 2026-09-05. This document is the concise review entry point for the
 private hackathon repository. It contains no setup-conversation transcript.
 
+Latest update: the [extended search attempts](chia_extended_trials_20260905.md)
+were configured for 25 designs and USD 100 per model, but provider connection
+failures stopped Pro after six evaluated designs and Flash after four. Their
+frozen results are audited; they are not completed 25-design experiments.
+
 ## Research objective
 
 Synthesize a fast, generic immediate-response DRAM controller through an
@@ -32,7 +37,7 @@ hold 64 requests; write-drain low/high watermarks are 0.5/0.8. These settings
 are supplied as configuration rather than embedded in candidate models.
 
 Training families are mcf and lbm. Final testing uses milc, soplex, GemsFDTD,
-and fotonik3d, after both backend selections are frozen. Each run issues
+and fotonik3d, after the corresponding run's selection is frozen. Each run issues
 20 million instructions/core from cold initialization and drains outstanding
 work completely. There is no separate unscored warmup. Inputs must not wrap;
 hashes and family identities are checked across the split. The meta-reviewers
@@ -275,18 +280,36 @@ HIGH is a relative dynamic effort setting, not equal reasoning-token use.
 
 ## Extended search trials
 
-The next experiment runs Gemini 3.1 Pro Preview and Gemini 3.8 Flash
-independently from the clean seed, each for at most 25 evaluated designs and
-USD 100 of conservative budget accounting. Each run receives six CPU slots;
-combined evaluation parallelism is at most 12. The full 20M-instruction ROI,
+The extended attempts ran Gemini 3.1 Pro Preview and Gemini 3.8 Flash
+independently from the clean seed, each configured for at most 25 evaluated
+designs and USD 100 of conservative budget accounting. Each received six CPU
+slots; combined evaluation parallelism was at most 12. The full 20M-instruction ROI,
 HIGH thinking, 65,536 output-token ceiling, comparison models, training split,
 atomicity checks, and Pareto promotion rule are unchanged. The v6 runner pins
 these configurable limits per run; a new invocation cannot alter an existing
 budget or silently resume a paid run.
 
-Earlier designs, results, and test feedback are not supplied to either agent.
-Training trajectories will show whether iterations beyond five improve the
-incumbent. Final testing occurs only after each run freezes its selection.
-These are fresh stochastic trials, not continuations of test-exposed models;
-one trial per backend cannot establish a general model-capability ranking.
-No extended-trial results are claimed until execution and audit complete.
+Neither agent received earlier designs, other runs' results, or test feedback.
+Provider connection failures stopped Pro during iteration seven and Flash during
+iteration five. Both incumbents were frozen before final testing; all artifact
+and measurement audits passed. Neither spending nor output truncation caused
+the stops. The requested 25-design comparison remains incomplete.
+
+| Run | Evaluated designs | Selected design | Test core MAE (%) | Test request MAE/L |
+| --- | ---: | --- | ---: | ---: |
+| Gemini 3.1 Pro Preview | 6 | pro_001 | 36.06 | 0.4177 |
+| Gemini 3.8 Flash | 4 | flash_004 | 13.73 | 0.3201 |
+
+Flash improves both test averages over Pro and the seed/FixedLat/MD1/WMG1
+comparators. Against oracle-calibrated MESS, it has lower request error but
+higher core-cycle error. These are unequal-length stochastic search prefixes,
+not evidence that more iterations caused the difference or a general backend
+ranking. See the [extended report](chia_extended_trials_20260905.md) for
+accounting, workload breakdowns, source descriptions, plots, and limitations.
+
+The post-run v7 change adds one budget-accounted retry for transient transport
+failures, retaining unknown usage and checking STOP before every attempt.
+It passes 79 targeted tests, including mocked transport and budget failures;
+it has not been validated by another paid run. Original execution snapshots,
+sources, scores, and ledgers are unchanged. Test-exposed runs cannot be resumed
+for optimization; any authorized restart must be fresh and carry prior charges.

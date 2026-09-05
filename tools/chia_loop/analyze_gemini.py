@@ -103,6 +103,8 @@ def main():
     fig.legend(handles, labels, loc="outside lower center", ncol=7, frameon=False)
     fig.savefig(out / "per_workload.png"); fig.savefig(out / "per_workload.svg"); plt.close(fig)
 
+    observed_iterations = max((h["iteration"] for state in manifest["arms"].values()
+                               for h in state["history"]), default=0)
     fig, axes = plt.subplots(1, 2, figsize=(11, 4), constrained_layout=True)
     for arm in manifest["models"]:
         state = manifest["arms"][arm]
@@ -116,12 +118,15 @@ def main():
                 else:
                     ax.scatter(attempt["iteration"], y[-1], color=COLORS[arm], marker="x", s=60)
             ax.step(x,y, where="post", color=COLORS[arm], label=NAMES[arm])
-            ax.set_xticks(range(maximum_iterations + 1)); ax.set_xlabel(
+            tick_step = 1 if observed_iterations <= 10 else 5
+            ticks = sorted({0, observed_iterations, *range(0, observed_iterations + 1, tick_step)})
+            ax.set_xticks(ticks); ax.set_xlim(-.25, max(1, observed_iterations) + .35); ax.set_xlabel(
                 "Design iteration (0 = seed)" if repaired_protocol else "Proposal attempt (0 = unmodified seed)")
             ax.grid(alpha=.2); ax.set_ylim(bottom=0)
     axes[0].set_ylabel("Training core-cycle MAE (%)"); axes[1].set_ylabel("Training request MAE / L")
     axes[0].legend(frameon=False)
-    fig.suptitle("Incumbent trajectory · circles = valid trials; crosses = rejected attempts")
+    fig.suptitle(f"Incumbent trajectory · circles = evaluated; crosses = unscored stops\n"
+                 f"Observed prefix only · configured ceiling: {maximum_iterations} evaluated designs", fontsize=12)
     fig.savefig(out / "evolution.png"); fig.savefig(out / "evolution.svg"); plt.close(fig)
 
     text = ["# Gemini CHIA results", "", "Independent run IDs: " +

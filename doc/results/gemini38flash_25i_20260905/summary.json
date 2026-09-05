@@ -1,0 +1,230 @@
+{
+  "artifact_sha256": {
+    "evolution.svg": "f1c686cf1247f44bbf07a8d614caa386eade30da31fac6a182305ae2722f4bd5",
+    "headline.csv": "9d8eaa98925e19c91369aca041054367e8432aadb9aad1e7e15245d8dc2346ce",
+    "headline.svg": "5c46c00b884da3f7ba10ceb942da199cc141af2d8c5f964d86291862ba8e9845",
+    "per_workload.csv": "682d593b060d4fbf967a2bfe4c2c0d73b13a739827a64cea10517ec0e28e87d3",
+    "per_workload.svg": "a9924b8acf472fd4227d645f547b3d2dd7f04feb0150a79cab6931b0fa680f86",
+    "selected.cpp": "a787e59c8c704e7b608cacb4d16e377bdcfb851620c54e87f94086cb9f577d48"
+  },
+  "backend": "flash",
+  "budget": {
+    "api_attempts": 116,
+    "cap_charge_usd": 16.5561786,
+    "carryover_api_attempts": 0,
+    "carryover_cap_charge_usd": 0,
+    "carryover_estimated_standard_usd": 0,
+    "estimated_standard_usd": 6.32420925,
+    "output_tokens_including_thinking": 264734,
+    "prompt_tokens": 7108609,
+    "thinking_tokens": 225295,
+    "unknown_usage_calls": 1
+  },
+  "cache_adjusted_estimate_current_calls_usd": 2.2692992999999984,
+  "evaluated_designs": 4,
+  "evaluation_protocol_sha256": "a237a8d8171bb76f6257ac68455fd668d777c2204a4c1d504332a78834b4dd2a",
+  "final_test": [
+    "433.milc",
+    "450.soplex",
+    "459.GemsFDTD",
+    "549.fotonik3d"
+  ],
+  "frozen_at": 1788615270.2073889,
+  "generation_finish_reasons": {
+    "MALFORMED_FUNCTION_CALL": 6,
+    "NO_RESPONSE": 1,
+    "STOP": 109
+  },
+  "instructions_per_core": 20000000,
+  "integrity": {
+    "scope": "This model's results; shared-store counts are not per-run sample counts.",
+    "source_sha256_verified_on_export": true,
+    "status": "pass",
+    "test_after_selection_freeze": true
+  },
+  "model": "gemini-3.8-flash",
+  "policy": {
+    "accuracy_tail_or_speed_rejection_threshold": null,
+    "api_attempts_per_proposal": 60,
+    "compiler_cpu_seconds": 180,
+    "consecutive_truncation_stop": 2,
+    "context_policy": "count input tokens before dispatch; retain conversation/signatures; no silent truncation",
+    "cpu_budget": 6,
+    "diagnostic_calls_per_proposal": 192,
+    "drafts_per_iteration": 12,
+    "finalization_turn_reserve": 2,
+    "iteration_unit": "successfully evaluated design; draft repairs stay inside the iteration",
+    "live_completion_preflight": "first counted proposal in this run; no extra paid preflight attempts",
+    "maximum_context_utf8_bytes": 8000000,
+    "maximum_input_tokens": 900000,
+    "maximum_iterations": 25,
+    "maximum_output_tokens": 65536,
+    "model_turns_per_proposal": 48,
+    "operator_stop_file": "STOP: settle an in-flight call, then stop before another generation/evaluation",
+    "parent_selection": "round_robin_sorted_nondominated_archive",
+    "process_memory_bytes": 4294967296,
+    "promotion": "strict two-objective Pareto dominance of incumbent",
+    "provider_timeout_seconds": 1800,
+    "reviewer": "orchestrating coding agent; compliance only; no human modeling hints",
+    "simulator_cpu_seconds": 600,
+    "simulator_file_bytes": 8589934592,
+    "temperature": 1.0,
+    "thinking_level": "HIGH",
+    "tool_protocol": "JSON inspections and region-body submissions with build/review/runtime repair feedback",
+    "transient_retries_per_turn": 1,
+    "usd_cap": 100.0,
+    "validity": [
+      "protected lifecycle unchanged",
+      "static source boundary",
+      "semantic compliance review",
+      "bounded causal state",
+      "successful O3 build and drained simulation",
+      "finite errors",
+      "exact bidirectional stable ID coverage",
+      "committed callback latency audit"
+    ],
+    "version": "gemini_individual_run_v6"
+  },
+  "promotions": 2,
+  "provenance": {
+    "exporter_sha256": "2f16279e1421e451e6c27d4a2a1c9698fa0ea6e9a9193fb1443928be243345f6",
+    "historical_shared_execution": null,
+    "integrity_audit_sha256": "a6b2a8194aa46125616757e53b7c76495c2bff4aed844deb4f25c88aa9564a9b",
+    "raw_records_rewritten": false,
+    "run_manifest_sha256": "793a5dac3bbc94734a965ff53cf4c1b4d4156c5fd9bbe9737061264759a4915a",
+    "test_access": "after_this_run_selection_frozen"
+  },
+  "record_type": "optimization_run_summary",
+  "run_id": "gemini38flash_25i_20260905",
+  "schema_version": 2,
+  "seed_sha256": "a81de012155850724b2970b092259afbbd9f518a36fe805f202516ceda1b636a",
+  "selected_id": "flash_004",
+  "source_file": "selected.cpp",
+  "source_sha256": "a787e59c8c704e7b608cacb4d16e377bdcfb851620c54e87f94086cb9f577d48",
+  "status": "completed",
+  "submitted_drafts": 6,
+  "test_metrics": {
+    "cycle_macro_mae_pct": 13.7283,
+    "cycle_worst_core_abs_pct": 26.508,
+    "n_workloads": 4,
+    "oracle_wall_s": 13.406,
+    "request_coverage": "exact_bidirectional_stable_id",
+    "request_macro_abs_signed_drift_over_L": 0.19631,
+    "request_macro_mae_over_L": 0.32014,
+    "request_most_negative_over_L": -10.7748,
+    "request_most_positive_over_L": 5.22589,
+    "request_worst_paired_p99_over_L": 6.1153,
+    "speedup_vs_oracle": 3.668,
+    "wall_s": 3.654
+  },
+  "training": [
+    "429.mcf",
+    "519.lbm"
+  ],
+  "training_metrics": {
+    "cycle_macro_mae_pct": 12.3659,
+    "cycle_worst_core_abs_pct": 14.6907,
+    "n_workloads": 2,
+    "oracle_wall_s": 17.636,
+    "request_coverage": "exact_bidirectional_stable_id",
+    "request_macro_abs_signed_drift_over_L": 0.19274,
+    "request_macro_mae_over_L": 0.32534,
+    "request_most_negative_over_L": -6.93368,
+    "request_most_positive_over_L": 4.28885,
+    "request_worst_paired_p99_over_L": 3.0184,
+    "speedup_vs_oracle": 3.255,
+    "wall_s": 5.418
+  },
+  "trajectory": [
+    {
+      "id": "flash_001",
+      "iteration": 1,
+      "metrics": {
+        "cycle_macro_mae_pct": 37.9283,
+        "cycle_worst_core_abs_pct": 56.7942,
+        "n_workloads": 2,
+        "oracle_wall_s": 17.636,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.38834,
+        "request_macro_mae_over_L": 0.56804,
+        "request_most_negative_over_L": -6.89677,
+        "request_most_positive_over_L": 34.50154,
+        "request_worst_paired_p99_over_L": 3.5775,
+        "speedup_vs_oracle": 2.987,
+        "wall_s": 5.904
+      },
+      "parent": "seed",
+      "promoted": true,
+      "status": "valid"
+    },
+    {
+      "id": "flash_002",
+      "iteration": 2,
+      "metrics": {
+        "cycle_macro_mae_pct": 259.7314,
+        "cycle_worst_core_abs_pct": 282.7186,
+        "n_workloads": 2,
+        "oracle_wall_s": 17.636,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 3.72027,
+        "request_macro_mae_over_L": 3.73002,
+        "request_most_negative_over_L": -4.11005,
+        "request_most_positive_over_L": 26.37687,
+        "request_worst_paired_p99_over_L": 21.0052,
+        "speedup_vs_oracle": 1.691,
+        "wall_s": 10.432
+      },
+      "parent": "flash_001",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "flash_003",
+      "iteration": 3,
+      "metrics": {
+        "cycle_macro_mae_pct": 17.3938,
+        "cycle_worst_core_abs_pct": 22.7304,
+        "n_workloads": 2,
+        "oracle_wall_s": 17.636,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.47371,
+        "request_macro_mae_over_L": 0.60703,
+        "request_most_negative_over_L": -5.37162,
+        "request_most_positive_over_L": 5.57063,
+        "request_worst_paired_p99_over_L": 2.9328,
+        "speedup_vs_oracle": 2.77,
+        "wall_s": 6.366
+      },
+      "parent": "flash_001",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "flash_004",
+      "iteration": 4,
+      "metrics": {
+        "cycle_macro_mae_pct": 12.3659,
+        "cycle_worst_core_abs_pct": 14.6907,
+        "n_workloads": 2,
+        "oracle_wall_s": 17.636,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.19274,
+        "request_macro_mae_over_L": 0.32534,
+        "request_most_negative_over_L": -6.93368,
+        "request_most_positive_over_L": 4.28885,
+        "request_worst_paired_p99_over_L": 3.0184,
+        "speedup_vs_oracle": 3.255,
+        "wall_s": 5.418
+      },
+      "parent": "flash_003",
+      "promoted": true,
+      "status": "valid"
+    },
+    {
+      "id": "flash_005",
+      "iteration": 5,
+      "parent": "flash_004",
+      "status": "stopped"
+    }
+  ]
+}

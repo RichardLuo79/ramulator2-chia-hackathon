@@ -1,0 +1,5 @@
+run_id,model,split,cycle_macro_mae_pct,cycle_worst_core_abs_pct,n_workloads,oracle_wall_s,request_coverage,request_macro_abs_signed_drift_over_L,request_macro_mae_over_L,request_most_negative_over_L,request_most_positive_over_L,request_worst_paired_p99_over_L,speedup_vs_oracle,wall_s
+gemini31pro_25i_20260905,gemini-3.1-pro-preview,training,34.54,46.5816,2,18.707,exact_bidirectional_stable_id,0.19789,0.45601,-6.06873,2.64947,2.2364,3.541,5.282
+gemini31pro_25i_20260905,gemini-3.1-pro-preview,test,36.0566,49.5959,4,13.917,exact_bidirectional_stable_id,0.2752,0.41766,-11.36332,3.8276,5.5445,3.741,3.72
+gemini38flash_25i_20260905,gemini-3.8-flash,training,12.3659,14.6907,2,17.636,exact_bidirectional_stable_id,0.19274,0.32534,-6.93368,4.28885,3.0184,3.255,5.418
+gemini38flash_25i_20260905,gemini-3.8-flash,test,13.7283,26.508,4,13.406,exact_bidirectional_stable_id,0.19631,0.32014,-10.7748,5.22589,6.1153,3.668,3.654

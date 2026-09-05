@@ -1,0 +1,24 @@
+{
+  "artifact_sha256": {
+    "headline.csv": "2367bcb44289fd880d6fbf247004a0139a5f1e5c4d7287eb92c86a750a2dda43"
+  },
+  "comparison_id": "gemini_extended_20260905",
+  "experimental_unit": "one independent optimization run; no pooled budget or lineage",
+  "matched_setup_verified": true,
+  "record_type": "run_comparison",
+  "runs": [
+    {
+      "model": "gemini-3.1-pro-preview",
+      "run_id": "gemini31pro_25i_20260905",
+      "summary": "../gemini31pro_25i_20260905/summary.json",
+      "summary_sha256": "c9c32f91ac5bd8d2daa9cc0cd5017e96a9e5a2cd1dab03ae64c37f183f3252d0"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "run_id": "gemini38flash_25i_20260905",
+      "summary": "../gemini38flash_25i_20260905/summary.json",
+      "summary_sha256": "9eb6514911e0ea6414eac88be423922bf337b650b5c5e9bdabd3c631ccdf954c"
+    }
+  ],
+  "schema_version": 2
+}

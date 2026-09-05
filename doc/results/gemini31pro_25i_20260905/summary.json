@@ -1,0 +1,271 @@
+{
+  "artifact_sha256": {
+    "evolution.svg": "191d726bec1cb104f6e452bbf82f47866b9e1d7a1be0d38bd383c793e23f3f46",
+    "headline.csv": "e4cba15cf82bc0c63af764c6b63362e5d1d7ebe1587a70dc0bab8111184c7f1d",
+    "headline.svg": "77af63d89b0fb76fde81c0f132987b7f1d3b665d6294abb542059cb19094cef6",
+    "per_workload.csv": "28a1886b37ff20bb72456d562a571140c55a7768e488e91c556006dfd95cb30e",
+    "per_workload.svg": "5b63d87690886dff8af53b092dc7dba9e1a6c6fd10dfbe7ffdbad779a6d59c7c",
+    "selected.cpp": "a60ec8012f27c1b20fa0432d680a3d2cefcfea56e762f091a69adca979ef65ce"
+  },
+  "backend": "pro",
+  "budget": {
+    "api_attempts": 16,
+    "cap_charge_usd": 9.81036,
+    "carryover_api_attempts": 0,
+    "carryover_cap_charge_usd": 0,
+    "carryover_estimated_standard_usd": 0,
+    "estimated_standard_usd": 3.506488,
+    "output_tokens_including_thinking": 224118,
+    "prompt_tokens": 408536,
+    "thinking_tokens": 189742,
+    "unknown_usage_calls": 1
+  },
+  "cache_adjusted_estimate_current_calls_usd": 3.396382,
+  "evaluated_designs": 6,
+  "evaluation_protocol_sha256": "a237a8d8171bb76f6257ac68455fd668d777c2204a4c1d504332a78834b4dd2a",
+  "final_test": [
+    "433.milc",
+    "450.soplex",
+    "459.GemsFDTD",
+    "549.fotonik3d"
+  ],
+  "frozen_at": 1788615373.2962742,
+  "generation_finish_reasons": {
+    "NO_RESPONSE": 1,
+    "STOP": 15
+  },
+  "instructions_per_core": 20000000,
+  "integrity": {
+    "scope": "This model's results; shared-store counts are not per-run sample counts.",
+    "source_sha256_verified_on_export": true,
+    "status": "pass",
+    "test_after_selection_freeze": true
+  },
+  "model": "gemini-3.1-pro-preview",
+  "policy": {
+    "accuracy_tail_or_speed_rejection_threshold": null,
+    "api_attempts_per_proposal": 60,
+    "compiler_cpu_seconds": 180,
+    "consecutive_truncation_stop": 2,
+    "context_policy": "count input tokens before dispatch; retain conversation/signatures; no silent truncation",
+    "cpu_budget": 6,
+    "diagnostic_calls_per_proposal": 192,
+    "drafts_per_iteration": 12,
+    "finalization_turn_reserve": 2,
+    "iteration_unit": "successfully evaluated design; draft repairs stay inside the iteration",
+    "live_completion_preflight": "first counted proposal in this run; no extra paid preflight attempts",
+    "maximum_context_utf8_bytes": 8000000,
+    "maximum_input_tokens": 900000,
+    "maximum_iterations": 25,
+    "maximum_output_tokens": 65536,
+    "model_turns_per_proposal": 48,
+    "operator_stop_file": "STOP: settle an in-flight call, then stop before another generation/evaluation",
+    "parent_selection": "round_robin_sorted_nondominated_archive",
+    "process_memory_bytes": 4294967296,
+    "promotion": "strict two-objective Pareto dominance of incumbent",
+    "provider_timeout_seconds": 1800,
+    "reviewer": "orchestrating coding agent; compliance only; no human modeling hints",
+    "simulator_cpu_seconds": 600,
+    "simulator_file_bytes": 8589934592,
+    "temperature": 1.0,
+    "thinking_level": "HIGH",
+    "tool_protocol": "JSON inspections and region-body submissions with build/review/runtime repair feedback",
+    "transient_retries_per_turn": 1,
+    "usd_cap": 100.0,
+    "validity": [
+      "protected lifecycle unchanged",
+      "static source boundary",
+      "semantic compliance review",
+      "bounded causal state",
+      "successful O3 build and drained simulation",
+      "finite errors",
+      "exact bidirectional stable ID coverage",
+      "committed callback latency audit"
+    ],
+    "version": "gemini_individual_run_v6"
+  },
+  "promotions": 1,
+  "provenance": {
+    "exporter_sha256": "2f16279e1421e451e6c27d4a2a1c9698fa0ea6e9a9193fb1443928be243345f6",
+    "historical_shared_execution": null,
+    "integrity_audit_sha256": "71bb08e86e1f5b62ff532680d359a83786b6376dbf26a14bef4c3ec74ee8391a",
+    "raw_records_rewritten": false,
+    "run_manifest_sha256": "0b5ee2047c3837a0d0cb6f56076ef7ac4e3b6f63cf9b88fc082d1de8322662ad",
+    "test_access": "after_this_run_selection_frozen"
+  },
+  "record_type": "optimization_run_summary",
+  "run_id": "gemini31pro_25i_20260905",
+  "schema_version": 2,
+  "seed_sha256": "a81de012155850724b2970b092259afbbd9f518a36fe805f202516ceda1b636a",
+  "selected_id": "pro_001",
+  "source_file": "selected.cpp",
+  "source_sha256": "a60ec8012f27c1b20fa0432d680a3d2cefcfea56e762f091a69adca979ef65ce",
+  "status": "completed",
+  "submitted_drafts": 11,
+  "test_metrics": {
+    "cycle_macro_mae_pct": 36.0566,
+    "cycle_worst_core_abs_pct": 49.5959,
+    "n_workloads": 4,
+    "oracle_wall_s": 13.917,
+    "request_coverage": "exact_bidirectional_stable_id",
+    "request_macro_abs_signed_drift_over_L": 0.2752,
+    "request_macro_mae_over_L": 0.41766,
+    "request_most_negative_over_L": -11.36332,
+    "request_most_positive_over_L": 3.8276,
+    "request_worst_paired_p99_over_L": 5.5445,
+    "speedup_vs_oracle": 3.741,
+    "wall_s": 3.72
+  },
+  "training": [
+    "429.mcf",
+    "519.lbm"
+  ],
+  "training_metrics": {
+    "cycle_macro_mae_pct": 34.54,
+    "cycle_worst_core_abs_pct": 46.5816,
+    "n_workloads": 2,
+    "oracle_wall_s": 18.707,
+    "request_coverage": "exact_bidirectional_stable_id",
+    "request_macro_abs_signed_drift_over_L": 0.19789,
+    "request_macro_mae_over_L": 0.45601,
+    "request_most_negative_over_L": -6.06873,
+    "request_most_positive_over_L": 2.64947,
+    "request_worst_paired_p99_over_L": 2.2364,
+    "speedup_vs_oracle": 3.541,
+    "wall_s": 5.282
+  },
+  "trajectory": [
+    {
+      "id": "pro_001",
+      "iteration": 1,
+      "metrics": {
+        "cycle_macro_mae_pct": 34.54,
+        "cycle_worst_core_abs_pct": 46.5816,
+        "n_workloads": 2,
+        "oracle_wall_s": 18.707,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.19789,
+        "request_macro_mae_over_L": 0.45601,
+        "request_most_negative_over_L": -6.06873,
+        "request_most_positive_over_L": 2.64947,
+        "request_worst_paired_p99_over_L": 2.2364,
+        "speedup_vs_oracle": 3.541,
+        "wall_s": 5.282
+      },
+      "parent": "seed",
+      "promoted": true,
+      "status": "valid"
+    },
+    {
+      "id": "pro_002",
+      "iteration": 2,
+      "metrics": {
+        "cycle_macro_mae_pct": 43.5265,
+        "cycle_worst_core_abs_pct": 63.7145,
+        "n_workloads": 2,
+        "oracle_wall_s": 18.707,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.86886,
+        "request_macro_mae_over_L": 1.10752,
+        "request_most_negative_over_L": -5.48486,
+        "request_most_positive_over_L": 8.58698,
+        "request_worst_paired_p99_over_L": 6.8012,
+        "speedup_vs_oracle": 2.607,
+        "wall_s": 7.176
+      },
+      "parent": "pro_001",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "pro_003",
+      "iteration": 3,
+      "metrics": {
+        "cycle_macro_mae_pct": 17.6619,
+        "cycle_worst_core_abs_pct": 31.806,
+        "n_workloads": 2,
+        "oracle_wall_s": 18.707,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.13855,
+        "request_macro_mae_over_L": 0.58551,
+        "request_most_negative_over_L": -6.06873,
+        "request_most_positive_over_L": 5.24554,
+        "request_worst_paired_p99_over_L": 3.2485,
+        "speedup_vs_oracle": 3.292,
+        "wall_s": 5.682
+      },
+      "parent": "pro_001",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "pro_004",
+      "iteration": 4,
+      "metrics": {
+        "cycle_macro_mae_pct": 20.8482,
+        "cycle_worst_core_abs_pct": 38.8722,
+        "n_workloads": 2,
+        "oracle_wall_s": 18.707,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.14563,
+        "request_macro_mae_over_L": 0.50944,
+        "request_most_negative_over_L": -6.06873,
+        "request_most_positive_over_L": 4.08683,
+        "request_worst_paired_p99_over_L": 2.6044,
+        "speedup_vs_oracle": 3.281,
+        "wall_s": 5.701
+      },
+      "parent": "pro_003",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "pro_005",
+      "iteration": 5,
+      "metrics": {
+        "cycle_macro_mae_pct": 17.9484,
+        "cycle_worst_core_abs_pct": 30.8734,
+        "n_workloads": 2,
+        "oracle_wall_s": 18.707,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.14431,
+        "request_macro_mae_over_L": 0.58674,
+        "request_most_negative_over_L": -6.06873,
+        "request_most_positive_over_L": 4.60374,
+        "request_worst_paired_p99_over_L": 3.2697,
+        "speedup_vs_oracle": 3.126,
+        "wall_s": 5.984
+      },
+      "parent": "pro_003",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "pro_006",
+      "iteration": 6,
+      "metrics": {
+        "cycle_macro_mae_pct": 22.0621,
+        "cycle_worst_core_abs_pct": 38.753,
+        "n_workloads": 2,
+        "oracle_wall_s": 18.707,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.10433,
+        "request_macro_mae_over_L": 0.47683,
+        "request_most_negative_over_L": -6.06873,
+        "request_most_positive_over_L": 3.11045,
+        "request_worst_paired_p99_over_L": 2.5938,
+        "speedup_vs_oracle": 3.326,
+        "wall_s": 5.625
+      },
+      "parent": "pro_004",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "pro_007",
+      "iteration": 7,
+      "parent": "pro_004",
+      "status": "stopped"
+    }
+  ]
+}
