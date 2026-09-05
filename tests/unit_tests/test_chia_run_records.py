@@ -4,7 +4,7 @@ import json
 import pytest
 
 from tools.chia_loop.core import atomic_write_json
-from tools.chia_loop.run_records import reporting_view, frozen_selections
+from tools.chia_loop.run_records import reporting_view, frozen_selections, validate_limits, execution_limits
 
 
 def individual(root):
@@ -68,3 +68,51 @@ def test_finalization_preserves_single_run_schema(tmp_path, monkeypatch):
     assert "arms" not in result and "models" not in result
     assert result["archives_verified"] is True
     assert result["post_run_artifact_finalization"]["additional_generation_calls"] == 0
+
+
+def test_extended_limits_survive_worker_imports_and_cannot_change_after_start(tmp_path):
+    from tools.chia_loop import gemini_loop as G
+    limits = validate_limits(25, 100, 6)
+    atomic_write_json(tmp_path / "preparation_manifest.json", {"limits": limits})
+    assert execution_limits(tmp_path) == limits
+    policy = G.configured_policy(tmp_path)
+    assert policy["maximum_iterations"] == 25 and policy["usd_cap"] == 100
+    atomic_write_json(tmp_path / "run_manifest.json", {"record_type": "optimization_run", "policy": policy})
+    assert G.run_ledger(tmp_path, "pro").cap_usd == 100
+    atomic_write_json(tmp_path / "preparation_manifest.json", {"limits": validate_limits(30, 100, 6)})
+    with pytest.raises(ValueError, match="changed after run start"):
+        execution_limits(tmp_path)
+
+
+def test_evolution_uses_all_25_configured_iterations_without_provider_calls(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    from tools.chia_loop import gemini_loop as G
+    atomic_write_json(tmp_path / "preparation_manifest.json", {"limits": validate_limits(25, 100, 6)})
+    (tmp_path / "seed").mkdir()
+    (tmp_path / "seed/atomic_controller.cpp").write_text("seed")
+    (tmp_path / "prompts").mkdir()
+    (tmp_path / "prompts/system_v1.md").write_text("fixture")
+    (tmp_path / "training/reports").mkdir(parents=True)
+    def metrics(i):
+        return {"aggregate": {"cycle_macro_mae_pct": 100 - i, "request_macro_mae_over_L": 1 - i / 100}}
+    atomic_write_json(tmp_path / "training/reports/seed.json", {"models": {"seed": metrics(0)}})
+    seen = []
+    def propose(root, backend, iteration, *args):
+        seen.append(iteration)
+        return {"status": "evaluated", "candidate": {"source_path": str(tmp_path / "seed/atomic_controller.cpp"),
+            "sha256": "fixture", "metrics": metrics(iteration), "label": f"pro_{iteration:03d}"}}
+    monkeypatch.setattr(G, "make_prompt", lambda *args: "fixture")
+    monkeypatch.setattr(G, "propose", SimpleNamespace(chia_remote=propose))
+    monkeypatch.setattr(G, "get", lambda value: value)
+    monkeypatch.setattr(G, "event", lambda *args, **kwargs: None)
+    result = G.run_model(tmp_path, "pro")
+    assert seen == list(range(1, 26))
+    assert len(result["history"]) == 25 and result["incumbent"] == "pro_025"
+    assert result["status"] == "frozen" and result["budget"]["api_attempts"] == 0
+
+
+@pytest.mark.parametrize("limits", [(0, 100, 6), (25.0, 100, 6), (True, 100, 6),
+    (25, 0, 6), (25, float("nan"), 6), (25, float("inf"), 6), (25, 100, 2), (25, 100, 13)])
+def test_reject_invalid_limits(limits):
+    with pytest.raises(ValueError):
+        validate_limits(*limits)

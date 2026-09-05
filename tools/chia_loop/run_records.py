@@ -7,8 +7,35 @@ from __future__ import annotations
 
 import copy
 import json
+import math
 import pathlib
 import re
+
+
+def validate_limits(maximum_iterations=5, usd_cap=50.0, cpu_budget=12):
+    if isinstance(maximum_iterations, bool) or not isinstance(maximum_iterations, int) or maximum_iterations < 1:
+        raise ValueError("maximum_iterations must be a positive integer")
+    if isinstance(usd_cap, bool) or not isinstance(usd_cap, (int, float)) or not math.isfinite(usd_cap) or usd_cap <= 0:
+        raise ValueError("usd_cap must be a finite positive amount authorized for this run")
+    if isinstance(cpu_budget, bool) or not isinstance(cpu_budget, int) or not 3 <= cpu_budget <= 12:
+        raise ValueError("cpu_budget must be an integer in [3, 12]")
+    return {"maximum_iterations": maximum_iterations, "usd_cap": float(usd_cap), "cpu_budget": cpu_budget}
+
+
+def execution_limits(root):
+    """Workers read the same preparation limits; importing a module cannot reset them."""
+    root = pathlib.Path(root)
+    preparation = root / "preparation_manifest.json"
+    prepared = json.loads(preparation.read_text()) if preparation.exists() else {}
+    limits = validate_limits(**prepared.get("limits", {}))
+    manifest = root / "run_manifest.json"
+    if manifest.exists():
+        recorded = json.loads(manifest.read_text())
+        if recorded.get("record_type") == "optimization_run":
+            for key, value in limits.items():
+                if recorded["policy"].get(key, value) != value:
+                    raise ValueError("execution limits changed after run start: " + key)
+    return limits
 
 
 def run_policy(policy):

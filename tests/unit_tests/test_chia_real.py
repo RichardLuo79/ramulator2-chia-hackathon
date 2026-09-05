@@ -327,6 +327,17 @@ def test_ledger_cannot_mix_models_or_run_identities(tmp_path):
         assert path.read_bytes() == original
 
 
+def test_explicit_higher_budget_is_pinned_and_cannot_reset(tmp_path):
+    path = tmp_path / "ledger.json"
+    ledger = P.Ledger(path, "flash", run_id="extended", cap_usd=100)
+    ledger.initialize_carryover({"cap_charge_usd": 99, "estimated_standard_usd": 40})
+    with pytest.raises(P.BudgetExhausted, match="100"):
+        ledger.reserve("hello", 1, 1, input_tokens=10)
+    with pytest.raises(ValueError, match="cannot change"):
+        P.Ledger(path, "flash", run_id="extended", cap_usd=200).reserve("hello", 1, 1)
+    assert P.Ledger(path, "flash", run_id="extended", cap_usd=100).totals()["cap_charge_usd"] == 99
+
+
 @pytest.mark.parametrize("backend", ["pro", "flash"])
 def test_single_model_main_records_own_freeze_and_test_only(tmp_path, monkeypatch, backend):
     """Exercise orchestration with no provider, compiler, Ray worker, or simulator."""
@@ -334,7 +345,8 @@ def test_single_model_main_records_own_freeze_and_test_only(tmp_path, monkeypatc
     from tools.chia_loop import gemini_loop as G
     atomic_write_json(tmp_path / "preflight_pass.json", {})
     atomic_write_json(tmp_path / "preparation_manifest.json", {
-        "run_id": tmp_path.name, "model": P.MODELS[backend], "seed_sha256": "seed"})
+        "run_id": tmp_path.name, "model": P.MODELS[backend], "seed_sha256": "seed",
+        "limits": {"maximum_iterations": 25, "usd_cap": 100, "cpu_budget": 6}})
     for workload in G.E.TRAIN:
         for label in ("oracle", "seed", *G.E.COMPARISONS):
             directory = tmp_path / "training/simpleo3/DDR5" / workload / label
@@ -368,6 +380,8 @@ def test_single_model_main_records_own_freeze_and_test_only(tmp_path, monkeypatc
     result = json.loads((tmp_path / "run_manifest.json").read_text())
     assert result["record_type"] == "optimization_run" and result["model"] == P.MODELS[backend]
     assert result["status"] == "completed" and result["state"] == state
+    assert result["policy"]["maximum_iterations"] == 25 and result["policy"]["usd_cap"] == 100
+    assert result["policy"]["cpu_budget"] == 6
     assert "arms" not in result and "models" not in result
     assert result["final_test_metrics"] == {"aggregate": {"fixture": 1}}
     assert evolved == [backend] and evaluated == ["test"] * 3

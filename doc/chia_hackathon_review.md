@@ -272,3 +272,21 @@ Provider configuration is checked against Google's
 [Gemini 3.1 Pro specification](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-1-pro),
 and [pricing](https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing).
 HIGH is a relative dynamic effort setting, not equal reasoning-token use.
+
+## Extended search trials
+
+The next experiment runs Gemini 3.1 Pro Preview and Gemini 3.8 Flash
+independently from the clean seed, each for at most 25 evaluated designs and
+USD 100 of conservative budget accounting. Each run receives six CPU slots;
+combined evaluation parallelism is at most 12. The full 20M-instruction ROI,
+HIGH thinking, 65,536 output-token ceiling, comparison models, training split,
+atomicity checks, and Pareto promotion rule are unchanged. The v6 runner pins
+these configurable limits per run; a new invocation cannot alter an existing
+budget or silently resume a paid run.
+
+Earlier designs, results, and test feedback are not supplied to either agent.
+Training trajectories will show whether iterations beyond five improve the
+incumbent. Final testing occurs only after each run freezes its selection.
+These are fresh stochastic trials, not continuations of test-exposed models;
+one trial per backend cannot establish a general model-capability ranking.
+No extended-trial results are claimed until execution and audit complete.

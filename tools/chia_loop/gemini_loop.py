@@ -28,10 +28,10 @@ from chia.base.ChiaFunction import ChiaFunction, get
 from chia.trace.profiler import start_collector, stop_collector, get_collector, get_profiler
 from tools.chia_loop import artifacts, real_core as P, real_eval as E
 from tools.chia_loop.core import atomic_write_json
-from tools.chia_loop.run_records import model_pricing
+from tools.chia_loop.run_records import model_pricing, execution_limits
 
 POLICY = {
-    "version": "gemini_individual_run_v5", "maximum_iterations": 5, "usd_cap": 50,
+    "version": "gemini_individual_run_v6", "maximum_iterations": 5, "usd_cap": 50,
     "iteration_unit": "successfully evaluated design; draft repairs stay inside the iteration",
     "thinking_level": "HIGH", "temperature": 1.0,
     "maximum_output_tokens": P.MAX_OUTPUT, "maximum_context_utf8_bytes": P.MAX_CONTEXT_BYTES,
@@ -72,6 +72,16 @@ VISIBLE = [
     "src/ramulator/dram/impl/DDR5.cpp", "python/ramulator/dram/ddr5.py",
 ]
 PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "ramulator-chia")
+
+
+def configured_policy(root):
+    return {**POLICY, **execution_limits(root)}
+
+
+def run_ledger(root, backend):
+    root = pathlib.Path(root)
+    return P.Ledger(root / "ledger.json", backend, run_id=root.name,
+                    cap_usd=configured_policy(root)["usd_cap"])
 
 
 def event(root, kind, **data):
@@ -123,7 +133,7 @@ def propose(root_text, arm, iteration, system, user_prompt, parent):
     root = pathlib.Path(root_text)
     interactions = root / "interactions" / f"iter_{iteration:03d}"
     interactions.mkdir(parents=True, exist_ok=True)
-    ledger = P.Ledger(root / "ledger.json", arm, run_id=root.name)
+    ledger = run_ledger(root, arm)
     client = genai.Client(vertexai=True, project=PROJECT, location="global",
         http_options=types.HttpOptions(timeout=POLICY["provider_timeout_seconds"] * 1000,
             retry_options=types.HttpRetryOptions(attempts=1)))
@@ -256,7 +266,7 @@ def evaluate_draft(root, parent, seed_source, proposal, directory, label, *, arm
     (directory / "atomic_controller.cpp").write_text(source)
     atomic_write_json(directory / "static_checks.json", checks)
     plugin = get(build.chia_remote(str(root), source, str(directory / "build")))
-    atomic_write_json(directory / "review_needed.json", {"source_sha256": P.sha(source), "policy": POLICY})
+    atomic_write_json(directory / "review_needed.json", {"source_sha256": P.sha(source), "policy": configured_policy(root)})
     event(root, "compliance_review_needed", arm=arm, iteration=iteration, directory=str(directory))
     review_deadline = time.monotonic() + 7200
     while not (directory / "review.json").exists():
@@ -292,7 +302,7 @@ def make_prompt(root, arm, iteration, candidates, incumbent, parent_id, history)
     comparisons = json.loads((root / "training/reports/comparisons.json").read_text())["models"]
     template = (root / "prompts/iteration_v1.md").read_text()
     fields = {
-        "iteration_number": iteration, "max_proposal_iterations": 5,
+        "iteration_number": iteration, "max_proposal_iterations": configured_policy(root)["maximum_iterations"],
         "parent_id": parent_id, "parent_source_sha256": parent["sha256"], "incumbent_id": incumbent,
         "parent_source": pathlib.Path(parent["source_path"]).read_text(),
         "parent_and_incumbent_training_scores": json.dumps({"parent": parent["metrics"]["aggregate"], "incumbent": candidates[incumbent]["metrics"]["aggregate"]}),
@@ -310,12 +320,12 @@ def make_prompt(root, arm, iteration, candidates, incumbent, parent_id, history)
         "accepted_and_rejected_proposals_with_reasons": json.dumps(history),
         "last_build_or_evaluation_diagnostics": json.dumps(history[-1:] if history else []),
         "this_run_pareto_archive": json.dumps({k: candidates[k]["metrics"]["aggregate"] for k in P.pareto(candidates)}),
-        "promotion_and_guardrail_configuration": json.dumps(POLICY),
+        "promotion_and_guardrail_configuration": json.dumps(configured_policy(root)),
         "allowed_tools_and_readable_file_manifest": json.dumps({"files": [P.MUTABLE, *VISIBLE],
             "tools": ["read_file", "search_file", "training_diagnostics"], "submission": "complete includes/code region bodies, no diff or boundary markers"}),
         "remaining_model_call_diagnostic_and_token_limits": json.dumps({"model_turns": POLICY["model_turns_per_proposal"],
             "diagnostics": POLICY["diagnostic_calls_per_proposal"], "drafts": POLICY["drafts_per_iteration"],
-            "output_tokens_per_turn": P.MAX_OUTPUT, "budget": P.Ledger(root / "ledger.json", arm, run_id=root.name).totals(), "cap_usd": 50}),
+            "output_tokens_per_turn": P.MAX_OUTPUT, "budget": run_ledger(root, arm).totals(), "cap_usd": configured_policy(root)["usd_cap"]}),
     }
     return P.render(template, fields)
 
@@ -328,7 +338,7 @@ def run_model(root, arm):
         raise RuntimeError("refusing implicit paid campaign resume; audit existing state first")
     carryover = root / "budget_carryover.json"
     if carryover.exists():
-        P.Ledger(arm_dir / "ledger.json", arm, run_id=root.name).initialize_carryover(json.loads(carryover.read_text()))
+        run_ledger(root, arm).initialize_carryover(json.loads(carryover.read_text()))
     seed_source = (root / "seed/atomic_controller.cpp").read_text()
     seed_metrics = json.loads((root / "training/reports/seed.json").read_text())["models"]["seed"]
     candidates = {"seed": {"source_path": str(root / "seed/atomic_controller.cpp"), "sha256": P.sha(seed_source),
@@ -337,7 +347,7 @@ def run_model(root, arm):
     system = (root / "prompts/system_v1.md").read_text()
     event(root, "run_started", backend=arm, model=P.MODELS[arm])
     state = {}
-    for iteration in range(1, POLICY["maximum_iterations"] + 1):
+    for iteration in range(1, configured_policy(root)["maximum_iterations"] + 1):
         archive = P.pareto(candidates)
         parent_id = archive[(iteration - 1) % len(archive)]
         parent = {**candidates[parent_id], "id": parent_id}
@@ -374,7 +384,7 @@ def run_model(root, arm):
         history.append(record)
         state = {"run_id": root.name, "backend": arm, "model": P.MODELS[arm], "status": "running", "history": history,
                  "candidates": candidates, "incumbent": incumbent, "pareto_archive": P.pareto(candidates),
-                 "budget": P.Ledger(arm_dir / "ledger.json", arm, run_id=root.name).totals()}
+                 "budget": run_ledger(root, arm).totals()}
         atomic_write_json(arm_dir / "state.json", state)
         if proposal.get("status") != "evaluated":
             state["stop_reason"] = record["reason"]
@@ -427,7 +437,7 @@ def main():
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(path, destination)
     manifest = {"schema_version": 2, "record_type": "optimization_run", "run_id": root.name,
-        "backend": arm, "model": P.MODELS[arm], "status": "running", "started_at": time.time(), "policy": POLICY,
+        "backend": arm, "model": P.MODELS[arm], "status": "running", "started_at": time.time(), "policy": configured_policy(root),
         "project": PROJECT, "location": "global", "pricing": model_pricing(P.PRICING, arm),
         "budget_carryover": json.loads((root / "budget_carryover.json").read_text()) if (root / "budget_carryover.json").exists() else {},
         "training": E.TRAIN, "final_test": E.TEST, "instructions_per_core": E.evaluation_insts(root),
@@ -439,7 +449,7 @@ def main():
         "visible_hashes": {p: P.sha((root / "visible" / p).read_bytes()) for p in VISIBLE},
         "versions": {p: importlib.metadata.version(p) for p in ("chialoops", "ray", "google-genai", "numpy", "pandas")}}
     atomic_write_json(root / "run_manifest.json", manifest)
-    ray.init(num_cpus=12, include_dashboard=False, log_to_driver=False,
+    ray.init(address="local", num_cpus=manifest["policy"]["cpu_budget"], include_dashboard=False, log_to_driver=False,
         runtime_env={"env_vars": {"PYTHONPATH": str(REPO) + ":" + str(REPO / "tools"),
             "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1"}})
     start_collector(log_dir=str(root / "profiles"))
@@ -451,7 +461,7 @@ def main():
         atomic_write_json(root / "selection_frozen.json", {"run_id": root.name,
             "source_sha256": state["selected"]["sha256"], "incumbent": state["incumbent"], "frozen_at": state["frozen_at"]})
         event(root, "frozen_test_started")
-        E.evaluate(root, ["oracle", *E.COMPARISONS], split="test", workers=6)
+        E.evaluate(root, ["oracle", *E.COMPARISONS], split="test", workers=min(6, manifest["policy"]["cpu_budget"]))
         E.evaluate(root, ["candidate"], split="test", plugin=str(root / "seed/candidate.so"), label="seed")
         tests = get(score.chia_remote(str(root), state["selected"]["plugin"], arm + "_final", "test"))
         for relative, expected in manifest["protocol_hashes"].items():

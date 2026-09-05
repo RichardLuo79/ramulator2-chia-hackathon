@@ -12,8 +12,10 @@ part of this repository.
 One invocation runs exactly one Gemini backend through Google Cloud ADC.
 Gemini 3.1 Pro Preview and Gemini 3.8 Flash are separate model runs, compared
 only in downstream analysis. Each run starts clean, uses HIGH thinking and
-65,536 maximum output tokens, and stops after five evaluated designs or its
-USD 50 spending/safety limit. Failed drafts are repairable within an iteration.
+65,536 maximum output tokens, and stops at its configured iteration or
+spending/safety limit. Defaults are five evaluated designs and USD 50;
+larger limits require explicit run configuration and spending authorization.
+Failed drafts are repairable within an iteration.
 Every draft, API attempt, tool result, build, compliance decision, and score is
 retained locally; no hidden source repair or automatic paid resume occurs.
 
@@ -69,12 +71,21 @@ and model-parameter probes. It refreshes ADC but makes no paid generation calls.
 
 Use a different root and `--model flash` for a Flash run. Root names are stable
 run IDs and must be unique within a comparison. Do not reuse a run directory
-for another model or trial. Run these invocations sequentially to keep total
-evaluation/build parallelism within 12 CPUs; do not launch two 12-CPU runners.
+for another model or trial. Preparation accepts `--max-iterations`, `--usd-cap`,
+and `--cpus`; limits are pinned before generation and the runner reads them.
+Do not change an initialized ledger's cap or replenish it by restarting.
+Concurrent runs must have CPU budgets totaling at most 12. For example, two
+independent runs may each use `--cpus 6 --workers 6`; each gets its own local
+Ray instance. Do not launch two default 12-CPU runners concurrently.
 Each run has its own preparation, state, budget, interactions, CHIA profile,
 freeze, final-test results, and stop/failure status. A comparison owns none of
 those and cannot promote candidates or transfer budget between runs. Even when
 one run finishes first, its results must not become feedback for the other.
+
+The next authorized trials use separate fresh roots with
+`--max-iterations 25 --usd-cap 100 --cpus 6 --workers 6`. These change search
+duration and its spending allowance, not the 20M-instruction window, HIGH
+thinking, per-iteration repair limits, atomicity contract, or Pareto rule.
 
 A completed build emits a `compliance_review_needed` event and waits for a
 reviewer. Review the exact candidate source and its explanation against the

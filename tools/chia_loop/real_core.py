@@ -4,6 +4,7 @@ from __future__ import annotations
 import fcntl
 import hashlib
 import json
+import math
 import pathlib
 import re
 import time
@@ -77,9 +78,13 @@ class Ledger:
     Actual standard-rate estimates are reported separately, never used to raise
     the authorized per-run ceiling. No SDK hidden retries are allowed.
     """
-    def __init__(self, path: pathlib.Path, arm: str, *, run_id=None):
+    def __init__(self, path: pathlib.Path, arm: str, *, run_id=None, cap_usd=None):
         self.path, self.arm = pathlib.Path(path), arm
         self.run_id = run_id
+        if cap_usd is not None and (isinstance(cap_usd, bool) or not isinstance(cap_usd, (int, float))
+                                   or not math.isfinite(cap_usd) or cap_usd <= 0):
+            raise ValueError("budget cap must be finite and positive")
+        self.cap_usd = cap_usd
         if arm not in MODELS:
             raise ValueError("unknown model backend")
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -91,13 +96,16 @@ class Ledger:
             raise ValueError("ledger belongs to a different model version")
         if self.run_id is not None and data.get("run_id") != self.run_id:
             raise ValueError("ledger belongs to a different run")
+        if self.cap_usd is not None and data["cap_usd"] != self.cap_usd:
+            raise ValueError("cannot change an initialized run budget cap")
 
     def _transaction(self, update):
         with self.path.with_suffix(".lock").open("a") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             data = json.loads(self.path.read_text()) if self.path.exists() else {
                 "schema_version": 2, "record_type": "run_budget", "run_id": self.run_id,
-                "backend": self.arm, "model": MODELS[self.arm], "cap_usd": CAP_USD,
+                "backend": self.arm, "model": MODELS[self.arm],
+                "cap_usd": self.cap_usd if self.cap_usd is not None else CAP_USD,
                 "pricing": model_pricing(PRICING, self.arm), "calls": []}
             self._check_owner(data)
             result = update(data)
@@ -108,7 +116,7 @@ class Ledger:
         """Keep earlier infrastructure-attempt charges inside the same authorization."""
         charge = carryover.get("cap_charge_usd", 0)
         estimate = carryover.get("estimated_standard_usd", 0)
-        if not 0 <= estimate <= charge <= CAP_USD:
+        if not 0 <= estimate <= charge <= (self.cap_usd if self.cap_usd is not None else CAP_USD):
             raise ValueError("invalid budget carryover")
         def update(data):
             if data["calls"] or data.get("carryover"):
@@ -129,7 +137,7 @@ class Ledger:
         def update(data):
             committed = data.get("carryover", {}).get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in data["calls"])
             if committed + reserve > data["cap_usd"]:
-                raise BudgetExhausted("per-run $50 ceiling would be exceeded by next call")
+                raise BudgetExhausted(f"per-run ${data['cap_usd']:g} ceiling would be exceeded by next call")
             call_id = len(data["calls"])
             data["calls"].append({"id": call_id, "iteration": iteration, "turn": turn,
                 "reserved_at": time.time(), "state": "reserved", "payload_sha256": sha(payload),

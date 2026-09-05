@@ -23,6 +23,7 @@ for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUME
 from tools.chia_loop import real_core as P, real_eval as E
 from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.traffic import traffic_population
+from tools.chia_loop.run_records import validate_limits
 
 
 def progress(stage, **extra):
@@ -34,11 +35,19 @@ def main():
     ap.add_argument("--root", type=pathlib.Path, required=True)
     ap.add_argument("--model", choices=P.MODELS, required=True)
     ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--max-iterations", type=int, default=P.MAX_ITERATIONS)
+    ap.add_argument("--usd-cap", type=float, default=P.CAP_USD,
+        help="explicit per-run authorization; never increases an existing run's budget")
+    ap.add_argument("--cpus", type=int, default=12, help="CPU budget for this run; concurrent run budgets must total <=12")
     ap.add_argument("--carry-budget-from", type=pathlib.Path,
         help="retain charges from an aborted infrastructure attempt; never imports model feedback")
     args = ap.parse_args()
-    if not 1 <= args.workers <= 12:
-        ap.error("workers must be in [1, 12]")
+    try:
+        limits = validate_limits(args.max_iterations, args.usd_cap, args.cpus)
+    except ValueError as exc:
+        ap.error(str(exc))
+    if not 1 <= args.workers <= args.cpus:
+        ap.error("workers must be in [1, cpus]")
     root = args.root.resolve()
     arm, model = args.model, P.MODELS[args.model]
     root.mkdir(parents=True, exist_ok=False)
@@ -69,19 +78,19 @@ def main():
     if re.sub(r"\s+", "", regions["CODE"]) != expected_seed or regions["INCLUDES"].strip():
         raise RuntimeError("fresh campaign requires the unchanged fixed-delay skeleton")
     prep = {"status": "preparing", "started_at": time.time(), "run_id": root.name,
-        "backend": arm, "model": model,
+        "backend": arm, "model": model, "limits": limits,
         "seed_sha256": P.sha(seed), "seed_source": P.MUTABLE,
         "maximum_output_tokens": P.MAX_OUTPUT, "output_limit_source":
             "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/" +
             ("3-1-pro" if arm == "pro" else "3-8-flash"),
-        "authorization": "Five evaluated designs and USD 50 for this individual model run; paid execution requires user authorization",
+        "authorization": f"At most {args.max_iterations} evaluated designs and USD {args.usd_cap:g} for this individual model run; paid execution requires user authorization",
         "previous_campaign_inputs_imported": False, "human_modeling_hints": False,
         "workers": args.workers, "optimization": "-O3",
         "changes": [f"{model}, HIGH and 65,536 output tokens; independent single-model run",
             "complete editable-region bodies, with build/compliance/runtime repair feedback",
             "editable model parameters and read-only resolved controller behavior",
             "48 model turns, 192 inspections, and 12 drafts per evaluated iteration",
-            "token-counted context and model-specific conservative USD 50 ledger",
+            f"token-counted context and model-specific conservative USD {args.usd_cap:g} ledger",
             "fresh full 20M instruction evolution; immediate verified trace compression"],
         "live_generation_preflight": "first counted proposal in this run; no separate paid probe",
         "heldout_exposure": "operator has seen these families in earlier evaluation; fresh agents see training only"}
