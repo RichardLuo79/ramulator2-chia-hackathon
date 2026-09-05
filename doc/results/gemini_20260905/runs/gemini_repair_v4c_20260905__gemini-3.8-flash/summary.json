@@ -1,0 +1,240 @@
+{
+  "artifact_sha256": {
+    "headline.csv": "87b72ff13ffc647dd9a08e9a87e20f99ef7bf5ba1b661cb3e6b8a428fc95a563",
+    "per_workload.csv": "ef63d0e54b9413194ee527d32028e9fe50a8ccb765e8b7fa2241e1b0e4c5d2c0",
+    "selected.cpp": "5693b863d20a605a72303ed9c15b10440548dbf3d5ec3ad61077e9e476b5f4e0"
+  },
+  "backend": "flash",
+  "budget": {
+    "api_attempts": 126,
+    "cap_charge_usd": 19.5557814,
+    "carryover_api_attempts": 2,
+    "carryover_cap_charge_usd": 0.035674199999999996,
+    "carryover_estimated_standard_usd": 0.01486425,
+    "estimated_standard_usd": 8.148242250000001,
+    "output_tokens_including_thinking": 380513,
+    "prompt_tokens": 8941939,
+    "thinking_tokens": 339075,
+    "unknown_usage_calls": 0
+  },
+  "cache_adjusted_estimate_current_calls_usd": 2.9160829499999994,
+  "evaluated_designs": 5,
+  "evaluation_protocol_sha256": "8d63e389b00c75523242d7ed3f2d56ad2e796dfcf0a1321e9614ac8fb20303e1",
+  "final_test": [
+    "433.milc",
+    "450.soplex",
+    "459.GemsFDTD",
+    "549.fotonik3d"
+  ],
+  "frozen_at": 1788608430.9977286,
+  "generation_finish_reasons": {
+    "MALFORMED_FUNCTION_CALL": 7,
+    "STOP": 119
+  },
+  "instructions_per_core": 20000000,
+  "integrity": {
+    "scope": "This model's results; shared-store counts are not per-run sample counts.",
+    "source_sha256_verified_on_export": true,
+    "status": "pass",
+    "test_after_selection_freeze": true
+  },
+  "model": "gemini-3.8-flash",
+  "policy": {
+    "accuracy_tail_or_speed_rejection_threshold": null,
+    "api_attempts_per_proposal": 60,
+    "compiler_cpu_seconds": 180,
+    "consecutive_truncation_stop": 2,
+    "context_policy": "count input tokens before dispatch; retain conversation/signatures; no silent truncation",
+    "diagnostic_calls_per_proposal": 192,
+    "drafts_per_iteration": 12,
+    "finalization_turn_reserve": 2,
+    "iteration_unit": "successfully evaluated design; draft repairs stay inside the iteration",
+    "live_completion_preflight": "first counted proposal in each fresh arm; no extra paid preflight attempts",
+    "maximum_context_utf8_bytes": 8000000,
+    "maximum_input_tokens": 900000,
+    "maximum_iterations": 5,
+    "maximum_output_tokens": 65536,
+    "model_turns_per_proposal": 48,
+    "operator_stop_file": "STOP: settle an in-flight call, then stop before another generation/evaluation",
+    "parent_selection": "round_robin_sorted_nondominated_archive",
+    "process_memory_bytes": 4294967296,
+    "promotion": "strict two-objective Pareto dominance of incumbent",
+    "provider_timeout_seconds": 1800,
+    "reviewer": "orchestrating coding agent; compliance only; no human modeling hints",
+    "simulator_cpu_seconds": 600,
+    "simulator_file_bytes": 8589934592,
+    "temperature": 1.0,
+    "thinking_level": "HIGH",
+    "tool_protocol": "JSON inspections and region-body submissions with build/review/runtime repair feedback",
+    "transient_retries_per_turn": 1,
+    "usd_cap": 50,
+    "validity": [
+      "protected lifecycle unchanged",
+      "static source boundary",
+      "semantic compliance review",
+      "bounded causal state",
+      "successful O3 build and drained simulation",
+      "finite errors",
+      "exact bidirectional stable ID coverage",
+      "committed callback latency audit"
+    ],
+    "version": "gemini_repair_loop_v4"
+  },
+  "promotions": 1,
+  "provenance": {
+    "exporter_sha256": "2f16279e1421e451e6c27d4a2a1c9698fa0ea6e9a9193fb1443928be243345f6",
+    "historical_shared_execution": "gemini_repair_v4c_20260905",
+    "integrity_audit_sha256": "94fe6833e404366860b835dc8b687f204d7ceef82f2068d8e45e60ed25864b7c",
+    "raw_records_rewritten": false,
+    "run_manifest_sha256": "210ca59beb8bca66611461548dca995674246b3ba0fa59cc3edc076825d9092b",
+    "test_access": "after_both_incumbents_frozen"
+  },
+  "record_type": "optimization_run_summary",
+  "run_id": "gemini_repair_v4c_20260905__gemini-3.8-flash",
+  "schema_version": 2,
+  "seed_sha256": "a81de012155850724b2970b092259afbbd9f518a36fe805f202516ceda1b636a",
+  "selected_id": "flash_001",
+  "source_file": "selected.cpp",
+  "source_sha256": "5693b863d20a605a72303ed9c15b10440548dbf3d5ec3ad61077e9e476b5f4e0",
+  "status": "completed",
+  "submitted_drafts": 7,
+  "test_metrics": {
+    "cycle_macro_mae_pct": 10.8502,
+    "cycle_worst_core_abs_pct": 20.5064,
+    "n_workloads": 4,
+    "oracle_wall_s": 13.165,
+    "request_coverage": "exact_bidirectional_stable_id",
+    "request_macro_abs_signed_drift_over_L": 0.2004,
+    "request_macro_mae_over_L": 0.38888,
+    "request_most_negative_over_L": -10.7748,
+    "request_most_positive_over_L": 16.03609,
+    "request_worst_paired_p99_over_L": 12.8059,
+    "speedup_vs_oracle": 3.893,
+    "wall_s": 3.382
+  },
+  "training": [
+    "429.mcf",
+    "519.lbm"
+  ],
+  "training_metrics": {
+    "cycle_macro_mae_pct": 10.1991,
+    "cycle_worst_core_abs_pct": 15.2484,
+    "n_workloads": 2,
+    "oracle_wall_s": 16.491,
+    "request_coverage": "exact_bidirectional_stable_id",
+    "request_macro_abs_signed_drift_over_L": 0.05651,
+    "request_macro_mae_over_L": 0.3928,
+    "request_most_negative_over_L": -6.68091,
+    "request_most_positive_over_L": 6.81757,
+    "request_worst_paired_p99_over_L": 3.7368,
+    "speedup_vs_oracle": 2.879,
+    "wall_s": 5.729
+  },
+  "trajectory": [
+    {
+      "id": "flash_001",
+      "iteration": 1,
+      "metrics": {
+        "cycle_macro_mae_pct": 10.1991,
+        "cycle_worst_core_abs_pct": 15.2484,
+        "n_workloads": 2,
+        "oracle_wall_s": 16.491,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.05651,
+        "request_macro_mae_over_L": 0.3928,
+        "request_most_negative_over_L": -6.68091,
+        "request_most_positive_over_L": 6.81757,
+        "request_worst_paired_p99_over_L": 3.7368,
+        "speedup_vs_oracle": 2.879,
+        "wall_s": 5.729
+      },
+      "parent": "seed",
+      "promoted": true,
+      "status": "valid"
+    },
+    {
+      "id": "flash_002",
+      "iteration": 2,
+      "metrics": {
+        "cycle_macro_mae_pct": 24.7416,
+        "cycle_worst_core_abs_pct": 33.5624,
+        "n_workloads": 2,
+        "oracle_wall_s": 16.491,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.35115,
+        "request_macro_mae_over_L": 0.8505,
+        "request_most_negative_over_L": -6.96154,
+        "request_most_positive_over_L": 7.4724,
+        "request_worst_paired_p99_over_L": 5.177,
+        "speedup_vs_oracle": 2.494,
+        "wall_s": 6.613
+      },
+      "parent": "flash_001",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "flash_003",
+      "iteration": 3,
+      "metrics": {
+        "cycle_macro_mae_pct": 10.165,
+        "cycle_worst_core_abs_pct": 13.2615,
+        "n_workloads": 2,
+        "oracle_wall_s": 16.491,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.08375,
+        "request_macro_mae_over_L": 0.41625,
+        "request_most_negative_over_L": -6.67737,
+        "request_most_positive_over_L": 6.95225,
+        "request_worst_paired_p99_over_L": 4.0305,
+        "speedup_vs_oracle": 2.795,
+        "wall_s": 5.899
+      },
+      "parent": "flash_001",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "flash_004",
+      "iteration": 4,
+      "metrics": {
+        "cycle_macro_mae_pct": 30.8346,
+        "cycle_worst_core_abs_pct": 57.8449,
+        "n_workloads": 2,
+        "oracle_wall_s": 16.491,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.23353,
+        "request_macro_mae_over_L": 0.40473,
+        "request_most_negative_over_L": -6.05812,
+        "request_most_positive_over_L": 4.73701,
+        "request_worst_paired_p99_over_L": 2.2293,
+        "speedup_vs_oracle": 2.912,
+        "wall_s": 5.664
+      },
+      "parent": "flash_003",
+      "promoted": false,
+      "status": "valid"
+    },
+    {
+      "id": "flash_005",
+      "iteration": 5,
+      "metrics": {
+        "cycle_macro_mae_pct": 10.1991,
+        "cycle_worst_core_abs_pct": 15.2484,
+        "n_workloads": 2,
+        "oracle_wall_s": 16.491,
+        "request_coverage": "exact_bidirectional_stable_id",
+        "request_macro_abs_signed_drift_over_L": 0.05651,
+        "request_macro_mae_over_L": 0.3928,
+        "request_most_negative_over_L": -6.68091,
+        "request_most_positive_over_L": 6.81757,
+        "request_worst_paired_p99_over_L": 3.7368,
+        "speedup_vs_oracle": 2.783,
+        "wall_s": 5.926
+      },
+      "parent": "flash_001",
+      "promoted": false,
+      "status": "valid"
+    }
+  ]
+}

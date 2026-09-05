@@ -54,4 +54,4 @@ tools/chia_loop/finalize_smoke_audit.py
 tools/chia_loop/representative_eval.py
 tools/chia_loop/smoke_diagnostics.py
 !tools/chia_loop/smoke.json
-!doc/results/*/summary.json
+!doc/results/**/summary.json

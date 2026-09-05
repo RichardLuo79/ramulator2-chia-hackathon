@@ -10,6 +10,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from tools.chia_loop.run_records import reporting_view
 
 NAMES = {"seed": "Seed", "fixedlat": "FixedLat", "md1": "MD1", "wmg1": "WMG1",
          "mess": "MESS", "pro": "Gemini Pro", "flash": "Gemini Flash"}
@@ -26,15 +27,15 @@ def main():
     ap.add_argument("root", type=pathlib.Path)
     args = ap.parse_args()
     root = args.root.resolve()
-    manifest = read(root / "run_manifest.json")
+    manifest = reporting_view(root)
     if manifest["status"] != "completed":
         raise RuntimeError("analysis requires completed/frozen campaigns")
     out = root / "analysis"
     out.mkdir(exist_ok=True)
     insts = manifest["instructions_per_core"]
-    maximum_iterations = manifest["policy"]["iterations_per_arm"]
+    maximum_iterations = manifest["policy"]["maximum_iterations"]
     repaired_protocol = "iteration_unit" in manifest["policy"]
-    for arm in ("pro", "flash"):
+    for arm in manifest["models"]:
         NAMES[arm] = (manifest["models"][arm].replace("gemini-", "Gemini ")
                      .replace("-preview", "").replace("-", " ")
                      .replace(" pro", " Pro").replace(" flash", " Flash"))
@@ -48,10 +49,10 @@ def main():
         reports = root / split / "reports"
         data[split] = {"seed": read(reports / "seed.json")["models"]["seed"],
                        **read(reports / "comparisons.json")["models"]}
-        for arm in ("pro", "flash"):
+        for arm in manifest["models"]:
             state = manifest["arms"][arm]
             data[split][arm] = state["selected"]["metrics"] if split == "training" else manifest["final_test_metrics"][arm]
-    order = list(NAMES)
+    order = ["seed", *manifest["comparisons"], *manifest["models"]]
     rows, workloads = [], []
     for split, models in data.items():
         for model in order:
@@ -92,7 +93,8 @@ def main():
                 for w in wls:
                     v = data[split][model]["per_workload"][w]
                     values.append(v["cycles"]["per_core_dev_pct"][0] if row == 0 else v["requests"]["bulk_mae_over_L"])
-                ax.bar(np.arange(len(wls)) + (i-3)*.115, values, width=.11, color=COLORS[model], label=NAMES[model])
+                width = .8 / len(order)
+                ax.bar(np.arange(len(wls)) + (i-(len(order)-1)/2)*width, values, width=width*.96, color=COLORS[model], label=NAMES[model])
             ax.set_xticks(range(len(wls)), wls, rotation=15 if len(wls) > 2 else 0); ax.axhline(0, color="#555", lw=.7)
             ax.grid(axis="y", alpha=.2)
             ax.set_ylabel("Signed core-cycle error (%)" if row == 0 else "Request MAE / L")
@@ -102,7 +104,7 @@ def main():
     fig.savefig(out / "per_workload.png"); fig.savefig(out / "per_workload.svg"); plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(11, 4), constrained_layout=True)
-    for arm in ("pro", "flash"):
+    for arm in manifest["models"]:
         state = manifest["arms"][arm]
         for ax, key in zip(axes, ("cycle_macro_mae_pct", "request_macro_mae_over_L")):
             x, y = [0], [data["training"]["seed"]["aggregate"][key]]
@@ -122,11 +124,14 @@ def main():
     fig.suptitle("Incumbent trajectory · circles = valid trials; crosses = rejected attempts")
     fig.savefig(out / "evolution.png"); fig.savefig(out / "evolution.svg"); plt.close(fig)
 
-    text = ["# Gemini CHIA comparison", "", f"Campaign: `{root.name}`.", "",
-        ("One independent run per backend, HIGH thinking, at most five evaluated designs (with draft repair) and USD 50 per arm. "
-         if repaired_protocol else "One independent run per backend, HIGH thinking, at most five proposals and USD 50 per arm. ") +
+    text = ["# Gemini CHIA results", "", "Independent run IDs: " +
+        ", ".join(f"`{identifier}`" for identifier in manifest["run_ids"].values()) + ".", "",
+        ("HIGH thinking, at most five evaluated designs (with draft repair) and USD 50 per run. "
+         if repaired_protocol else "HIGH thinking, at most five proposals and USD 50 per run. ") +
         "Each starts from the same fixed-delay seed. Core cycles and read latencies come from closed-loop SimpleO3; "
-        "the final test is evaluated only after both selected sources are frozen.", "",
+        "the final test is evaluated only after selection is frozen. " +
+        ("The historical shared execution waited for both selections; its raw records are unchanged."
+         if len(manifest["models"]) > 1 else "This record contains exactly one model run."), "",
         f"Training: {', '.join(manifest['training'])}. Test: {', '.join(manifest['final_test'])}. "
         f"All are single-core, {insts:,} issued instructions with a fully drained ROI; DDR5_16Gb_x8 / DDR5_4800AN, "
         "refresh disabled. Cold-start full-prefix evaluation; no separate unscored warmup. "
@@ -136,9 +141,9 @@ def main():
         "HIGH is a dynamic reasoning-effort setting, not an equal token allocation across models. "
         + manifest.get("meta_reviewer_test_exposure", "").capitalize() + ".", "",
         "## Outcomes and estimated spending", "",
-        "| Arm | Selected source | Attempts | Valid | Promotions | API calls | Known-usage standard estimate (USD) | Unknown-usage calls | Conservative cap accounted (USD) |",
+        "| Run model | Selected source | Attempts | Valid | Promotions | API calls | Known-usage standard estimate (USD) | Unknown-usage calls | Conservative cap accounted (USD) |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"]
-    for arm in ("pro", "flash"):
+    for arm in manifest["models"]:
         state = manifest["arms"][arm]; budget = state["budget"]
         text.append(f"| {state['model']} | {state['incumbent']} | {len(state['history'])} | "
             f"{sum(h['status']=='valid' for h in state['history'])} | {sum(bool(h.get('promoted')) for h in state['history'])} | "
@@ -146,7 +151,7 @@ def main():
     text.extend(["", "Estimates include thinking tokens, conservatively charge cached input at the full standard rate, "
         "and exclude credit/discount effects. They are not Cloud Billing invoices. The separate cap ledger uses "
         "higher tariffs and retains pessimistic reservations for unknown calls. "
-        "Reported call counts cover this campaign; standard estimates and cap charges also include any explicitly "
+        "Reported call counts cover each individual run; standard estimates and cap charges also include any explicitly "
         "recorded infrastructure-attempt carryover, available separately in the budget fields. "
         "[Pricing source](https://cloud.google.com/vertex-ai/generative-ai/pricing), checked 2026-09-05.", "",
         "## Accuracy", "", "![Headline comparison](headline.png)", ""])
@@ -164,7 +169,7 @@ def main():
                  "The mechanism descriptions below are the proposing models' own **unverified claims**, "
                  "not conclusions of this report. Rejected proposals have no measured candidate accuracy. "
                  "A selected `seed` means no promoted generated design; its scores are the unchanged skeleton's scores.", ""])
-    for arm in ("pro", "flash"):
+    for arm in manifest["models"]:
         text.extend([f"### {NAMES[arm]}", ""])
         for h in manifest["arms"][arm]["history"]:
             desc = h["explanation"].get("mechanism", h["explanation"].get("reason", "No mechanism returned"))
@@ -193,12 +198,13 @@ def main():
         "Simulation-only wall times are recorded separately from construction and trace loading. They are "
         "instrumented and were not repeated under controlled CPU affinity, so no reliable speedup "
         "ranking is claimed. No transfer study, multi-seed replication, or rule ablation "
-        "was performed by these two campaigns.", "",
+        "was performed by the runs reported here.", "",
         "## Artifacts", "",
-        "`../run_manifest.json` records the frozen protocol, selected sources and results; `../arms/*/state.json` "
-        "records lineage and selection; `../arms/*/ledger.json` records every reservation and usage settlement. "
+        "Each new run has one `run_manifest.json`, `state.json`, `ledger.json`, and `interactions/` directory. "
+        "Historical paired execution directories retain their original manifest and `arms/<backend>/` evidence; "
+        "compact exports give each of those model runs its own record and link them only in a comparison. "
         "Candidate folders contain source, submitted-region/explanation records, build evidence and compliance reviews. "
-        "Full requests, model responses and inspection results are in `../arms/*/interactions/` with verified gzip "
+        "Full requests, model responses and inspection results remain in their originating run with verified gzip "
         "compression for larger files. Raw traces have per-file checksum-bearing gzip archives; compact manifests "
         "and CSV tables remain directly readable. `headline.csv` and `per_workload.csv` retain numerical results.", ""])
     (out / "report.md").write_text("\n".join(text))

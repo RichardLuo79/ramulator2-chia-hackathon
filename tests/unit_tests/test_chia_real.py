@@ -229,12 +229,13 @@ def test_real_loop_repairs_drafts_inside_one_evaluated_iteration(tmp_path, monke
             raise ValueError("mock compiler diagnostic")
         return {"sha256": "valid", "metrics": {}}
     monkeypatch.setattr(G, "evaluate_draft", evaluate)
-    result = G.propose(str(tmp_path), "flash", 1, "contract", "initial prompt", {})
+    result = G.propose._chia_original(str(tmp_path), "flash", 1, "contract", "initial prompt", {})
     assert result["status"] == "evaluated"
     assert [d["status"] for d in result["drafts"]] == ["rejected", "valid"]
     assert len(calls) == 3
     assert "mock compiler diagnostic" in calls[2]["contents"][-1].parts[0].text
-    assert P.Ledger(tmp_path / "arms/flash/ledger.json", "flash").totals()["api_attempts"] == 3
+    assert P.Ledger(tmp_path / "ledger.json", "flash", run_id=tmp_path.name).totals()["api_attempts"] == 3
+    assert not (tmp_path / "arms").exists()
 
 
 def test_script_entrypoint_chia_functions_are_serializable():
@@ -303,6 +304,71 @@ def test_paid_runner_rejects_stale_short_training_before_calls(tmp_path, monkeyp
     directory = tmp_path / "training/simpleo3/DDR5/429.mcf/oracle"
     directory.mkdir(parents=True)
     atomic_write_json(directory / "manifest.json", {"insts_per_core": 50_000})
-    monkeypatch.setattr(sys, "argv", ["gemini_loop.py", "--root", str(tmp_path)])
+    monkeypatch.setattr(sys, "argv", ["gemini_loop.py", "--root", str(tmp_path), "--model", "pro"])
     with pytest.raises(RuntimeError, match="prepared training ROI"):
         G.main()
+
+
+def test_ledger_cannot_mix_models_or_run_identities(tmp_path):
+    path = tmp_path / "ledger.json"
+    ledger = P.Ledger(path, "pro", run_id="pro-trial-001")
+    ledger.reserve("hello", 1, 1, input_tokens=10)
+    original = path.read_bytes()
+    data = json.loads(original)
+    assert data["model"] == P.MODELS["pro"]
+    assert P.MODELS["flash"] not in json.dumps(data)
+    assert "flash" not in data["pricing"] and "pro" not in data["pricing"]
+    for backend, run_id in (("flash", "pro-trial-001"), ("pro", "pro-trial-002")):
+        other = P.Ledger(path, backend, run_id=run_id)
+        with pytest.raises(ValueError, match="different"):
+            other.totals()
+        with pytest.raises(ValueError, match="different"):
+            other.reserve("hello", 1, 1, input_tokens=10)
+        assert path.read_bytes() == original
+
+
+@pytest.mark.parametrize("backend", ["pro", "flash"])
+def test_single_model_main_records_own_freeze_and_test_only(tmp_path, monkeypatch, backend):
+    """Exercise orchestration with no provider, compiler, Ray worker, or simulator."""
+    from types import SimpleNamespace
+    from tools.chia_loop import gemini_loop as G
+    atomic_write_json(tmp_path / "preflight_pass.json", {})
+    atomic_write_json(tmp_path / "preparation_manifest.json", {
+        "run_id": tmp_path.name, "model": P.MODELS[backend], "seed_sha256": "seed"})
+    for workload in G.E.TRAIN:
+        for label in ("oracle", "seed", *G.E.COMPARISONS):
+            directory = tmp_path / "training/simpleo3/DDR5" / workload / label
+            directory.mkdir(parents=True)
+            atomic_write_json(directory / "manifest.json", {"insts_per_core": 20_000_000})
+    state = {"run_id": tmp_path.name, "model": P.MODELS[backend], "status": "frozen",
+        "incumbent": backend + "_001", "frozen_at": 1,
+        "selected": {"sha256": "candidate", "plugin": "mock-plugin"}}
+    evolved, evaluated = [], []
+    def evolve(root, selected_backend):
+        evolved.append(selected_backend)
+        return state
+    def evaluate(root, *args, **kwargs):
+        frozen = json.loads((tmp_path / "selection_frozen.json").read_text())
+        assert frozen["run_id"] == tmp_path.name and frozen["source_sha256"] == "candidate"
+        evaluated.append(kwargs["split"])
+        return {"aggregate": {"fixture": 1}}
+    monkeypatch.setattr(G, "run_model", evolve)
+    monkeypatch.setattr(G.E, "evaluate", evaluate)
+    monkeypatch.setattr(G, "score", SimpleNamespace(chia_remote=lambda *args: evaluate(args[0], split=args[3])))
+    monkeypatch.setattr(G, "get", lambda value: value)
+    monkeypatch.setattr(G, "ray", SimpleNamespace(init=lambda **kwargs: None, shutdown=lambda: None))
+    monkeypatch.setattr(G, "start_collector", lambda **kwargs: None)
+    monkeypatch.setattr(G, "stop_collector", lambda: None)
+    monkeypatch.setattr(G, "get_collector", lambda: None)
+    monkeypatch.setattr(G.E, "verify_run_archives", lambda *args: 0)
+    monkeypatch.setattr(G.artifacts, "compress", lambda *args, **kwargs: None)
+    monkeypatch.setattr(G.artifacts, "verify", lambda *args: None)
+    monkeypatch.setattr(sys, "argv", ["gemini_loop.py", "--root", str(tmp_path), "--model", backend])
+    G.main()
+    result = json.loads((tmp_path / "run_manifest.json").read_text())
+    assert result["record_type"] == "optimization_run" and result["model"] == P.MODELS[backend]
+    assert result["status"] == "completed" and result["state"] == state
+    assert "arms" not in result and "models" not in result
+    assert result["final_test_metrics"] == {"aggregate": {"fixture": 1}}
+    assert evolved == [backend] and evaluated == ["test"] * 3
+    assert not (tmp_path / "both_frozen.json").exists()

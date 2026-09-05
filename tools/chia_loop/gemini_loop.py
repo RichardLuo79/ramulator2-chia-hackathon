@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-"""Two independent, budgeted Gemini source-evolution arms as a native CHIA graph.
+"""One budgeted, single-model Gemini source-evolution run as a native CHIA graph.
 
 An operator-side *compliance* review gate is intentional: the orchestrating
 coding agent checks boundedness/atomicity without supplying modeling fixes.
-No held-out result is evaluated until both incumbents are frozen. The model
+No held-out result is evaluated until this run's incumbent is frozen. The model
 backend does not inherit CHIA's default tools/retries: every paid request has
 an explicit HIGH setting, persisted reservation, and raw response record.
 """
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import fcntl
 import importlib.metadata
 import json
@@ -29,9 +28,10 @@ from chia.base.ChiaFunction import ChiaFunction, get
 from chia.trace.profiler import start_collector, stop_collector, get_collector, get_profiler
 from tools.chia_loop import artifacts, real_core as P, real_eval as E
 from tools.chia_loop.core import atomic_write_json
+from tools.chia_loop.run_records import model_pricing
 
 POLICY = {
-    "version": "gemini_repair_loop_v4", "iterations_per_arm": 5, "usd_cap_per_arm": 50,
+    "version": "gemini_individual_run_v5", "maximum_iterations": 5, "usd_cap": 50,
     "iteration_unit": "successfully evaluated design; draft repairs stay inside the iteration",
     "thinking_level": "HIGH", "temperature": 1.0,
     "maximum_output_tokens": P.MAX_OUTPUT, "maximum_context_utf8_bytes": P.MAX_CONTEXT_BYTES,
@@ -41,7 +41,7 @@ POLICY = {
     "api_attempts_per_proposal": 60, "transient_retries_per_turn": 1,
     "provider_timeout_seconds": 1800, "simulator_cpu_seconds": E.SIM_CPU_SECONDS,
     "consecutive_truncation_stop": 2,
-    "live_completion_preflight": "first counted proposal in each fresh arm; no extra paid preflight attempts",
+    "live_completion_preflight": "first counted proposal in this run; no extra paid preflight attempts",
     "simulator_file_bytes": E.SIM_FILE_BYTES,
     "compiler_cpu_seconds": 180, "process_memory_bytes": 4 * 1024**3,
     "promotion": "strict two-objective Pareto dominance of incumbent",
@@ -75,7 +75,7 @@ PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "ramulator-chia")
 
 
 def event(root, kind, **data):
-    record = {"time": time.time(), "event": kind, **data}
+    record = {"time": time.time(), "event": kind, "run_id": pathlib.Path(root).name, **data}
     with (pathlib.Path(root) / "events.jsonl").open("a") as f:
         # Workers may emit events too. A file lock is process-safe and does not
         # capture an unpickleable thread lock in CHIA's dispatched function.
@@ -121,9 +121,9 @@ def propose(root_text, arm, iteration, system, user_prompt, parent):
     from google import genai
     from google.genai import types
     root = pathlib.Path(root_text)
-    interactions = root / "arms" / arm / "interactions" / f"iter_{iteration:03d}"
+    interactions = root / "interactions" / f"iter_{iteration:03d}"
     interactions.mkdir(parents=True, exist_ok=True)
-    ledger = P.Ledger(root / "arms" / arm / "ledger.json", arm)
+    ledger = P.Ledger(root / "ledger.json", arm, run_id=root.name)
     client = genai.Client(vertexai=True, project=PROJECT, location="global",
         http_options=types.HttpOptions(timeout=POLICY["provider_timeout_seconds"] * 1000,
             retry_options=types.HttpRetryOptions(attempts=1)))
@@ -131,7 +131,7 @@ def propose(root_text, arm, iteration, system, user_prompt, parent):
         max_output_tokens=P.MAX_OUTPUT, thinking_config=types.ThinkingConfig(thinking_level="HIGH", include_thoughts=True),
         response_mime_type="application/json")
     contents = [types.Content(role="user", parts=[types.Part(text=user_prompt)])]
-    directory = root / "arms" / arm / "candidates" / f"{arm}_{iteration:03d}"
+    directory = root / "candidates" / f"{arm}_{iteration:03d}"
     seed_source = (root / "seed/atomic_controller.cpp").read_text()
     diagnostics, attempts, drafts, consecutive_truncations = 0, 0, [], 0
     maximum_turns = POLICY["model_turns_per_proposal"]
@@ -309,35 +309,35 @@ def make_prompt(root, arm, iteration, candidates, incumbent, parent_id, history)
         "published_comparison_training_metrics": json.dumps(comparisons),
         "accepted_and_rejected_proposals_with_reasons": json.dumps(history),
         "last_build_or_evaluation_diagnostics": json.dumps(history[-1:] if history else []),
-        "this_arm_pareto_archive": json.dumps({k: candidates[k]["metrics"]["aggregate"] for k in P.pareto(candidates)}),
+        "this_run_pareto_archive": json.dumps({k: candidates[k]["metrics"]["aggregate"] for k in P.pareto(candidates)}),
         "promotion_and_guardrail_configuration": json.dumps(POLICY),
         "allowed_tools_and_readable_file_manifest": json.dumps({"files": [P.MUTABLE, *VISIBLE],
             "tools": ["read_file", "search_file", "training_diagnostics"], "submission": "complete includes/code region bodies, no diff or boundary markers"}),
         "remaining_model_call_diagnostic_and_token_limits": json.dumps({"model_turns": POLICY["model_turns_per_proposal"],
             "diagnostics": POLICY["diagnostic_calls_per_proposal"], "drafts": POLICY["drafts_per_iteration"],
-            "output_tokens_per_turn": P.MAX_OUTPUT, "budget": P.Ledger(root / "arms" / arm / "ledger.json", arm).totals(), "cap_usd": 50}),
+            "output_tokens_per_turn": P.MAX_OUTPUT, "budget": P.Ledger(root / "ledger.json", arm, run_id=root.name).totals(), "cap_usd": 50}),
     }
     return P.render(template, fields)
 
 
-def run_arm(root, arm):
+def run_model(root, arm):
     root = pathlib.Path(root)
-    arm_dir = root / "arms" / arm
+    arm_dir = root
     arm_dir.mkdir(parents=True, exist_ok=True)
     if (arm_dir / "state.json").exists():
         raise RuntimeError("refusing implicit paid campaign resume; audit existing state first")
     carryover = root / "budget_carryover.json"
     if carryover.exists():
-        P.Ledger(arm_dir / "ledger.json", arm).initialize_carryover(json.loads(carryover.read_text())[arm])
+        P.Ledger(arm_dir / "ledger.json", arm, run_id=root.name).initialize_carryover(json.loads(carryover.read_text()))
     seed_source = (root / "seed/atomic_controller.cpp").read_text()
     seed_metrics = json.loads((root / "training/reports/seed.json").read_text())["models"]["seed"]
     candidates = {"seed": {"source_path": str(root / "seed/atomic_controller.cpp"), "sha256": P.sha(seed_source),
         "plugin": str(root / "seed/candidate.so"), "metrics": seed_metrics, "label": "seed"}}
     incumbent, history = "seed", []
     system = (root / "prompts/system_v1.md").read_text()
-    event(root, "arm_started", arm=arm, model=P.MODELS[arm])
+    event(root, "run_started", backend=arm, model=P.MODELS[arm])
     state = {}
-    for iteration in range(1, POLICY["iterations_per_arm"] + 1):
+    for iteration in range(1, POLICY["maximum_iterations"] + 1):
         archive = P.pareto(candidates)
         parent_id = archive[(iteration - 1) % len(archive)]
         parent = {**candidates[parent_id], "id": parent_id}
@@ -372,24 +372,26 @@ def run_arm(root, arm):
             record.update({"status": "stopped", "reason": proposal.get("reason", "no_change")})
             event(root, "proposal_rejected", arm=arm, iteration=iteration, reason=record["reason"])
         history.append(record)
-        state = {"arm": arm, "model": P.MODELS[arm], "status": "running", "history": history,
+        state = {"run_id": root.name, "backend": arm, "model": P.MODELS[arm], "status": "running", "history": history,
                  "candidates": candidates, "incumbent": incumbent, "pareto_archive": P.pareto(candidates),
-                 "budget": P.Ledger(arm_dir / "ledger.json", arm).totals()}
+                 "budget": P.Ledger(arm_dir / "ledger.json", arm, run_id=root.name).totals()}
         atomic_write_json(arm_dir / "state.json", state)
         if proposal.get("status") != "evaluated":
             state["stop_reason"] = record["reason"]
             break
     state.update({"status": "frozen", "frozen_at": time.time(), "selected": candidates[incumbent]})
     atomic_write_json(arm_dir / "state.json", state)
-    event(root, "arm_frozen", arm=arm, incumbent=incumbent, budget=state["budget"])
+    event(root, "selection_frozen", backend=arm, incumbent=incumbent, budget=state["budget"])
     return state
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", type=pathlib.Path, required=True)
+    ap.add_argument("--model", choices=P.MODELS, required=True, help="exactly one backend per run")
     args = ap.parse_args()
     root = args.root.resolve()
+    arm = args.model
     if not (root / "preflight_pass.json").exists():
         raise RuntimeError("paid calls require a completed isolation/evaluation/budget preflight")
     # A leftover infrastructure-smoke result must never become full-ROI
@@ -402,6 +404,9 @@ def main():
                 raise RuntimeError("prepared training ROI differs from campaign window policy")
     if (root / "run_manifest.json").exists():
         raise RuntimeError("run already has a manifest; no automatic paid resume")
+    preparation = json.loads((root / "preparation_manifest.json").read_text())
+    if preparation.get("model") != P.MODELS[arm] or preparation.get("run_id") != root.name:
+        raise RuntimeError("preparation belongs to a different model or run; prepare an individual run first")
     (root / "visible").mkdir()
     for relative in VISIBLE:
         source = REPO / relative
@@ -414,20 +419,21 @@ def main():
     protocol_paths = [REPO / "tools/chia_loop" / name for name in (
         "artifacts.py", "core.py", "gemini_loop.py", "real_core.py", "real_eval.py",
         "preflight_real.py", "prepare_gemini.py", "sandbox.py", "traffic.py",
-        "review_candidate.py", "analyze_gemini.py", "audit_gemini_campaign.py")]
+        "review_candidate.py", "run_records.py", "analyze_gemini.py", "audit_gemini_campaign.py")]
     protocol_paths += list((REPO / "tools/chia_loop/prompts").glob("*.md"))
     protocol_paths += list((REPO / "tools/eval").glob("*.py"))
     for path in protocol_paths:
         destination = root / "protocol" / path.relative_to(REPO)
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(path, destination)
-    manifest = {"status": "running", "started_at": time.time(), "policy": POLICY, "models": P.MODELS,
-        "project": PROJECT, "location": "global", "pricing": P.PRICING,
+    manifest = {"schema_version": 2, "record_type": "optimization_run", "run_id": root.name,
+        "backend": arm, "model": P.MODELS[arm], "status": "running", "started_at": time.time(), "policy": POLICY,
+        "project": PROJECT, "location": "global", "pricing": model_pricing(P.PRICING, arm),
         "budget_carryover": json.loads((root / "budget_carryover.json").read_text()) if (root / "budget_carryover.json").exists() else {},
         "training": E.TRAIN, "final_test": E.TEST, "instructions_per_core": E.evaluation_insts(root),
         "comparisons": E.COMPARISONS, "prior_design_exposed": False,
-        "human_modeling_hints": False, "test_access": "after_both_incumbents_frozen",
-        "preparation": json.loads((root / "preparation_manifest.json").read_text()) if (root / "preparation_manifest.json").exists() else None,
+        "human_modeling_hints": False, "test_access": "after_this_run_selection_frozen",
+        "preparation": preparation,
         "meta_reviewer_test_exposure": "these workload families were evaluated before this fresh campaign; agents see training only",
         "protocol_hashes": {str(p.relative_to(REPO)): P.sha(p.read_bytes()) for p in protocol_paths},
         "visible_hashes": {p: P.sha((root / "visible" / p).read_bytes()) for p in VISIBLE},
@@ -438,24 +444,22 @@ def main():
             "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1"}})
     start_collector(log_dir=str(root / "profiles"))
     try:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-            futures = {arm: pool.submit(run_arm, root, arm) for arm in P.MODELS}
-            states = {arm: future.result() for arm, future in futures.items()}
+        state = run_model(root, arm)
+        manifest["state"] = state
         if (root / "STOP").exists():
             raise InterruptedError("operator stop requested; held-out evaluation not started")
-        atomic_write_json(root / "both_frozen.json", {arm: {"source_sha256": s["selected"]["sha256"],
-            "incumbent": s["incumbent"], "frozen_at": s["frozen_at"]} for arm, s in states.items()})
-        event(root, "both_frozen_test_started")
+        atomic_write_json(root / "selection_frozen.json", {"run_id": root.name,
+            "source_sha256": state["selected"]["sha256"], "incumbent": state["incumbent"], "frozen_at": state["frozen_at"]})
+        event(root, "frozen_test_started")
         E.evaluate(root, ["oracle", *E.COMPARISONS], split="test", workers=6)
         E.evaluate(root, ["candidate"], split="test", plugin=str(root / "seed/candidate.so"), label="seed")
-        test_refs = {arm: score.chia_remote(str(root), state["selected"]["plugin"], arm + "_final", "test") for arm, state in states.items()}
-        tests = {arm: get(ref) for arm, ref in test_refs.items()}
+        tests = get(score.chia_remote(str(root), state["selected"]["plugin"], arm + "_final", "test"))
         for relative, expected in manifest["protocol_hashes"].items():
             if P.sha((REPO / relative).read_bytes()) != expected:
                 raise RuntimeError("protocol mutated during paid campaign: " + relative)
         manifest.update({"status": "completed", "finished_at": time.time(),
-                         "arms": states, "final_test_metrics": tests})
-        event(root, "campaign_completed", test_metrics={k:v["aggregate"] for k,v in tests.items()})
+                         "state": state, "final_test_metrics": tests})
+        event(root, "run_completed", test_metrics=tests["aggregate"])
     except BaseException:
         manifest.update({"status": "failed", "failure": traceback.format_exc(), "finished_at": time.time()})
         raise

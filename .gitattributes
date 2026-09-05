@@ -3,5 +3,6 @@
 # Preserve checksum-bound exports exactly, including generated source and CSV whitespace.
 doc/results/** -text
 doc/results/*/*_selected.cpp whitespace=-blank-at-eol
-doc/results/*/*.svg whitespace=-blank-at-eol
-doc/results/*/*.csv whitespace=cr-at-eol
+doc/results/**/selected.cpp whitespace=-blank-at-eol
+doc/results/**/*.svg whitespace=-blank-at-eol
+doc/results/**/*.csv whitespace=cr-at-eol

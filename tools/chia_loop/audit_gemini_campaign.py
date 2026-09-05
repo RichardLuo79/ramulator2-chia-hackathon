@@ -16,6 +16,7 @@ import pathlib
 import time
 
 from tools.chia_loop.core import atomic_write_json
+from tools.chia_loop.run_records import reporting_view, frozen_selections
 
 
 def load(path):
@@ -39,7 +40,7 @@ def main():
     ap.add_argument("root", type=pathlib.Path)
     args = ap.parse_args()
     root = args.root.resolve()
-    manifest = load(root / "run_manifest.json")
+    manifest = reporting_view(root)
     assert manifest["status"] == "completed" and manifest["archives_verified"]
     policy = manifest["policy"]
     for relative, expected in manifest["protocol_hashes"].items():
@@ -50,17 +51,17 @@ def main():
     for filename, key in (("libramulator.so", "library_sha256"), ("isolated_sim", "executable_sha256")):
         assert digest(root / "runtime" / filename) == runtime[key]
     assert runtime["optimization"] == "-O3"
-    frozen = load(root / "both_frozen.json")
+    frozen = frozen_selections(manifest)
     freeze_time = max(s["frozen_at"] for s in frozen.values())
     events = [json.loads(line) for line in (root / "events.jsonl").read_text().splitlines()]
-    test_start = next(e["time"] for e in events if e["event"] == "both_frozen_test_started")
+    test_start = next(e["time"] for e in events if e["event"] == manifest["test_start_event"])
     assert test_start >= freeze_time
     seed_hash = digest(root / "seed/atomic_controller.cpp")
     assert seed_hash == manifest["preparation"]["seed_sha256"]
     assert all(not row["wraps"] for row in load(root / "input_inventory.json").values())
     usage, arm_summaries = [], {}
     for arm, state in manifest["arms"].items():
-        assert 1 <= len(state["history"]) <= policy["iterations_per_arm"]
+        assert 1 <= len(state["history"]) <= policy["maximum_iterations"]
         assert state["selected"]["sha256"] == frozen[arm]["source_sha256"]
         assert state["status"] == "frozen"
         drafts = [d for h in state["history"] for d in h.get("drafts", [])]
@@ -76,16 +77,21 @@ def main():
             if candidate_id != "seed":
                 review = load(pathlib.Path(candidate["source_path"]).parent / "review.json")
                 assert review["approved"] is True and review["source_sha256"] == candidate["sha256"]
-        ledger = load(root / "arms" / arm / "ledger.json")
+        run_directory = manifest["run_directories"][arm]
+        ledger = load(run_directory / "ledger.json")
+        assert ledger.get("backend", ledger.get("arm")) == arm
+        if manifest.get("record_type") == "optimization_run":
+            assert ledger["run_id"] == manifest["run_id"] and ledger["model"] == manifest["model"]
+            assert state["run_id"] == manifest["run_id"] and state["model"] == manifest["model"]
         carry = ledger.get("carryover", {})
         if carry:
             assert digest(carry["prior_ledger"]) == carry["prior_ledger_sha256"]
             assert carry == manifest["budget_carryover"][arm]
-        assert carry.get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in ledger["calls"]) <= policy["usd_cap_per_arm"]
+        assert carry.get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in ledger["calls"]) <= policy["usd_cap"]
         assert len(ledger["calls"]) == state["budget"]["api_attempts"]
         adjusted_cost = 0.0
         for call in ledger["calls"]:
-            base = root / "arms" / arm / "interactions" / f"iter_{call['iteration']:03d}" / f"call_{call['id']:03d}"
+            base = run_directory / "interactions" / f"iter_{call['iteration']:03d}" / f"call_{call['id']:03d}"
             request = load(base.with_suffix(".request.json"))
             assert request["model"] == manifest["models"][arm]
             assert request["config"]["thinking_config"]["thinking_level"] == policy["thinking_level"]
@@ -96,9 +102,9 @@ def main():
             for workload in manifest["final_test"]:
                 assert workload not in json.dumps(request), "held-out identity in paid request"
             sent_prompt = request["contents"][0]["parts"][0]["text"]
-            prompt = root / "arms" / arm / "candidates" / f"{arm}_{call['iteration']:03d}/prompt.md"
+            prompt = run_directory / "candidates" / f"{arm}_{call['iteration']:03d}/prompt.md"
             assert sent_prompt == prompt.read_text()
-            row = {"arm": arm, "iteration": call["iteration"], "call_id": call["id"],
+            row = {"run_id": manifest["run_ids"][arm], "backend": arm, "iteration": call["iteration"], "call_id": call["id"],
                 "turn": call["turn"], "state": call["state"], "finish_reason": "NO_RESPONSE",
                 "prompt_tokens": 0, "cached_tokens": 0, "thinking_tokens": 0, "answer_tokens": 0,
                 "billed_output_tokens": 0, "standard_usd": call["estimated_standard_usd"],
@@ -123,7 +129,7 @@ def main():
                 adjusted_cost += ((row["prompt_tokens"] - .9 * row["cached_tokens"]) * input_rate
                     + row["billed_output_tokens"] * output_rate) / 1e6
             usage.append(row)
-        this_arm = [r for r in usage if r["arm"] == arm]
+        this_arm = [r for r in usage if r["backend"] == arm]
         arm_summaries[arm] = {"selected": state["incumbent"], "attempts": len(state["history"]),
             "drafts_submitted": len(drafts), "draft_rejections": sum(d["status"] == "rejected" for d in drafts),
             "valid": sum(h["status"] == "valid" for h in state["history"]),
@@ -201,7 +207,7 @@ def main():
     out = root / "analysis"
     out.mkdir(exist_ok=True)
     with (out / "provider_calls.csv").open("w") as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(usage[0]) if usage else ["arm", "call_id"])
+        writer = csv.DictWriter(stream, fieldnames=list(usage[0]) if usage else ["run_id", "call_id"])
         writer.writeheader(); writer.writerows(usage)
     audit = {"status": "pass", "time": time.time(), "runs": runs, "candidate_callback_checks": callback_runs,
         "paired_logical_reads_across_reports": pairings, "traces": traces, "raw_bytes": raw_bytes,
@@ -210,14 +216,21 @@ def main():
         "archive_recoveries_verified": len(recoveries), "archive_recoveries": recoveries,
         "scored_trace_archives_recovered": sum(r["split"] in ("training", "test") for r in recoveries),
         "protocol_and_visible_snapshots_verified": True, "runtime_and_candidate_hashes_verified": True,
-        "test_after_both_freezes": True, "heldout_ids_absent_from_paid_requests": True,
+        "test_after_selection_freeze": True, "heldout_ids_absent_from_paid_requests": True,
         "actual_api_prompt_matches_saved_prompt": True, "caps_respected": True,
-        "all_requests_use_configured_HIGH_and_output_maximum": True, "arms": arm_summaries,
+        "all_requests_use_configured_HIGH_and_output_maximum": True,
         "analysis_source_sha256": digest(__file__),
         "figure_report_source_sha256": digest(pathlib.Path(__file__).with_name("analyze_gemini.py")),
         "post_run_working_copy_changes": {p: digest(pathlib.Path(__file__).resolve().parents[2] / p)
             for p, expected in manifest["protocol_hashes"].items()
             if digest(pathlib.Path(__file__).resolve().parents[2] / p) != expected}}
+    if manifest.get("record_type") == "optimization_run":
+        audit.update(record_type="run_integrity_audit", run_id=manifest["run_id"],
+                     model=manifest["model"], generation=arm_summaries[manifest["backend"]])
+    else:
+        # Legacy shared-store audit only. Do not turn it into a new joint run.
+        audit.update(record_type="legacy_shared_execution_audit", test_after_both_freezes=True,
+                     runs_by_id={manifest["run_ids"][arm]: summary for arm, summary in arm_summaries.items()})
     atomic_write_json(root / "final_integrity_audit.json", audit)
     print(json.dumps(audit, indent=2))
 

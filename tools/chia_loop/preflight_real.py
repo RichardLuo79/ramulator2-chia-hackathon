@@ -21,6 +21,8 @@ def main():
     root = args.root.resolve()
     tests = E.command([sys.executable, "-m", "pytest",
         "tests/unit_tests/test_chia_real.py", "tests/unit_tests/test_chia_loop.py",
+        "tests/unit_tests/test_chia_run_records.py", "tests/unit_tests/test_chia_review_export.py",
+        "tests/unit_tests/test_eval_archive_recovery.py",
         "tests/unit_tests/test_eval_metrics.py", "tests/unit_tests/test_atomic_skeleton.py", "-q"],
         root / "logs/unit_tests.log")
     parity = []
@@ -101,7 +103,7 @@ __attribute__((constructor)) void probe() {
         "unit_test_command": "pytest tests/unit_tests/test_chia_real.py tests/unit_tests/test_chia_loop.py tests/unit_tests/test_eval_metrics.py tests/unit_tests/test_atomic_skeleton.py -q",
         "unit_test_execution": tests,
         "operator_setup_notes": ["Full-window O3 parity and loaded-candidate isolation checked before paid calls.",
-                                 "Live generation preflight is the first counted proposal per arm."]})
+                                 "Live generation preflight is the first counted proposal in the individual model run."]})
     print("PREFLIGHT_PASS: exact parity, loaded-candidate isolation, disjoint trace hashes")
 
 

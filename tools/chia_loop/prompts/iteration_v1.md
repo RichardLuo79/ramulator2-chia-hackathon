@@ -1,10 +1,11 @@
 Evaluated design iteration {{iteration_number}} of {{max_proposal_iterations}}.
 Draft repairs and inspections stay within this iteration until one design is
-successfully evaluated or a budget/safety limit stops the arm.
+successfully evaluated or a budget/safety limit stops this run.
 
 Use the frozen system contract. Propose one coherent change to the supplied
-parent, informed by this campaign's training feedback. The following fields
-are supplied by the runner; all results and history belong to this arm.
+parent, informed by this run's training feedback. The following fields
+are supplied by the runner; all optimization results and history belong to
+this individual model run. Published comparison models are fixed baselines.
 
 ## Parent and incumbent
 
@@ -32,7 +33,7 @@ Incumbent ID: {{incumbent_id}}
 
 {{last_build_or_evaluation_diagnostics}}
 
-{{this_arm_pareto_archive}}
+{{this_run_pareto_archive}}
 
 ## Fixed policy and available actions
 

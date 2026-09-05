@@ -9,6 +9,7 @@ import re
 import time
 
 from tools.chia_loop.core import atomic_write_json
+from tools.chia_loop.run_records import model_pricing
 
 MUTABLE = "src/ramulator/controller/impl/atomic_controller.cpp"
 MODELS = {"pro": "gemini-3.1-pro-preview", "flash": "gemini-3.8-flash"}
@@ -74,17 +75,31 @@ class Ledger:
     if no count is supplied, and twice the output cap including thinking.
     Successful usage replaces the reservation with a conservative tariff bound.
     Actual standard-rate estimates are reported separately, never used to raise
-    the authorized per-arm ceiling. No SDK hidden retries are allowed.
+    the authorized per-run ceiling. No SDK hidden retries are allowed.
     """
-    def __init__(self, path: pathlib.Path, arm: str):
+    def __init__(self, path: pathlib.Path, arm: str, *, run_id=None):
         self.path, self.arm = pathlib.Path(path), arm
+        self.run_id = run_id
+        if arm not in MODELS:
+            raise ValueError("unknown model backend")
         self.path.parent.mkdir(parents=True, exist_ok=True)
+
+    def _check_owner(self, data):
+        if data.get("backend", data.get("arm")) != self.arm:
+            raise ValueError("ledger belongs to a different model backend")
+        if data.get("model", MODELS[self.arm]) != MODELS[self.arm]:
+            raise ValueError("ledger belongs to a different model version")
+        if self.run_id is not None and data.get("run_id") != self.run_id:
+            raise ValueError("ledger belongs to a different run")
 
     def _transaction(self, update):
         with self.path.with_suffix(".lock").open("a") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             data = json.loads(self.path.read_text()) if self.path.exists() else {
-                "arm": self.arm, "cap_usd": CAP_USD, "pricing": PRICING, "calls": []}
+                "schema_version": 2, "record_type": "run_budget", "run_id": self.run_id,
+                "backend": self.arm, "model": MODELS[self.arm], "cap_usd": CAP_USD,
+                "pricing": model_pricing(PRICING, self.arm), "calls": []}
+            self._check_owner(data)
             result = update(data)
             atomic_write_json(self.path, data)
             return result
@@ -97,7 +112,7 @@ class Ledger:
             raise ValueError("invalid budget carryover")
         def update(data):
             if data["calls"] or data.get("carryover"):
-                raise ValueError("cannot replace an initialized campaign budget")
+                raise ValueError("cannot replace an initialized run budget")
             data["carryover"] = carryover
         self._transaction(update)
 
@@ -114,7 +129,7 @@ class Ledger:
         def update(data):
             committed = data.get("carryover", {}).get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in data["calls"])
             if committed + reserve > data["cap_usd"]:
-                raise BudgetExhausted("per-arm $50 ceiling would be exceeded by next call")
+                raise BudgetExhausted("per-run $50 ceiling would be exceeded by next call")
             call_id = len(data["calls"])
             data["calls"].append({"id": call_id, "iteration": iteration, "turn": turn,
                 "reserved_at": time.time(), "state": "reserved", "payload_sha256": sha(payload),
@@ -159,6 +174,7 @@ class Ledger:
         if not self.path.exists():
             return {"api_attempts": 0, "cap_charge_usd": 0, "estimated_standard_usd": 0}
         data = json.loads(self.path.read_text())
+        self._check_owner(data)
         calls, carry = data["calls"], data.get("carryover", {})
         return {"api_attempts": len(calls),
             "carryover_api_attempts": carry.get("api_attempts", 0),

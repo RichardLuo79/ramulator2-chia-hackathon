@@ -8,16 +8,23 @@ import time
 
 from tools.chia_loop import artifacts, real_eval
 from tools.chia_loop.core import atomic_write_json
+from tools.chia_loop.run_records import reporting_view, frozen_selections
 
 
 def finalize(root):
     root = pathlib.Path(root).resolve()
     path = root / "run_manifest.json"
     manifest = json.loads(path.read_text())
-    if manifest.get("status") != "completed" or not (root / "both_frozen.json").exists():
+    if manifest.get("status") != "completed":
         raise ValueError("artifact finalization requires completed evaluation and frozen selections")
-    if any(state.get("status") != "frozen" for state in manifest["arms"].values()):
-        raise ValueError("cannot finalize an active optimization arm")
+    view = reporting_view(root)
+    if not view["freeze_file"].exists() or any(state.get("status") != "frozen" for state in view["arms"].values()):
+        raise ValueError("cannot finalize an active or unfrozen optimization run")
+    frozen = frozen_selections(view)
+    if set(frozen) != set(view["arms"]) or any(
+            frozen[backend]["source_sha256"] != state["selected"]["sha256"]
+            for backend, state in view["arms"].items()):
+        raise ValueError("selection freeze does not match the completed run")
     for failure in root.glob("training/simpleo3/DDR5/*/*/failure.json"):
         real_eval.archive_failed_run(failure.parent)
     count = real_eval.verify_run_archives(root)

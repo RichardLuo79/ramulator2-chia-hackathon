@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Non-billable preparation of a fresh full-window Gemini comparison.
+"""Non-billable preparation of one fresh full-window Gemini run.
 
 Never imports sources, candidates, metrics, or ledgers from an earlier run.
 The isolated and ordinary Python runners must agree before any paid call.
@@ -32,6 +32,7 @@ def progress(stage, **extra):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", type=pathlib.Path, required=True)
+    ap.add_argument("--model", choices=P.MODELS, required=True)
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--carry-budget-from", type=pathlib.Path,
         help="retain charges from an aborted infrastructure attempt; never imports model feedback")
@@ -39,22 +40,22 @@ def main():
     if not 1 <= args.workers <= 12:
         ap.error("workers must be in [1, 12]")
     root = args.root.resolve()
+    arm, model = args.model, P.MODELS[args.model]
     root.mkdir(parents=True, exist_ok=False)
     if args.carry_budget_from:
         origin = args.carry_budget_from.resolve()
         previous = json.loads((origin / "run_manifest.json").read_text())
-        if previous.get("models") != P.MODELS or previous.get("no_candidate_evaluated") is not True:
+        previous_model = previous.get("model", previous.get("models", {}).get(arm))
+        if previous_model != model or previous.get("no_candidate_evaluated") is not True:
             raise RuntimeError("carryover requires a same-backend infrastructure abort before candidate evaluation")
-        carried = {}
-        for arm in P.MODELS:
-            path = origin / "arms" / arm / "ledger.json"
-            totals = P.Ledger(path, arm).totals()
-            if totals.get("unknown_usage_calls", 0):
-                raise RuntimeError("settle or audit unknown generation usage before restarting")
-            carried[arm] = {**{k: totals[k] for k in ("cap_charge_usd", "estimated_standard_usd", "unknown_usage_calls")},
-                "api_attempts": totals["api_attempts"] + totals.get("carryover_api_attempts", 0),
-                "prior_ledger": str(path), "prior_ledger_sha256": P.sha(path.read_bytes()),
-                "reason": "infrastructure attempt charges retained within the original per-arm authorization"}
+        path = (origin if previous.get("record_type") == "optimization_run" else origin / "arms" / arm) / "ledger.json"
+        totals = P.Ledger(path, arm).totals()
+        if totals.get("unknown_usage_calls", 0):
+            raise RuntimeError("settle or audit unknown generation usage before restarting")
+        carried = {**{k: totals.get(k, 0) for k in ("cap_charge_usd", "estimated_standard_usd", "unknown_usage_calls")},
+            "api_attempts": totals["api_attempts"] + totals.get("carryover_api_attempts", 0),
+            "prior_ledger": str(path), "prior_ledger_sha256": P.sha(path.read_bytes()),
+            "reason": "infrastructure attempt charges retained within the original per-run authorization"}
         atomic_write_json(root / "budget_carryover.json", carried)
     atomic_write_json(root / "window_policy.json", {
         "instructions_per_core": E.C.INSTS_SINGLE,
@@ -67,21 +68,22 @@ def main():
     expected_seed = "voidinit_model(){}Clk_tpredict_departure(constRequest&req){returnm_clk+m_latency;}"
     if re.sub(r"\s+", "", regions["CODE"]) != expected_seed or regions["INCLUDES"].strip():
         raise RuntimeError("fresh campaign requires the unchanged fixed-delay skeleton")
-    prep = {"status": "preparing", "started_at": time.time(),
+    prep = {"status": "preparing", "started_at": time.time(), "run_id": root.name,
+        "backend": arm, "model": model,
         "seed_sha256": P.sha(seed), "seed_source": P.MUTABLE,
-        "maximum_output_tokens": P.MAX_OUTPUT, "output_limit_source": [
-            "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-1-pro",
-            "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-8-flash"],
-        "authorization": "User requested Gemini 3.8 Flash, relaxed limits, and a fresh comparison; five evaluated designs and USD 50 per arm",
+        "maximum_output_tokens": P.MAX_OUTPUT, "output_limit_source":
+            "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/" +
+            ("3-1-pro" if arm == "pro" else "3-8-flash"),
+        "authorization": "Five evaluated designs and USD 50 for this individual model run; paid execution requires user authorization",
         "previous_campaign_inputs_imported": False, "human_modeling_hints": False,
         "workers": args.workers, "optimization": "-O3",
-        "changes": ["Gemini 3.8 Flash versus Gemini 3.1 Pro, HIGH and 65,536 output tokens",
+        "changes": [f"{model}, HIGH and 65,536 output tokens; independent single-model run",
             "complete editable-region bodies, with build/compliance/runtime repair feedback",
             "editable model parameters and read-only resolved controller behavior",
             "48 model turns, 192 inspections, and 12 drafts per evaluated iteration",
             "token-counted context and model-specific conservative USD 50 ledger",
             "fresh full 20M instruction evolution; immediate verified trace compression"],
-        "live_generation_preflight": "first counted proposal in each arm; no separate paid probe",
+        "live_generation_preflight": "first counted proposal in this run; no separate paid probe",
         "heldout_exposure": "operator has seen these families in earlier evaluation; fresh agents see training only"}
     atomic_write_json(root / "preparation_manifest.json", prep)
     progress("optimized_runtime")
@@ -130,13 +132,12 @@ def main():
     with genai.Client(vertexai=True, project=os.environ.get("GOOGLE_CLOUD_PROJECT", "ramulator-chia"),
             location="global", http_options=types.HttpOptions(timeout=60_000,
                 retry_options=types.HttpRetryOptions(attempts=1))) as client:
-        counts = {arm: client.models.count_tokens(model=model, contents="Configuration preflight.",
+        counts = client.models.count_tokens(model=model, contents="Configuration preflight.",
             config=types.CountTokensConfig(system_instruction="Return only a proposal JSON object.")).total_tokens
-            for arm, model in P.MODELS.items()}
     prep.update({"status": "ready", "finished_at": time.time(), "adc_refreshed": True,
                  "adc_project": project, "api_calls": 0, "nonbillable_count_tokens_preflight": counts})
     atomic_write_json(root / "preparation_manifest.json", prep)
-    progress("ready_for_paid_campaign", root=str(root), api_calls=0)
+    progress("ready_for_individual_run", root=str(root), model=model, api_calls=0)
 
 
 if __name__ == "__main__":

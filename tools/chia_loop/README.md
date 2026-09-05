@@ -9,8 +9,9 @@ part of this repository.
 
 ## Current experiment
 
-The real backend compares Gemini 3.1 Pro Preview with Gemini 3.8 Flash through
-Google Cloud ADC. Each independent arm starts clean, uses HIGH thinking and
+One invocation runs exactly one Gemini backend through Google Cloud ADC.
+Gemini 3.1 Pro Preview and Gemini 3.8 Flash are separate model runs, compared
+only in downstream analysis. Each run starts clean, uses HIGH thinking and
 65,536 maximum output tokens, and stops after five evaluated designs or its
 USD 50 spending/safety limit. Failed drafts are repairable within an iteration.
 Every draft, API attempt, tool result, build, compliance decision, and score is
@@ -25,14 +26,16 @@ is not replenished by restarting. This option requires that the aborted run
 evaluated no candidate and that all generation usage is settled.
 
 Training uses mcf/lbm; final testing uses milc/soplex/GemsFDTD/fotonik3d, only
-after both selections are frozen. Every case executes 20 million issued
+after that run's selection is frozen. The historical shared execution waited
+for both selections; this is retained in its provenance, not imposed as a
+dependency between new runs. Every case executes 20 million issued
 instructions per core, from a cold start through complete drain. The real
 runner rejects shorter windows. It checks trace length, disjoint input hashes,
 oracle DRAM traffic, exact request pairing, and callback integrity. The
 published comparison models are FixedLat, MD1, Sniper WMG1, and MESS.
 
 An independent earlier feasibility design and all earlier campaigns are
-unavailable to optimization agents. Only their own campaign history, selected
+unavailable to optimization agents. Only their own run history, selected
 public source files, and training diagnostics are exposed. This isolation is
 implemented by the tool adapter and runtime, not merely requested in a prompt.
 
@@ -60,9 +63,18 @@ normal/isolated-runner parity checks, unit tests, and actual loaded-DSO isolatio
 and model-parameter probes. It refreshes ADC but makes no paid generation calls.
 
 ```sh
-.venv/bin/python tools/chia_loop/prepare_gemini.py --root eval_out/chia/NEW_RUN --workers 6
-.venv/bin/python tools/chia_loop/gemini_loop.py --root eval_out/chia/NEW_RUN
+.venv/bin/python tools/chia_loop/prepare_gemini.py --root eval_out/chia/PRO_RUN_ID --model pro --workers 6
+.venv/bin/python tools/chia_loop/gemini_loop.py --root eval_out/chia/PRO_RUN_ID --model pro
 ```
+
+Use a different root and `--model flash` for a Flash run. Root names are stable
+run IDs and must be unique within a comparison. Do not reuse a run directory
+for another model or trial. Run these invocations sequentially to keep total
+evaluation/build parallelism within 12 CPUs; do not launch two 12-CPU runners.
+Each run has its own preparation, state, budget, interactions, CHIA profile,
+freeze, final-test results, and stop/failure status. A comparison owns none of
+those and cannot promote candidates or transfer budget between runs. Even when
+one run finishes first, its results must not become feedback for the other.
 
 A completed build emits a `compliance_review_needed` event and waits for a
 reviewer. Review the exact candidate source and its explanation against the
@@ -89,7 +101,7 @@ runner preserves all surrounding code. Model state, helpers, parameter defaults
 and validation, `init_model()`, and `predict_departure()` are editable.
 `model_param(name, default, minimum, maximum)` declares a numeric model
 parameter during initialization. Optional public overrides use
-`model_parameters=["name=value"]`; a campaign uses one shared configuration,
+`model_parameters=["name=value"]`; a run uses one shared configuration,
 never workload-specific values. `controller_config()` supplies the resolved
 buffer sizes and write-drain watermarks read-only. The DRAM specification is
 also readable. Admission, callbacks, time, mapping, and observations stay frozen.
@@ -122,6 +134,20 @@ infrastructure guards, not accuracy thresholds.
 .venv/bin/python tools/chia_loop/export_review.py eval_out/chia/NEW_RUN doc/results/NEW_RUN
 ```
 
+After separately exporting two completed runs, create a comparison that
+references their checksummed summaries:
+
+```sh
+.venv/bin/python tools/chia_loop/compare_reviews.py \
+  doc/results/PRO_RUN_ID/summary.json doc/results/FLASH_RUN_ID/summary.json \
+  --destination doc/results/COMPARISON_ID
+```
+
+The comparison checks matching setup, input/protocol identities, and source
+checksums. Its table labels every row by run ID. It contains no joint budget,
+search lineage, or promotion history. Repeated runs of the same model are also
+supported; five iterations within one run are not five independent trials.
+
 The run directory holds frozen execution/source snapshots, exact manifests,
 provider ledgers, source lineage, CHIA execution profiles, per-workload metrics,
 and plots. Raw traces are gzip-compressed immediately after each successful
@@ -138,10 +164,18 @@ Large finalized interactions/logs/profiles are compressed too.
 Restoration is optional. Do not restore whole archives merely to compute
 metrics. Generated data and interaction logs stay outside Git; a compact
 review summary and selected result tables/plots can be curated separately.
-The exporter requires a completed, audited campaign and a new destination. It
+The exporter requires a completed, audited run and a new destination. It
 copies only selected sources, numeric summaries, and allowlisted tables/plots,
 not the full run manifest, proposal explanations, or interaction records.
 The runner never commits or pushes.
+
+The completed 2026-09-05 evidence used an older shared execution directory.
+The reader supports that layout without rewriting its manifests, ledgers,
+interactions, or compressed traces. Its export contains one `runs/RUN_ID/`
+record per model, each with its own selected source, accounting, trajectory,
+and numerical tables; the top-level `summary.json` is only a comparison with
+references. Shared oracle/baseline trace archives are retained once. Shared
+artifact counts must not be reported as each model run's sample count.
 
 If evaluation completed but post-run archival failed, fix the specific storage
 problem, then run `finalize_artifacts.py RUN_ROOT` and repeat the analysis/audit.

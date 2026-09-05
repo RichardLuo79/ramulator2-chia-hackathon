@@ -100,17 +100,22 @@ in principle; initial backend trials receive no human modeling insights.
 
 ## Completed Gemini comparison
 
-Campaign `gemini_repair_v4c_20260905` compared **Gemini 3.1 Pro Preview** and
-**Gemini 3.8 Flash**, each starting from the same clean seed. Both completed
+The [Gemini 3.1 Pro Preview run](results/gemini_20260905/runs/gemini_repair_v4c_20260905__gemini-3.1-pro-preview/summary.json)
+and [Gemini 3.8 Flash run](results/gemini_20260905/runs/gemini_repair_v4c_20260905__gemini-3.8-flash/summary.json)
+are independent optimization runs, each starting from the same clean seed.
+`gemini_repair_v4c_20260905` names their historical shared execution directory,
+not a joint model run. Each has its own model identity, budget, interactions,
+candidate lineage, selection, and results; the comparison references the two
+run records without merging them. Both completed
 five evaluated designs, with one promotion each. The execution protocol and
 runtime were frozen before generation; subsequent storage/reporting changes
 did not alter the evaluated sources or scores.
 
 Protocol v4 uses HIGH thinking, a 65,536-token output ceiling, and USD 50 per
-arm. Each iteration allows draft repair, up to 48 model turns, 192 inspection
+run. Each iteration allows draft repair, up to 48 model turns, 192 inspection
 requests, and 12 drafts. Input is token-counted before dispatch. The last two
 turns are reserved for submission/repair. These are runaway guards, not
-accuracy thresholds; neither arm stopped because of spending or truncation.
+accuracy thresholds; neither run stopped because of spending or truncation.
 
 The matched 20M-instruction results are:
 
@@ -130,7 +135,7 @@ Pro has lower training core-cycle error, but Flash is better on both held-out
 headline objectives. Flash improves both held-out averages over the seed,
 FixedLat, MD1, and WMG1; MESS remains better on both headline averages. Pro's
 held-out request error is slightly worse than FixedLat despite much better
-core-cycle accuracy. This is one independent campaign per backend, not a
+core-cycle accuracy. This is one independent run per backend, not a
 general model-capability ranking or five independent repetitions.
 
 | Backend | Evaluated designs | Submitted drafts | Generation attempts | Full-input-rate estimate, USD |
@@ -138,12 +143,12 @@ general model-capability ranking or five independent repetitions.
 | Gemini 3.1 Pro Preview | 5 | 12 | 22 | 4.93 |
 | Gemini 3.8 Flash | 5 | 7 | 126 | 8.15 |
 
-Attempt counts cover this completed campaign. Cost estimates include thinking
+Attempt counts cover each model's completed run. Cost estimates include thinking
 and financial carryover from aborted infrastructure setup: USD 0.4840 for Pro
 (3 earlier attempts) and USD 0.0149 for Flash (2 earlier attempts). Carryover
 imported no model source or feedback and did not replenish the USD 50 caps.
 The table conservatively charges cached input at full input rates. For current
-campaign calls alone, cache-adjusted usage estimates are USD 4.12 and USD 2.92,
+run calls alone, cache-adjusted usage estimates are USD 4.12 and USD 2.92,
 respectively. None of these estimates is a Cloud Billing invoice or includes
 credit effects. Conservative cap accounting was USD 9.81 / 19.56; no usage is
 unresolved.
@@ -155,7 +160,7 @@ including thinking, was 36,671 tokens for Pro and 54,500 for Flash.
 
 ## Selected models and remaining errors
 
-The [Pro source](results/gemini_20260905/pro_selected.cpp) maintains per-bank
+The [Pro source](results/gemini_20260905/runs/gemini_repair_v4c_20260905__gemini-3.1-pro-preview/selected.cpp) maintains per-bank
 row state and fluid backlogs for banks and the shared data bus. Backlogs decay
 with elapsed causal time; the predicted latency combines row-dependent base
 latency with the larger bank/bus wait. Configured write watermarks trigger
@@ -164,7 +169,7 @@ is the configured bank count represented by the model.
 Its current bank indexing does not distinguish ranks; multi-rank behavior is
 not validated by this single-rank experiment.
 
-The [Flash source](results/gemini_20260905/flash_selected.cpp) combines bank
+The [Flash source](results/gemini_20260905/runs/gemini_repair_v4c_20260905__gemini-3.8-flash/selected.cpp) combines bank
 row/readiness state, a bounded calendar of immutable read-burst departures,
 and aggregate write-drain accounting. Read bursts can occupy earlier free
 bus slots without changing previous predictions. State is O(B+C), and read
@@ -219,12 +224,14 @@ measurement contracts. Execution snapshots, prompts, source lineage, all model
 interactions, rejection reasons, budgets, and compressed raw traces are
 retained locally for audit. Compression verifies byte count and SHA-256 before
 removing the raw copy; readers support gzip without bulk decompression.
-The final integrity audit passed across 70 runs and 140 trace archives,
+The final integrity audit passed across 70 simulator executions and 140 trace archives
+in the shared historical store, not 70 independent optimization runs,
 including exact scored request pairing, 37 candidate callback checks,
 frozen-source/runtime identities, and test execution after both freezes.
 Trace storage is 2.47 GB instead of 7.79 GB raw, a 68.26% reduction.
-Campaign preflight passed 43 targeted tests; the current repository passes
-51 after additional storage/export regression coverage.
+Execution preflight passed 43 targeted tests. Subsequent regression coverage
+also checks storage/export integrity and independent run recording; it does
+not rerun model evolution or alter the recorded measurements.
 
 One non-scored preflight gzip had a single-bit mismatch detected at final
 verification. It was restored from an intact duplicate matching both original
@@ -233,12 +240,22 @@ No scored archive, expected checksum, selected source, or score was changed.
 The underlying cause of the corruption was not established. Post-run storage
 and reporting changes are recorded separately from the frozen experiment.
 
-The [compact numerical summary](results/gemini_20260905/summary.json),
-[headline table](results/gemini_20260905/headline.csv), and
-[per-workload table](results/gemini_20260905/per_workload.csv) include source
-identities, accounting, primary errors, drift, tails, and signed extremes.
+The [comparison index](results/gemini_20260905/summary.json) references the two
+individual run summaries. Each run summary retains its own source identity,
+accounting, training/test metrics, trajectory, and per-workload table. The
+[headline table](results/gemini_20260905/headline.csv) and
+[per-workload comparison table](results/gemini_20260905/per_workload.csv) place
+the independently measured results side by side, including primary errors,
+drift, tails, and signed extremes. They do not pool model budgets or lineage.
 The generated controller snapshots are review artifacts, not active build targets;
 the main Atomic source remains the clean seed.
+
+New executions use the individual-run v5 recording protocol: one explicit
+`--model` and one unique run root per invocation, followed by a separate
+comparison command. Each selection is frozen before that run's held-out test.
+The original v4 execution waited for both freezes; its evidence remains
+unchanged. The recording refactor made no new generation calls or simulator
+evaluations and did not duplicate the large shared trace archives.
 
 This review repository excludes raw interaction transcripts, detailed pipeline
 setup discussions, unrelated DRAM-timing review notes, credentials, and
