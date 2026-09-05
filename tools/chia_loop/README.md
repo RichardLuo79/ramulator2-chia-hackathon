@@ -16,6 +16,14 @@ USD 50 spending/safety limit. Failed drafts are repairable within an iteration.
 Every draft, API attempt, tool result, build, compliance decision, and score is
 retained locally; no hidden source repair or automatic paid resume occurs.
 
+Create a `STOP` file in the run root to stop safely after any in-flight
+generation settles and before another generation/evaluation starts. A fresh
+restart after an audited infrastructure abort can use
+`prepare_gemini.py --carry-budget-from OLD_RUN`; financial charges are carried
+forward without importing model sources or feedback. The USD 50 authorization
+is not replenished by restarting. This option requires that the aborted run
+evaluated no candidate and that all generation usage is settled.
+
 Training uses mcf/lbm; final testing uses milc/soplex/GemsFDTD/fotonik3d, only
 after both selections are frozen. Every case executes 20 million issued
 instructions per core, from a cold start through complete drain. The real

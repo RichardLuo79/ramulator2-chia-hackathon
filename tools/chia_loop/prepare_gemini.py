@@ -33,11 +33,29 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", type=pathlib.Path, required=True)
     ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--carry-budget-from", type=pathlib.Path,
+        help="retain charges from an aborted infrastructure attempt; never imports model feedback")
     args = ap.parse_args()
     if not 1 <= args.workers <= 12:
         ap.error("workers must be in [1, 12]")
     root = args.root.resolve()
     root.mkdir(parents=True, exist_ok=False)
+    if args.carry_budget_from:
+        origin = args.carry_budget_from.resolve()
+        previous = json.loads((origin / "run_manifest.json").read_text())
+        if previous.get("models") != P.MODELS or previous.get("no_candidate_evaluated") is not True:
+            raise RuntimeError("carryover requires a same-backend infrastructure abort before candidate evaluation")
+        carried = {}
+        for arm in P.MODELS:
+            path = origin / "arms" / arm / "ledger.json"
+            totals = P.Ledger(path, arm).totals()
+            if totals.get("unknown_usage_calls", 0):
+                raise RuntimeError("settle or audit unknown generation usage before restarting")
+            carried[arm] = {**{k: totals[k] for k in ("cap_charge_usd", "estimated_standard_usd", "unknown_usage_calls")},
+                "api_attempts": totals["api_attempts"] + totals.get("carryover_api_attempts", 0),
+                "prior_ledger": str(path), "prior_ledger_sha256": P.sha(path.read_bytes()),
+                "reason": "infrastructure attempt charges retained within the original per-arm authorization"}
+        atomic_write_json(root / "budget_carryover.json", carried)
     atomic_write_json(root / "window_policy.json", {
         "instructions_per_core": E.C.INSTS_SINGLE,
         "initialization": "cold caches and DRAM; full prefix with drain; no unscored warmup",

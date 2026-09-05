@@ -77,7 +77,11 @@ def main():
                 review = load(pathlib.Path(candidate["source_path"]).parent / "review.json")
                 assert review["approved"] is True and review["source_sha256"] == candidate["sha256"]
         ledger = load(root / "arms" / arm / "ledger.json")
-        assert sum(c["cap_charge_usd"] for c in ledger["calls"]) <= policy["usd_cap_per_arm"]
+        carry = ledger.get("carryover", {})
+        if carry:
+            assert digest(carry["prior_ledger"]) == carry["prior_ledger_sha256"]
+            assert carry == manifest["budget_carryover"][arm]
+        assert carry.get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in ledger["calls"]) <= policy["usd_cap_per_arm"]
         assert len(ledger["calls"]) == state["budget"]["api_attempts"]
         adjusted_cost = 0.0
         for call in ledger["calls"]:

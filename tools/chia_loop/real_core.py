@@ -89,6 +89,18 @@ class Ledger:
             atomic_write_json(self.path, data)
             return result
 
+    def initialize_carryover(self, carryover):
+        """Keep earlier infrastructure-attempt charges inside the same authorization."""
+        charge = carryover.get("cap_charge_usd", 0)
+        estimate = carryover.get("estimated_standard_usd", 0)
+        if not 0 <= estimate <= charge <= CAP_USD:
+            raise ValueError("invalid budget carryover")
+        def update(data):
+            if data["calls"] or data.get("carryover"):
+                raise ValueError("cannot replace an initialized campaign budget")
+            data["carryover"] = carryover
+        self._transaction(update)
+
     def reserve(self, payload: str, iteration: int, turn: int, input_tokens=None):
         size = len(payload.encode("utf-8"))
         if size > MAX_CONTEXT_BYTES:
@@ -100,7 +112,7 @@ class Ledger:
         rates = PRICING["conservative_cap_rates"][self.arm]
         reserve = (bound * rates["input"] + 2 * MAX_OUTPUT * rates["output"]) / 1e6
         def update(data):
-            committed = sum(c["cap_charge_usd"] for c in data["calls"])
+            committed = data.get("carryover", {}).get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in data["calls"])
             if committed + reserve > data["cap_usd"]:
                 raise BudgetExhausted("per-arm $50 ceiling would be exceeded by next call")
             call_id = len(data["calls"])
@@ -146,11 +158,15 @@ class Ledger:
     def totals(self):
         if not self.path.exists():
             return {"api_attempts": 0, "cap_charge_usd": 0, "estimated_standard_usd": 0}
-        calls = json.loads(self.path.read_text())["calls"]
+        data = json.loads(self.path.read_text())
+        calls, carry = data["calls"], data.get("carryover", {})
         return {"api_attempts": len(calls),
-            "cap_charge_usd": sum(c["cap_charge_usd"] for c in calls),
-            "estimated_standard_usd": sum(c["estimated_standard_usd"] or 0 for c in calls),
-            "unknown_usage_calls": sum(c["estimated_standard_usd"] is None for c in calls),
+            "carryover_api_attempts": carry.get("api_attempts", 0),
+            "carryover_cap_charge_usd": carry.get("cap_charge_usd", 0),
+            "carryover_estimated_standard_usd": carry.get("estimated_standard_usd", 0),
+            "cap_charge_usd": carry.get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in calls),
+            "estimated_standard_usd": carry.get("estimated_standard_usd", 0) + sum(c["estimated_standard_usd"] or 0 for c in calls),
+            "unknown_usage_calls": carry.get("unknown_usage_calls", 0) + sum(c["estimated_standard_usd"] is None for c in calls),
             "prompt_tokens": sum((c.get("usage") or {}).get("prompt_token_count") or 0 for c in calls),
             "thinking_tokens": sum((c.get("usage") or {}).get("thoughts_token_count") or 0 for c in calls),
             "output_tokens_including_thinking": sum(c.get("billed_output_including_thinking", 0) for c in calls)}

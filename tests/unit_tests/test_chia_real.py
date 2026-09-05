@@ -61,6 +61,18 @@ def test_token_count_bounds_and_http_error_accounting(tmp_path):
         ledger.reserve("hello", 1, 2, input_tokens=True)
 
 
+def test_budget_carryover_cannot_replenish_authorization(tmp_path):
+    ledger = P.Ledger(tmp_path / "ledger.json", "pro")
+    ledger.initialize_carryover({"cap_charge_usd": 49, "estimated_standard_usd": 25, "api_attempts": 10})
+    with pytest.raises(P.BudgetExhausted):
+        ledger.reserve("hello", 1, 1, input_tokens=10)
+    assert ledger.totals()["cap_charge_usd"] == 49
+    assert ledger.totals()["api_attempts"] == 0
+    assert ledger.totals()["carryover_api_attempts"] == 10
+    with pytest.raises(ValueError):
+        ledger.initialize_carryover({"cap_charge_usd": 0})
+
+
 def test_region_body_submission_preserves_scaffold_and_supports_parameters():
     seed = (REPO / P.MUTABLE).read_text()
     before, body = P.regions(seed)
@@ -193,15 +205,21 @@ def test_real_loop_repairs_drafts_inside_one_evaluated_iteration(tmp_path, monke
     from tools.chia_loop import gemini_loop as G
     (tmp_path / "seed").mkdir()
     (tmp_path / "seed/atomic_controller.cpp").write_text("seed")
-    answers = iter([{"status": "proposal"}, {"status": "proposal"}])
+    answers = iter([None, {"status": "proposal"}, {"status": "proposal"}])
     calls = []
     class Models:
         def count_tokens(self, **kwargs):
             return SimpleNamespace(total_tokens=100)
         def generate_content(self, **kwargs):
+            assert all(content.parts for content in kwargs["contents"])
             calls.append(kwargs)
+            answer = next(answers)
+            if answer is None:
+                return types.GenerateContentResponse.model_validate({"candidates": [{
+                    "finish_reason": "MALFORMED_FUNCTION_CALL", "content": {"role": "model"}}],
+                    "usage_metadata": {"prompt_token_count": 100, "candidates_token_count": 50, "total_token_count": 150}})
             return types.GenerateContentResponse.model_validate({"candidates": [{
-                "finish_reason": "STOP", "content": {"role": "model", "parts": [{"text": json.dumps(next(answers))}]}}],
+                "finish_reason": "STOP", "content": {"role": "model", "parts": [{"text": json.dumps(answer)}]}}],
                 "usage_metadata": {"prompt_token_count": 100, "candidates_token_count": 50, "total_token_count": 150}})
     monkeypatch.setattr(genai, "Client", lambda **kwargs: SimpleNamespace(models=Models(), close=lambda: None))
     drafts = []
@@ -214,9 +232,9 @@ def test_real_loop_repairs_drafts_inside_one_evaluated_iteration(tmp_path, monke
     result = G.propose(str(tmp_path), "flash", 1, "contract", "initial prompt", {})
     assert result["status"] == "evaluated"
     assert [d["status"] for d in result["drafts"]] == ["rejected", "valid"]
-    assert len(calls) == 2
-    assert "mock compiler diagnostic" in calls[1]["contents"][-1].parts[0].text
-    assert P.Ledger(tmp_path / "arms/flash/ledger.json", "flash").totals()["api_attempts"] == 2
+    assert len(calls) == 3
+    assert "mock compiler diagnostic" in calls[2]["contents"][-1].parts[0].text
+    assert P.Ledger(tmp_path / "arms/flash/ledger.json", "flash").totals()["api_attempts"] == 3
 
 
 def test_script_entrypoint_chia_functions_are_serializable():

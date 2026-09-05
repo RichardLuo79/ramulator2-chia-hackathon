@@ -53,6 +53,7 @@ POLICY = {
     "reviewer": "orchestrating coding agent; compliance only; no human modeling hints",
     "tool_protocol": "JSON inspections and region-body submissions with build/review/runtime repair feedback",
     "context_policy": "count input tokens before dispatch; retain conversation/signatures; no silent truncation",
+    "operator_stop_file": "STOP: settle an in-flight call, then stop before another generation/evaluation",
 }
 
 VISIBLE = [
@@ -136,6 +137,8 @@ def propose(root_text, arm, iteration, system, user_prompt, parent):
     maximum_turns = POLICY["model_turns_per_proposal"]
     try:
         for turn in range(1, maximum_turns + 1):
+            if (root / "STOP").exists():
+                return {"status": "stopped", "reason": "operator stop requested", "drafts": drafts}
             response = None
             for retry in range(2):
                 if attempts >= POLICY["api_attempts_per_proposal"]:
@@ -172,6 +175,8 @@ def propose(root_text, arm, iteration, system, user_prompt, parent):
                         return {"status": "failed", "reason": detail, "drafts": drafts}
                     time.sleep(2)
             proposal = P.parse_provider_response(raw)
+            if (root / "STOP").exists():
+                return {"status": "stopped", "reason": "operator stop requested after settling in-flight call", "drafts": drafts}
             consecutive_truncations = (consecutive_truncations + 1
                 if proposal.get("failure_kind") == "generation_truncated" else 0)
             if consecutive_truncations >= POLICY["consecutive_truncation_stop"]:
@@ -224,7 +229,8 @@ def propose(root_text, arm, iteration, system, user_prompt, parent):
             atomic_write_json(interactions / f"feedback_turn_{turn}.json", feedback)
             # Preserve the actual returned content, including thought signatures,
             # as recommended for multi-turn reasoning. Never synthesize them.
-            if response.candidates and response.candidates[0].content:
+            if (response.candidates and response.candidates[0].content
+                    and response.candidates[0].content.parts):
                 contents.append(response.candidates[0].content)
             contents.append(types.Content(role="user", parts=[types.Part(text=json.dumps({
                 **feedback, "remaining_diagnostics": POLICY["diagnostic_calls_per_proposal"]-diagnostics,
@@ -254,12 +260,16 @@ def evaluate_draft(root, parent, seed_source, proposal, directory, label, *, arm
     event(root, "compliance_review_needed", arm=arm, iteration=iteration, directory=str(directory))
     review_deadline = time.monotonic() + 7200
     while not (directory / "review.json").exists():
+        if (root / "STOP").exists():
+            raise InterruptedError("operator stop requested before evaluation")
         if time.monotonic() >= review_deadline:
             raise TimeoutError("compliance review unavailable for two hours")
         time.sleep(1)
     review = json.loads((directory / "review.json").read_text())
     if review.get("source_sha256") != P.sha(source) or review.get("approved") is not True:
         raise ValueError("semantic compliance review: " + review.get("reason", "not approved"))
+    if (root / "STOP").exists():
+        raise InterruptedError("operator stop requested before evaluation")
     metrics = get(score.chia_remote(str(root), plugin, label, "training"))
     return {"source_path": str(directory / "atomic_controller.cpp"), "sha256": P.sha(source),
             "plugin": plugin, "metrics": metrics, "label": label}
@@ -316,6 +326,9 @@ def run_arm(root, arm):
     arm_dir.mkdir(parents=True, exist_ok=True)
     if (arm_dir / "state.json").exists():
         raise RuntimeError("refusing implicit paid campaign resume; audit existing state first")
+    carryover = root / "budget_carryover.json"
+    if carryover.exists():
+        P.Ledger(arm_dir / "ledger.json", arm).initialize_carryover(json.loads(carryover.read_text())[arm])
     seed_source = (root / "seed/atomic_controller.cpp").read_text()
     seed_metrics = json.loads((root / "training/reports/seed.json").read_text())["models"]["seed"]
     candidates = {"seed": {"source_path": str(root / "seed/atomic_controller.cpp"), "sha256": P.sha(seed_source),
@@ -410,6 +423,7 @@ def main():
         shutil.copyfile(path, destination)
     manifest = {"status": "running", "started_at": time.time(), "policy": POLICY, "models": P.MODELS,
         "project": PROJECT, "location": "global", "pricing": P.PRICING,
+        "budget_carryover": json.loads((root / "budget_carryover.json").read_text()) if (root / "budget_carryover.json").exists() else {},
         "training": E.TRAIN, "final_test": E.TEST, "instructions_per_core": E.evaluation_insts(root),
         "comparisons": E.COMPARISONS, "prior_design_exposed": False,
         "human_modeling_hints": False, "test_access": "after_both_incumbents_frozen",
@@ -427,6 +441,8 @@ def main():
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
             futures = {arm: pool.submit(run_arm, root, arm) for arm in P.MODELS}
             states = {arm: future.result() for arm, future in futures.items()}
+        if (root / "STOP").exists():
+            raise InterruptedError("operator stop requested; held-out evaluation not started")
         atomic_write_json(root / "both_frozen.json", {arm: {"source_sha256": s["selected"]["sha256"],
             "incumbent": s["incumbent"], "frozen_at": s["frozen_at"]} for arm, s in states.items()})
         event(root, "both_frozen_test_started")
