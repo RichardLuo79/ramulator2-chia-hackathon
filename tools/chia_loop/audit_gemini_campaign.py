@@ -180,6 +180,24 @@ def main():
         assert not (archive.parent / "manifest.json").exists()
         AR.verify(archive)
         failed_archives += 1
+    recoveries = []
+    for record_path in root.glob("*/simpleo3/DDR5/*/*/*.recovery.json"):
+        record = load(record_path)
+        assert record["status"] == "restored"
+        target, duplicate, quarantine = [pathlib.Path(record[key]).resolve()
+                                         for key in ("target", "duplicate", "quarantine")]
+        assert all(path.is_relative_to(root) for path in (target, duplicate, quarantine))
+        assert digest(target) == digest(duplicate) == record["restored_archive_sha256"]
+        assert digest(quarantine) == record["original_damaged_sha256"]
+        archive = load(target.parent / "archive_manifest.json")
+        entry = next(e for e in archive["artifacts"].values() if e["archive_path"] == target.name)
+        assert entry["archive_sha256"] == record["restored_archive_sha256"]
+        assert entry["raw_sha256"] == record["unchanged_raw_sha256"]
+        recoveries.append({"record": str(record_path.relative_to(root)),
+                           "split": target.relative_to(root).parts[0],
+                           "original_expected_checksums_unchanged": True})
+    recorded = manifest.get("post_run_artifact_finalization", {}).get("archive_recovery_records", [])
+    assert sorted(recorded) == sorted(r["record"] for r in recoveries)
     out = root / "analysis"
     out.mkdir(exist_ok=True)
     with (out / "provider_calls.csv").open("w") as stream:
@@ -189,6 +207,8 @@ def main():
         "paired_logical_reads_across_reports": pairings, "traces": traces, "raw_bytes": raw_bytes,
         "gzip_bytes": gzip_bytes, "space_reduction_percent": 100 * (1 - gzip_bytes / raw_bytes),
         "failed_run_archives_verified": failed_archives,
+        "archive_recoveries_verified": len(recoveries), "archive_recoveries": recoveries,
+        "scored_trace_archives_recovered": sum(r["split"] in ("training", "test") for r in recoveries),
         "protocol_and_visible_snapshots_verified": True, "runtime_and_candidate_hashes_verified": True,
         "test_after_both_freezes": True, "heldout_ids_absent_from_paid_requests": True,
         "actual_api_prompt_matches_saved_prompt": True, "caps_respected": True,

@@ -50,7 +50,7 @@ def _physical_provenance(path: pathlib.Path) -> dict[str, object]:
     }
 
 
-def _discover_raw(paths) -> list[pathlib.Path]:
+def _discover_raw(paths, *, allow_incomplete=False) -> list[pathlib.Path]:
     discovered = set()
     for item in paths:
         path = pathlib.Path(item)
@@ -62,8 +62,8 @@ def _discover_raw(paths) -> list[pathlib.Path]:
             if candidate.is_symlink() and _TRACE_NAME.fullmatch(candidate.name):
                 raise RuntimeError(f"refusing to archive a symbolic link: {candidate}")
             if (candidate.is_file() and _TRACE_NAME.fullmatch(candidate.name)
-                    and not any(part.startswith(".incomplete-")
-                                for part in candidate.parts)):
+                    and (allow_incomplete or not any(part.startswith(".incomplete-")
+                                                    for part in candidate.parts))):
                 discovered.add(candidate.resolve())
     return sorted(discovered)
 
@@ -157,8 +157,10 @@ def _archive_one(raw: pathlib.Path, level: int) -> tuple[pathlib.Path, dict, dic
     return archived, raw_provenance, _physical_provenance(archived)
 
 
-def compress(paths, manifest_path: pathlib.Path, level: int, *, keep_raw=False) -> None:
-    raw_paths = _discover_raw(paths)
+def compress(paths, manifest_path: pathlib.Path, level: int, *, keep_raw=False,
+             allow_incomplete=False) -> None:
+    # Opt-in is only for reaped, failed simulations with separate failure evidence.
+    raw_paths = _discover_raw(paths, allow_incomplete=allow_incomplete)
     if not raw_paths:
         raise RuntimeError("no uncompressed *.chN trace artifacts found")
     manifest = _load_manifest(manifest_path)
@@ -175,8 +177,8 @@ def compress(paths, manifest_path: pathlib.Path, level: int, *, keep_raw=False) 
         C.atomic_write_json(manifest_path, manifest)
         if not keep_raw:
             raw.unlink()
-        reduction = 100.0 * (1.0 - archive_provenance["size"] /
-                             raw_provenance["size"])
+        reduction = (100.0 * (1.0 - archive_provenance["size"] / raw_provenance["size"])
+                     if raw_provenance["size"] else 0.0)
         print(
             f"[{index}/{len(raw_paths)}] {raw}: "
             f"{raw_provenance['size']} -> {archive_provenance['size']} "
@@ -259,6 +261,60 @@ def restore(manifest_path: pathlib.Path, requested) -> None:
         print(f"[{index}/{len(selected)}] restored {raw}", flush=True)
 
 
+def recover_duplicate(manifest_path: pathlib.Path, raw_name: str, source: pathlib.Path):
+    """Restore only byte-identical archived data; preserve the damaged original."""
+    entry = _load_manifest(manifest_path)["artifacts"][raw_name]
+    _, archived = _entry_paths(entry, manifest_path)
+    source = pathlib.Path(source).resolve()
+    if archived.is_symlink() or not archived.is_file() or source == archived.resolve():
+        raise RuntimeError("recovery requires a regular target and a distinct duplicate")
+    expected = (entry["archive_size"], entry["archive_sha256"])
+    original = _physical_provenance(archived)
+    if (original["size"], original["sha256"]) == expected:
+        raise RuntimeError("archive already matches its original checksum")
+    replacement = _physical_provenance(source)
+    if (replacement["size"], replacement["sha256"]) != expected:
+        raise RuntimeError("duplicate does not match the original archive checksum")
+    unpacked = A.raw_provenance(source)
+    if (unpacked["size"], unpacked["sha256"]) != (entry["raw_size"], entry["raw_sha256"]):
+        raise RuntimeError("duplicate does not match the original raw checksum")
+    quarantine = archived.with_name(archived.name + ".corrupt-" + original["sha256"][:16])
+    record_path = archived.with_name(archived.name + ".recovery.json")
+    if quarantine.exists() or record_path.exists():
+        raise RuntimeError("existing recovery evidence must not be overwritten")
+    record = {"status": "prepared", "utc": _utc_now(), "target": str(archived.resolve()),
+              "duplicate": str(source), "quarantine": str(quarantine.resolve()),
+              "original_damaged_sha256": original["sha256"],
+              "restored_archive_sha256": entry["archive_sha256"],
+              "unchanged_raw_sha256": entry["raw_sha256"]}
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile("w+b", dir=archived.parent,
+                prefix=".verified-recovery-", suffix=".gz", delete=False) as stream:
+            temporary = pathlib.Path(stream.name)
+            with source.open("rb") as incoming:
+                shutil.copyfileobj(incoming, stream, length=1024 * 1024)
+            stream.flush()
+            os.fsync(stream.fileno())
+        copied = _physical_provenance(temporary)
+        if (copied["size"], copied["sha256"]) != expected:
+            raise RuntimeError("duplicate changed while copying")
+        if _physical_provenance(archived)["sha256"] != original["sha256"]:
+            raise RuntimeError("target changed during recovery")
+        C.atomic_write_json(record_path, record)
+        previous_stat = archived.stat()
+        os.replace(archived, quarantine)
+        os.replace(temporary, archived)
+        temporary = None
+        os.utime(archived, ns=(previous_stat.st_atime_ns, previous_stat.st_mtime_ns))
+        record.update(status="restored", finished_utc=_utc_now())
+        C.atomic_write_json(record_path, record)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+    return record
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -276,11 +332,18 @@ def main() -> None:
     restore_parser.add_argument("manifest", type=pathlib.Path)
     restore_parser.add_argument("paths", nargs="*")
 
+    recovery_parser = subparsers.add_parser("recover-duplicate")
+    recovery_parser.add_argument("manifest", type=pathlib.Path)
+    recovery_parser.add_argument("raw_name", help="exact raw artifact key in the manifest")
+    recovery_parser.add_argument("source", type=pathlib.Path)
+
     args = parser.parse_args()
     if args.command == "compress":
         compress(args.paths, args.manifest, args.level, keep_raw=args.keep_raw)
     elif args.command == "verify":
         verify(args.manifest)
+    elif args.command == "recover-duplicate":
+        print(recover_duplicate(args.manifest, args.raw_name, args.source))
     else:
         restore(args.manifest, args.paths)
 

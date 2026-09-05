@@ -96,7 +96,7 @@ def compress(root: pathlib.Path, manifest: pathlib.Path, *,
         and path.stat().st_size >= min_bytes
         and any(part in {"logs", "interactions", "profiles"} for part in path.parts)
     )
-    payload = {
+    payload = json.loads(manifest.read_text()) if manifest.exists() else {
         "schema_version": SCHEMA_VERSION,
         "codec": "gzip",
         "gzip_header_mtime": 0,
@@ -104,6 +104,8 @@ def compress(root: pathlib.Path, manifest: pathlib.Path, *,
         "minimum_raw_bytes": min_bytes,
         "artifacts": {},
     }
+    if payload.get("schema_version") != SCHEMA_VERSION or pathlib.Path(payload["root"]).resolve() != root:
+        raise RuntimeError("incompatible existing auxiliary archive manifest")
     for raw in candidates:
         archive, entry = _gzip_verified(raw, level)
         relative = str(raw.relative_to(root))

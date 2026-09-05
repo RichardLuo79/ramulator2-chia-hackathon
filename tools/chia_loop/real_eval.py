@@ -174,9 +174,13 @@ def run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candida
                 "complete": False, "eligible_for_metrics": False})
             partials = list(directory.glob(".incomplete-*/*.ch0"))
             if partials:
-                from eval import archive_results as AR
-                AR.compress(partials, directory / "failed_archive_manifest.json", 3)
-                AR.verify(directory / "failed_archive_manifest.json")
+                try:
+                    archive_failed_run(directory)
+                except Exception as archive_error:
+                    # Storage failure must not hide the original simulator error.
+                    atomic_write_json(directory / "archive_failure.json", {
+                        "error": str(archive_error), "time": time.time(),
+                        "eligible_for_metrics": False})
         raise
 
 
@@ -267,6 +271,23 @@ def evaluate(root, models, *, plugin=None, label=None, split="training", workers
              "--workloads", *workloads, "--models", ",".join(labels), "--output", report],
             root / "logs" / (split + "_" + (label or "comparisons") + "_metrics.log"), env=env, timeout=3600)
     return json.loads(report.read_text())["models"]
+
+
+def archive_failed_run(directory):
+    """Archive only a closed failed run, never promote its output to metrics."""
+    from eval import archive_results as AR
+    directory = pathlib.Path(directory)
+    if (directory / "manifest.json").exists():
+        raise RuntimeError("failed-run archival cannot accept a completed run")
+    failure = json.loads((directory / "failure.json").read_text())
+    if failure.get("complete") is not False or failure.get("eligible_for_metrics") is not False:
+        raise RuntimeError("failed-run archival requires explicit failure evidence")
+    partials = list(directory.glob(".incomplete-*/*.ch0"))
+    archive = directory / "failed_archive_manifest.json"
+    if partials:
+        AR.compress(partials, archive, 3, allow_incomplete=True)
+    if archive.exists():
+        AR.verify(archive)
 
 
 def archive_completed_run(directory):
