@@ -238,6 +238,85 @@ def test_real_loop_repairs_drafts_inside_one_evaluated_iteration(tmp_path, monke
     assert not (tmp_path / "arms").exists()
 
 
+@pytest.mark.parametrize("mode,expected_status,expected_calls", [
+    ("recover", "no_change", 2),
+    ("repeat_failure", "failed", 2),
+    ("budget", "budget_stop", 1),
+    ("attempt_cap", "failed", 1),
+    ("stop", "stopped", 1),
+    ("local_error", "failed", 1),
+])
+def test_transport_retry_preserves_caps_context_and_stop(tmp_path, monkeypatch,
+                                                       mode, expected_status, expected_calls):
+    import httpx
+    from types import SimpleNamespace
+    from google import genai
+    from google.genai import types
+    from tools.chia_loop import gemini_loop as G
+    from tools.chia_loop.run_records import validate_limits
+
+    (tmp_path / "seed").mkdir()
+    (tmp_path / "seed/atomic_controller.cpp").write_text("seed")
+    atomic_write_json(tmp_path / "preparation_manifest.json", {"limits": validate_limits(25, 100, 6)})
+    ledger = G.run_ledger(tmp_path, "flash")
+    if mode == "budget":
+        ledger.initialize_carryover({"cap_charge_usd": 98, "estimated_standard_usd": 40, "api_attempts": 10})
+    if mode == "attempt_cap":
+        monkeypatch.setitem(G.POLICY, "api_attempts_per_proposal", 1)
+    calls = []
+    closed = []
+    class Models:
+        def count_tokens(self, **kwargs):
+            return SimpleNamespace(total_tokens=100)
+        def generate_content(self, **kwargs):
+            calls.append(json.dumps([c.model_dump(mode="json") for c in kwargs["contents"]]))
+            if mode == "local_error":
+                raise ValueError("invalid local request")
+            if mode == "stop":
+                (tmp_path / "STOP").write_text("operator stop")
+            if len(calls) == 1 or mode == "repeat_failure":
+                raise httpx.RemoteProtocolError("incomplete chunked read")
+            return types.GenerateContentResponse.model_validate({"candidates": [{
+                "finish_reason": "STOP", "content": {"role": "model", "parts": [
+                    {"text": '{"status":"no_change","reason":"mock completed response"}'}]}}],
+                "usage_metadata": {"prompt_token_count": 100, "candidates_token_count": 50, "total_token_count": 150}})
+    def client(**kwargs):
+        assert kwargs["http_options"].retry_options.attempts == 1
+        return SimpleNamespace(models=Models(), close=lambda: closed.append(True))
+    monkeypatch.setattr(genai, "Client", client)
+    monkeypatch.setattr(G.time, "sleep", lambda _: None)
+    result = G.propose._chia_original(str(tmp_path), "flash", 1, "contract", "initial prompt", {})
+    records = json.loads((tmp_path / "ledger.json").read_text())["calls"]
+    assert result["status"] == expected_status
+    assert len(calls) == len(records) == expected_calls
+    assert closed == [True]
+    assert all(r["iteration"] == r["turn"] == 1 for r in records)
+    assert len(set(calls)) == 1  # retry the same context; never splice in partial output
+    assert records[0]["state"] == "usage_unknown_reservation_retained"
+    assert records[0]["cap_charge_usd"] == records[0]["reserved_usd"]
+    assert ledger.totals()["cap_charge_usd"] <= 100
+    if mode == "recover":
+        assert records[1]["state"] == "usage_recorded"
+        assert ledger.totals()["unknown_usage_calls"] == 1
+    elif mode == "repeat_failure":
+        assert ledger.totals()["unknown_usage_calls"] == 2
+
+
+def test_only_transient_provider_failures_are_retryable():
+    import httpx
+    from tools.chia_loop.gemini_loop import transient_generation_error
+    for error in (httpx.ConnectError("offline"), httpx.ReadTimeout("timeout"),
+                  httpx.WriteError("connection lost"), httpx.RemoteProtocolError("truncated")):
+        assert transient_generation_error(error)
+    for error in (httpx.LocalProtocolError("bad request"), ValueError("invalid"), OSError("disk full")):
+        assert not transient_generation_error(error)
+    class ProviderError(Exception):
+        def __init__(self, code):
+            self.code = code
+    assert transient_generation_error(ProviderError(503))
+    assert not transient_generation_error(ProviderError(401))
+
+
 def test_script_entrypoint_chia_functions_are_serializable():
     # Imported functions pickle by reference and hide this class of bug.
     # CLI-defined functions must serialize their referenced globals by value.

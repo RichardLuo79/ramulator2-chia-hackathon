@@ -23,6 +23,7 @@ import traceback
 REPO = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 
+import httpx
 import ray
 from chia.base.ChiaFunction import ChiaFunction, get
 from chia.trace.profiler import start_collector, stop_collector, get_collector, get_profiler
@@ -31,7 +32,7 @@ from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.run_records import model_pricing, execution_limits
 
 POLICY = {
-    "version": "gemini_individual_run_v6", "maximum_iterations": 5, "usd_cap": 50,
+    "version": "gemini_individual_run_v7", "maximum_iterations": 5, "usd_cap": 50,
     "iteration_unit": "successfully evaluated design; draft repairs stay inside the iteration",
     "thinking_level": "HIGH", "temperature": 1.0,
     "maximum_output_tokens": P.MAX_OUTPUT, "maximum_context_utf8_bytes": P.MAX_CONTEXT_BYTES,
@@ -39,6 +40,7 @@ POLICY = {
     "model_turns_per_proposal": 48, "diagnostic_calls_per_proposal": 192,
     "drafts_per_iteration": 12, "finalization_turn_reserve": 2,
     "api_attempts_per_proposal": 60, "transient_retries_per_turn": 1,
+    "transport_retry_policy": "network, timeout and remote-protocol errors; retain unknown-usage reservation and reserve every retry",
     "provider_timeout_seconds": 1800, "simulator_cpu_seconds": E.SIM_CPU_SECONDS,
     "consecutive_truncation_stop": 2,
     "live_completion_preflight": "first counted proposal in this run; no extra paid preflight attempts",
@@ -82,6 +84,13 @@ def run_ledger(root, backend):
     root = pathlib.Path(root)
     return P.Ledger(root / "ledger.json", backend, run_id=root.name,
                     cap_usd=configured_policy(root)["usd_cap"])
+
+
+def transient_generation_error(exc):
+    """Retry connectivity failures, not invalid requests or local code errors."""
+    return (getattr(exc, "code", None) in (408, 429, 500, 502, 503, 504)
+            or isinstance(exc, (httpx.NetworkError, httpx.TimeoutException,
+                                httpx.RemoteProtocolError)))
 
 
 def event(root, kind, **data):
@@ -150,7 +159,9 @@ def propose(root_text, arm, iteration, system, user_prompt, parent):
             if (root / "STOP").exists():
                 return {"status": "stopped", "reason": "operator stop requested", "drafts": drafts}
             response = None
-            for retry in range(2):
+            for retry in range(POLICY["transient_retries_per_turn"] + 1):
+                if (root / "STOP").exists():
+                    return {"status": "stopped", "reason": "operator stop requested before generation attempt", "drafts": drafts}
                 if attempts >= POLICY["api_attempts_per_proposal"]:
                     return {"status": "failed", "reason": "iteration API-attempt safety limit", "drafts": drafts}
                 payload = {"model": P.MODELS[arm], "config": config.model_dump(mode="json", exclude_none=True),
@@ -181,7 +192,10 @@ def propose(root_text, arm, iteration, system, user_prompt, parent):
                     status = getattr(exc, "code", None)
                     ledger.settle(call_id, None, detail, http_status=status)
                     atomic_write_json(prefix.with_suffix(".error.json"), {"error": detail, "retry": retry})
-                    if status not in (408, 429, 500, 502, 503, 504) or retry == 1:
+                    # A lost response may still be billed. settle() retains its
+                    # reservation; reserve() must fund the next attempt too.
+                    if (not transient_generation_error(exc)
+                            or retry == POLICY["transient_retries_per_turn"]):
                         return {"status": "failed", "reason": detail, "drafts": drafts}
                     time.sleep(2)
             proposal = P.parse_provider_response(raw)

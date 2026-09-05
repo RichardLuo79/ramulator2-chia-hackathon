@@ -180,6 +180,23 @@ copies only selected sources, numeric summaries, and allowlisted tables/plots,
 not the full run manifest, proposal explanations, or interaction records.
 The runner never commits or pushes.
 
+Generation retries are bounded to one retry per model turn, within the same
+API-attempt and spending caps. The v7 runner recognizes transient HTTP responses
+and HTTPX network, timeout, and remote-protocol failures. A lost response can
+still be billed: its full reservation remains charged, and the retry needs a
+separate affordable reservation before dispatch. Invalid local requests,
+authentication errors, and exhausted retry limits stop the search. An operator
+STOP is checked before every attempt. SDK-hidden retries remain disabled.
+This policy improves resilience; it does not establish the cause of an upstream
+disconnect or guarantee that a repeated request will succeed.
+
+An early search stop can still produce a completed artifact record: the runner
+freezes the incumbent, evaluates it on the final test, and verifies archives.
+Always inspect `evaluated_designs` and the stopped trajectory entry; a completed
+record does not mean that the configured iteration ceiling was reached. Once
+test evaluation begins, do not resume that run for optimization. An authorized
+fresh run must start clean and preserve any carried-forward budget charges.
+
 The completed 2026-09-05 evidence used an older shared execution directory.
 The reader supports that layout without rewriting its manifests, ledgers,
 interactions, or compressed traces. Its export contains one `runs/RUN_ID/`
