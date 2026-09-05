@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "simpleo3-ddr5-smoke",
+  "backend": "dummy",
+  "frontend": "simpleo3",
+  "standard": "DDR5",
+  "training_workloads": ["429.mcf", "519.lbm"],
+  "validation_workloads": ["603.bwaves_s-1080B", "654.roms_s-1021B"],
+  "comparison_models": ["fixedlat", "md1", "wmg1", "mess"],
+  "iterations": 2,
+  "insts_per_core": 50000,
+  "workers": 12,
+  "initial_candidate": {"latency": 42},
+  "dummy_max_latency_step_fraction": 0.25,
+  "archive_aux_min_bytes": 1048576
+}

@@ -34,6 +34,8 @@ REFERENCE = dict(
 CANDIDATE_RESOURCES = dict(
     read_buffer_size=REFERENCE["read_buffer_size"],
     write_buffer_size=REFERENCE["write_buffer_size"],
+    wr_low_watermark=REFERENCE["wr_low_watermark"],
+    wr_high_watermark=REFERENCE["wr_high_watermark"],
 )
 
 MODEL_ORDER = ("candidate", "fixedlat", "md1", "wmg1", "mess")

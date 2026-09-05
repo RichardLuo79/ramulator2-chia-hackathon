@@ -1,11 +1,17 @@
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <limits>
+#include <map>
 #include <queue>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+// CHIA_MODEL_INCLUDES_BEGIN
+// CHIA_MODEL_INCLUDES_END
 
 #include <fmt/format.h>
 
@@ -35,6 +41,9 @@ class AtomicController final : public IController, public Implementation {
     RAMULATOR_PARSE_PARAM(m_latency, int, "latency").default_val(-1);
     RAMULATOR_PARSE_PARAM(m_read_buffer_size, int, "read_buffer_size").default_val(64);
     RAMULATOR_PARSE_PARAM(m_write_buffer_size, int, "write_buffer_size").default_val(64);
+    RAMULATOR_PARSE_PARAM(m_wr_low_watermark, float, "wr_low_watermark").default_val(0.5f);
+    RAMULATOR_PARSE_PARAM(m_wr_high_watermark, float, "wr_high_watermark").default_val(0.8f);
+    RAMULATOR_PARSE_PARAM(m_model_parameter_entries, std::vector<std::string>, "model_parameters").default_val({});
     RAMULATOR_PARSE_PARAM(m_refresh, std::string, "refresh").default_val("none");
     RAMULATOR_PARSE_PARAM(m_trace_path, std::string, "trace_path").default_val("");
 
@@ -51,12 +60,25 @@ class AtomicController final : public IController, public Implementation {
     if (m_read_buffer_size <= 0 || m_write_buffer_size <= 0) {
       throw std::runtime_error("Atomic buffer sizes must be positive");
     }
+    if (!std::isfinite(m_wr_low_watermark) || !std::isfinite(m_wr_high_watermark) ||
+        m_wr_low_watermark < 0 || m_wr_high_watermark > 1 || m_wr_low_watermark > m_wr_high_watermark) {
+      throw std::runtime_error("Atomic requires 0 <= low <= high <= 1 write watermarks");
+    }
     if (m_refresh != "none") {
       throw std::runtime_error(
           "Atomic skeleton supports refresh='none' only; refresh behavior is intentionally unspecified");
     }
 
     RAMULATOR_CREATE_CHILD(m_addr_mapper, IAddrMapper);
+    parse_model_parameters();
+    m_model_initializing = true;
+    init_model();
+    m_model_initializing = false;
+    for (const auto& [name, value] : m_model_parameters) {
+      if (!m_used_model_parameters.contains(name)) {
+        throw std::runtime_error("Unknown Atomic model parameter: " + name);
+      }
+    }
   }
 
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
@@ -123,7 +145,10 @@ class AtomicController final : public IController, public Implementation {
     m_addr_mapper->apply(req);
     req.addr_vec[0] = m_channel_id;
     req.arrive = m_clk;
-    req.depart = m_clk + m_latency;
+    req.depart = predict_departure(req);
+    if (req.depart <= m_clk) {
+      throw std::runtime_error("Atomic must commit a strictly future departure");
+    }
     inflight++;
     if (is_read) {
       s_num_read_reqs++;
@@ -194,6 +219,66 @@ class AtomicController final : public IController, public Implementation {
   }
 
  private:
+  // Read-only configured behavior, not calibration constants.
+  struct ModelControllerConfig {
+    int read_buffer_size;
+    int write_buffer_size;
+    double wr_low_watermark;
+    double wr_high_watermark;
+  };
+
+  ModelControllerConfig controller_config() const {
+    return {m_read_buffer_size, m_write_buffer_size, m_wr_low_watermark, m_wr_high_watermark};
+  }
+
+  // Model-owned names, defaults, and valid ranges are declared in init_model().
+  // Optional overrides use model_parameters=["name=value", ...] for every run.
+  double model_param(const std::string& name, double fallback, double minimum, double maximum) {
+    if (!m_model_initializing || name.empty() || name.size() > 64 ||
+        name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_") != std::string::npos ||
+        !std::isfinite(fallback) || !std::isfinite(minimum) || !std::isfinite(maximum) ||
+        minimum > maximum || fallback < minimum || fallback > maximum) {
+      throw std::runtime_error("Invalid Atomic model parameter declaration");
+    }
+    m_used_model_parameters.insert(name);
+    if (m_used_model_parameters.size() > 128) {
+      throw std::runtime_error("Too many Atomic model parameters");
+    }
+    const auto it = m_model_parameters.find(name);
+    const double value = it == m_model_parameters.end() ? fallback : it->second;
+    if (value < minimum || value > maximum) {
+      throw std::runtime_error("Atomic model parameter outside declared range: " + name);
+    }
+    return value;
+  }
+
+  void parse_model_parameters() {
+    if (m_model_parameter_entries.size() > 128) {
+      throw std::runtime_error("Too many Atomic model parameter overrides");
+    }
+    for (const auto& entry : m_model_parameter_entries) {
+      const auto equal = entry.find('=');
+      if (equal == std::string::npos || equal == 0 || equal > 64 || entry.size() > 256) {
+        throw std::runtime_error("Atomic model_parameters entries must be name=value");
+      }
+      const auto name = entry.substr(0, equal);
+      const auto text = entry.substr(equal + 1);
+      std::size_t consumed = 0;
+      const double value = std::stod(text, &consumed);
+      if (consumed != text.size() || !std::isfinite(value) || !m_model_parameters.emplace(name, value).second) {
+        throw std::runtime_error("Invalid or duplicate Atomic model parameter: " + name);
+      }
+    }
+  }
+
+  // CHIA_MODEL_BEGIN
+  void init_model() {}
+
+  Clk_t predict_departure(const Request& req) {
+    return m_clk + m_latency;
+  }
+  // CHIA_MODEL_END
+
   struct PendingRequest {
     Clk_t depart;
     std::uint64_t sequence;
@@ -228,6 +313,12 @@ class AtomicController final : public IController, public Implementation {
   int m_latency = -1;
   int m_read_buffer_size = 64;
   int m_write_buffer_size = 64;
+  float m_wr_low_watermark = 0.5f;
+  float m_wr_high_watermark = 0.8f;
+  std::vector<std::string> m_model_parameter_entries;
+  std::map<std::string, double> m_model_parameters;
+  std::set<std::string> m_used_model_parameters;
+  bool m_model_initializing = false;
   std::string m_refresh = "none";
 
   std::priority_queue<PendingRequest, std::vector<PendingRequest>, std::greater<PendingRequest>> m_pending;

@@ -36,3 +36,21 @@ sweep_log.txt
 !visualizer/package.json
 !visualizer/package-lock.json
 !visualizer/tsconfig.json
+
+# Private experiments, setup discussions, and unrelated timing-review notes.
+eval_out/
+build-*/
+local_notes/
+.claude/
+CLAUDE.md
+AGENTS.md
+DRAM_STANDARD_MODELING_AUDIT.md
+claudestandardsaudit/
+doc/atomic_chia_*.md
+# Historical operator-only recovery/analysis helpers; frozen copies remain local.
+tools/chia_loop/analyze_representative.py
+tools/chia_loop/audit_representative.py
+tools/chia_loop/finalize_smoke_audit.py
+tools/chia_loop/representative_eval.py
+tools/chia_loop/smoke_diagnostics.py
+!tools/chia_loop/smoke.json

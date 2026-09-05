@@ -1,0 +1,46 @@
+Evaluated design iteration {{iteration_number}} of {{max_proposal_iterations}}.
+Draft repairs and inspections stay within this iteration until one design is
+successfully evaluated or a budget/safety limit stops the arm.
+
+Use the frozen system contract. Propose one coherent change to the supplied
+parent, informed by this campaign's training feedback. The following fields
+are supplied by the runner; all results and history belong to this arm.
+
+## Parent and incumbent
+
+Parent ID: {{parent_id}}
+Parent source SHA-256: {{parent_source_sha256}}
+Incumbent ID: {{incumbent_id}}
+
+{{parent_source}}
+
+{{parent_and_incumbent_training_scores}}
+
+## Training evidence
+
+{{training_configuration_and_trace_clock_contract}}
+
+{{per_workload_training_metrics_and_coverage}}
+
+{{training_diagnostic_slices}}
+
+{{published_comparison_training_metrics}}
+
+## Evolution history
+
+{{accepted_and_rejected_proposals_with_reasons}}
+
+{{last_build_or_evaluation_diagnostics}}
+
+{{this_arm_pareto_archive}}
+
+## Fixed policy and available actions
+
+{{promotion_and_guardrail_configuration}}
+
+{{allowed_tools_and_readable_file_manifest}}
+
+{{remaining_model_call_diagnostic_and_token_limits}}
+
+Return the JSON proposal defined by the system contract. Do not use or request
+held-out information. No human modeling hint is supplied for this trial.

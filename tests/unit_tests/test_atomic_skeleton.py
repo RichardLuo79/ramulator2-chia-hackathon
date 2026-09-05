@@ -116,3 +116,16 @@ def test_atomic_seed_rejects_refresh_until_a_policy_is_defined():
             ramulator.frontend.External(clock_ratio=1),
             _memory(controller),
         )
+
+
+@pytest.mark.parametrize("values", [
+    {"wr_low_watermark": 0.9, "wr_high_watermark": 0.5},
+    {"wr_high_watermark": 1.1},
+    {"model_parameters": ["unknown=1"]},
+    {"model_parameters": ["gain=nan"]},
+    {"model_parameters": ["gain=1", "gain=2"]},
+    {"model_parameters": ["gain=1junk"]},
+])
+def test_atomic_model_interface_rejects_invalid_settings(values):
+    with pytest.raises(RuntimeError):
+        ramulator.Simulation(ramulator.frontend.External(clock_ratio=1), _memory(_ddr5_atomic(**values)))

@@ -25,14 +25,16 @@ none is silently promoted to the oracle.
 
 ## Workload and run contracts
 
-The proof-of-concept split is fixed in `tools/chia_loop/smoke.json`:
+The real Gemini experiment uses a fixed family-disjoint split:
 
 - Training: `429.mcf`, `519.lbm`
-- Validation: `603.bwaves_s-1080B`, `654.roms_s-1021B`
+- Final test: `433.milc`, `450.soplex`, `459.GemsFDTD`, `549.fotonik3d`
 
-The smoke ROI is 50,000 instructions per core. It tests orchestration and data
-contracts only. Full SimpleO3 campaigns retain 20 million instructions for
-single-core workloads and 10 million per core for mixes.
+Real trials use 20 million issued instructions/core, cold-start and fully
+drained, and reject shorter windows. The separate dummy configuration in
+`tools/chia_loop/smoke.json` uses 50K instructions to test plumbing only; its
+accuracy is not representative DRAM evaluation. The wider harness also
+retains 10-million-instruction/core configurations for multi-core mixes.
 
 All evaluation processes must use a Release build containing an explicit
 `-O3`. `config.py` records and checks the CMake cache and target flags, and all
@@ -101,7 +103,7 @@ remain visible guardrails and diagnostics.
 python tools/eval/run_simpleo3.py \
   --std DDR5 --workloads 429.mcf 519.lbm \
   --models oracle,candidate,fixedlat,md1,wmg1,mess \
-  --workers 12 --insts-per-core 50000
+  --workers 12 --insts-per-core 20000000
 
 python tools/eval/postprocess.py \
   --frontend simpleo3 --std DDR5 \

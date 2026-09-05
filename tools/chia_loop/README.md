@@ -1,71 +1,136 @@
-# CHIA loop: generic Atomic controller
+# CHIA: evolving immediate-response DRAM controllers
 
-`atomic_loop.py` is a native CHIA graph for the first proof-of-concept run. It
-uses `@ChiaFunction` nodes for the agent, optimized build, baseline matrix,
-candidate evaluations, Pareto selection, validation, and trace archival. The
-dummy backend replaces only the LLM/coding agent; every build, simulator run,
-comparator, metric, and integrity gate is real.
+This branch contains a clean fixed-delay Atomic seed, the protected evaluation
+harness, four comparison models, and a native CHIA/Ray evolution graph.
+See [project status and results](../../doc/chia_hackathon_review.md) for the
+scientific scope and current Gemini results. Setup conversations, unrelated
+DRAM timing audits, licensed workload traces, and raw interaction logs are not
+part of this repository.
 
-The smoke run deliberately adjusts only the skeleton's constant latency. After
-the first training result, the dummy agent subtracts the median signed request
-residual from that intercept, bounded to 25% of its current value. This follows
-the only causal degree of freedom in the seed and avoids inventing bank or bus
-behavior before an agent proposes and tests such structure.
+## Current experiment
 
-Selection treats core-cycle macro MAE and request macro MAE/L as co-equal.
-A challenger replaces the incumbent only if it is no worse on both and better
-on at least one. Incomparable smoke candidates retain the earlier incumbent.
-Validation is evaluated once, after selection, and cannot feed the agent.
+The real backend compares Gemini 3.1 Pro Preview with Gemini 3.8 Flash through
+Google Cloud ADC. Each independent arm starts clean, uses HIGH thinking and
+65,536 maximum output tokens, and stops after five evaluated designs or its
+USD 50 spending/safety limit. Failed drafts are repairable within an iteration.
+Every draft, API attempt, tool result, build, compliance decision, and score is
+retained locally; no hidden source repair or automatic paid resume occurs.
 
-## Reproducible local setup
+Training uses mcf/lbm; final testing uses milc/soplex/GemsFDTD/fotonik3d, only
+after both selections are frozen. Every case executes 20 million issued
+instructions per core, from a cold start through complete drain. The real
+runner rejects shorter windows. It checks trace length, disjoint input hashes,
+oracle DRAM traffic, exact request pairing, and callback integrity. The
+published comparison models are FixedLat, MD1, Sniper WMG1, and MESS.
 
-CHIA recommends Python 3.10.19 for parity with its containers. The package
-metadata supports Python 3.10 and newer.
+An independent earlier feasibility design and all earlier campaigns are
+unavailable to optimization agents. Only their own campaign history, selected
+public source files, and training diagnostics are exposed. This isolation is
+implemented by the tool adapter and runtime, not merely requested in a prompt.
 
-```sh
-python3.10 -m venv /tmp/ramulator-chia
-/tmp/ramulator-chia/bin/pip install -r tools/chia_loop/requirements.txt
-PYTHONPATH=$PWD/python:$PWD/tools:$PWD \
-  /tmp/ramulator-chia/bin/python tools/chia_loop/atomic_loop.py \
-  --config tools/chia_loop/smoke.json --run-id smoke-local
-```
+## Setup
 
-No API key is required for `backend: dummy`. A later real-agent backend will
-need credentials appropriate to the selected CHIA model adapter.
-
-The runner refuses a tracked-dirty worktree, requires the local
-`atomic-chia-loop` branch, never invokes a push, builds with explicit `-O3`,
-and caps build/evaluation parallelism at 12.
-
-## Audit and storage
-
-Each run writes `eval_out/chia/<run-id>/`:
-
-- `run_manifest.json`: scope, versions, human decisions, agent mode, results,
-  selection, validation, and final status;
-- `audit.jsonl`: ordered actions and whether a human intervened in-run;
-- `interactions/`: complete structured dummy-agent requests and responses;
-- `profiles/`: CHIA's native dispatch/completion/dependency JSONL trace;
-- `reports/`: baseline, per-iteration training, selection, and held-out
-  validation reports;
-- `evaluation/`: raw manifests and request traces;
-- `artifacts/`: verified trace and auxiliary gzip manifests.
-
-Every tracked file except the explicitly agent-owned Atomic implementation is
-hashed before the loop and checked after each build/evaluation. Any evaluator,
-metric, frontend, comparison model, or orchestration mutation fails the run.
-
-Completed `*.chN` traces are gzip-compressed individually, verified, and read
-transparently by the evaluator. Large command logs, transcripts, and CHIA
-profiles are also compressed above the configured threshold. Restore them with:
+Use Linux with Landlock ABI >= 3, libseccomp, a C++20 compiler, CMake, and Python
+3.10 or newer. The recorded experiments use Python 3.12. Configure the external
+trace paths described in [the evaluator guide](../eval/README.md); workload
+files are not redistributed. Six trace families are needed for real trials.
 
 ```sh
-python tools/eval/archive_results.py restore \
-  eval_out/chia/RUN/artifacts/trace_archive_manifest.json
-python tools/chia_loop/artifacts.py restore \
-  eval_out/chia/RUN/artifacts/aux_archive_manifest.json
+python3 -m venv .venv
+.venv/bin/pip install -e . -r tools/chia_loop/requirements.txt
+cmake -S . -B build-bench -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE="-O3 -DNDEBUG"
+cmake --build build-bench --parallel 12
+export PYTHONPATH="$PWD/python:$PWD/tools:$PWD"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
+export RAMULATOR_TRACES=/path/to/traces
+gcloud auth application-default login
 ```
 
-CHIA execution caches, when enabled in a later distributed campaign, are
-disposable bounded caches. They are not result archives and do not replace the
-checksum-bearing manifests above.
+Preparation runs the optimized oracle, four comparisons, seed, full-window
+normal/isolated-runner parity checks, unit tests, and actual loaded-DSO isolation
+and model-parameter probes. It refreshes ADC but makes no paid generation calls.
+
+```sh
+.venv/bin/python tools/chia_loop/prepare_gemini.py --root eval_out/chia/NEW_RUN --workers 6
+.venv/bin/python tools/chia_loop/gemini_loop.py --root eval_out/chia/NEW_RUN
+```
+
+A completed build emits a `compliance_review_needed` event and waits for a
+reviewer. Review the exact candidate source and its explanation against the
+frozen contract: immutable admission-time departures, bounded causal state,
+no explicit command scheduler, no hidden data access, generic parameters, and
+physically interpretable rules. Do not supply model changes or accuracy hints.
+Record a decision, for example:
+
+```sh
+.venv/bin/python tools/chia_loop/review_candidate.py /path/to/draft \
+  --approve --reviewer REVIEWER_NAME --reviewer-kind agent \
+  --reason "Source-specific justification of compliance."
+```
+
+Use `--reject` with a precise contract violation instead when needed. A rejected
+draft receives that feedback and can be repaired by its proposing model. This
+external compliance supervision is part of the protocol; the system is not
+claimed to be an unsupervised single-model search.
+
+## Editable interface and limits
+
+Agents submit complete `includes` and `code` region bodies as JSON. The trusted
+runner preserves all surrounding code. Model state, helpers, parameter defaults
+and validation, `init_model()`, and `predict_departure()` are editable.
+`model_param(name, default, minimum, maximum)` declares a numeric model
+parameter during initialization. Optional public overrides use
+`model_parameters=["name=value"]`; a campaign uses one shared configuration,
+never workload-specific values. `controller_config()` supplies the resolved
+buffer sizes and write-drain watermarks read-only. The DRAM specification is
+also readable. Admission, callbacks, time, mapping, and observations stay frozen.
+
+Per evaluated iteration, runaway guards allow 48 model turns, 192 inspections,
+12 submitted drafts, and 60 API attempts including one transient retry per
+turn. The final two turns reserve a submission/repair opportunity. Source
+search, 1,200-line paging, final statistics, paired extremes, and 200-row
+time/type-filtered training slices are available. No shell or arbitrary file
+tool is provided. Open-loop/synthetic tools exist in the wider harness but
+are not yet exposed through this real-agent adapter.
+
+Input is counted before dispatch, with a 900,000-token limit and an 8 MB
+transport guard; conversation content and returned signatures are preserved.
+The crash-safe ledger reserves before each generation, includes thinking in
+output usage, uses conservative model-specific tariffs, and retains unknown
+transport-failure reservations. Known non-200 HTTP responses are unbilled
+under Google's pricing policy. Estimates are not Cloud Billing invoices.
+
+Builds use explicit `-O3`; total evaluation/build parallelism is at most 12.
+Per process: 4 GiB address space, 180 CPU seconds for compilation, 600 CPU
+seconds for simulation, and 8 GiB per simulator output file. These are
+infrastructure guards, not accuracy thresholds.
+
+## Results, audit, and storage
+
+```sh
+.venv/bin/python tools/chia_loop/analyze_gemini.py eval_out/chia/NEW_RUN
+.venv/bin/python tools/chia_loop/audit_gemini_campaign.py eval_out/chia/NEW_RUN
+```
+
+The run directory holds frozen execution/source snapshots, exact manifests,
+provider ledgers, source lineage, CHIA execution profiles, per-workload metrics,
+and plots. Raw traces are gzip-compressed immediately after each successful
+simulation, checksum-verified, and read transparently by metrics/diagnostics.
+Failed traces have separate archives and cannot become scoring evidence.
+Large finalized interactions/logs/profiles are compressed too.
+
+```sh
+.venv/bin/python tools/eval/archive_results.py verify eval_out/chia/NEW_RUN/archive_manifest.json
+.venv/bin/python tools/eval/archive_results.py restore eval_out/chia/NEW_RUN/archive_manifest.json
+.venv/bin/python tools/chia_loop/artifacts.py restore eval_out/chia/NEW_RUN/aux_archive_manifest.json
+```
+
+Restoration is optional. Do not restore whole archives merely to compute
+metrics. Generated data and interaction logs stay outside Git; a compact
+review summary and selected result tables/plots can be curated separately.
+The runner never commits or pushes.
+
+The original `atomic_loop.py --config tools/chia_loop/smoke.json` remains a
+non-LLM plumbing test with a deliberately short ROI. It is not the real-model
+experiment and its accuracy is not used as scientific evidence.

@@ -1,5 +1,10 @@
 # Ramulator 2.1 User Guide
 
+This private hackathon branch develops **agent-evolved atomic DRAM models**
+with a CHIA feedback loop. Start with the [project status and results](doc/chia_hackathon_review.md)
+and the [reproduction guide](tools/chia_loop/README.md). The original Ramulator
+user guide follows below. This is not the upstream public release branch.
+
 - [1. Overview](#1-overview)
 - [2. Using Ramulator 2.1](#2-using-ramulator-21)
 - [3. Your First Run](#3-your-first-run)
