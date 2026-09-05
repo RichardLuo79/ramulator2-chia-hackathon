@@ -11,13 +11,13 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import fcntl
 import importlib.metadata
 import json
 import os
 import pathlib
 import shutil
 import sys
-import threading
 import time
 import traceback
 
@@ -70,13 +70,15 @@ VISIBLE = [
     "src/ramulator/controller/scheduler/impl/frfcfs_rowhit.cpp",
     "src/ramulator/dram/impl/DDR5.cpp", "python/ramulator/dram/ddr5.py",
 ]
-EVENT_LOCK = threading.Lock()
 PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "ramulator-chia")
 
 
 def event(root, kind, **data):
     record = {"time": time.time(), "event": kind, **data}
-    with EVENT_LOCK, (pathlib.Path(root) / "events.jsonl").open("a") as f:
+    with (pathlib.Path(root) / "events.jsonl").open("a") as f:
+        # Workers may emit events too. A file lock is process-safe and does not
+        # capture an unpickleable thread lock in CHIA's dispatched function.
+        fcntl.flock(f, fcntl.LOCK_EX)
         f.write(json.dumps(record, sort_keys=True) + "\n"); f.flush(); os.fsync(f.fileno())
     print(json.dumps(record, sort_keys=True), flush=True)
 
@@ -335,7 +337,10 @@ def run_arm(root, arm):
         try:
             proposal = get(propose.chia_remote(str(root), arm, iteration, system, prompt, parent))
         except Exception as exc:
-            proposal = {"status": "failed", "reason": str(exc)[-8000:]}
+            # A Ray dispatch/infrastructure exception is not an agent result.
+            # Fail the campaign before test evaluation; keep all local evidence.
+            event(root, "infrastructure_failure", arm=arm, iteration=iteration, reason=str(exc)[-8000:])
+            raise
         atomic_write_json(directory / "proposal.json", proposal)
         event(root, "proposal_response_received", arm=arm, iteration=iteration,
             proposal_status=proposal.get("status"), failure_kind=proposal.get("failure_kind"))

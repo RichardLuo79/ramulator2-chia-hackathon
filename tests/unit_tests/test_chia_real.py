@@ -219,6 +219,17 @@ def test_real_loop_repairs_drafts_inside_one_evaluated_iteration(tmp_path, monke
     assert P.Ledger(tmp_path / "arms/flash/ledger.json", "flash").totals()["api_attempts"] == 2
 
 
+def test_script_entrypoint_chia_functions_are_serializable():
+    # Imported functions pickle by reference and hide this class of bug.
+    # CLI-defined functions must serialize their referenced globals by value.
+    import runpy
+    import ray.cloudpickle as cloudpickle
+    namespace = runpy.run_path(str(REPO / "tools/chia_loop/gemini_loop.py"), run_name="serialization_probe")
+    for name in ("propose", "build", "score"):
+        restored = cloudpickle.loads(cloudpickle.dumps(namespace[name]._chia_original))
+        assert callable(restored)
+
+
 def test_no_weighted_tradeoff_promotion():
     assert P.dominates((1, 2), (2, 3))
     assert not P.dominates((1, 4), (2, 3))
