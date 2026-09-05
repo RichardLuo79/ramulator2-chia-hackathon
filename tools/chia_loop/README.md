@@ -119,6 +119,7 @@ infrastructure guards, not accuracy thresholds.
 ```sh
 .venv/bin/python tools/chia_loop/analyze_gemini.py eval_out/chia/NEW_RUN
 .venv/bin/python tools/chia_loop/audit_gemini_campaign.py eval_out/chia/NEW_RUN
+.venv/bin/python tools/chia_loop/export_review.py eval_out/chia/NEW_RUN doc/results/NEW_RUN
 ```
 
 The run directory holds frozen execution/source snapshots, exact manifests,
@@ -137,7 +138,19 @@ Large finalized interactions/logs/profiles are compressed too.
 Restoration is optional. Do not restore whole archives merely to compute
 metrics. Generated data and interaction logs stay outside Git; a compact
 review summary and selected result tables/plots can be curated separately.
+The exporter requires a completed, audited campaign and a new destination. It
+copies only selected sources, numeric summaries, and allowlisted tables/plots,
+not the full run manifest, proposal explanations, or interaction records.
 The runner never commits or pushes.
+
+If evaluation completed but post-run archival failed, fix the specific storage
+problem, then run `finalize_artifacts.py RUN_ROOT` and repeat the analysis/audit.
+This command does not repeat evaluations or make generation calls. Failed-run
+traces stay in separate archives with explicit ineligibility for metrics.
+`archive_results.py recover-duplicate MANIFEST RAW_KEY DUPLICATE_GZIP` can restore
+a damaged archive only from an exact match to its original compressed and raw
+checksums; it preserves the damaged file and writes a recovery record. Never
+replace expected checksums to make a damaged or changed result pass verification.
 
 The original `atomic_loop.py --config tools/chia_loop/smoke.json` remains a
 non-LLM plumbing test with a deliberately short ROI. It is not the real-model

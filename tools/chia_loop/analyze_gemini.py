@@ -35,7 +35,9 @@ def main():
     maximum_iterations = manifest["policy"]["iterations_per_arm"]
     repaired_protocol = "iteration_unit" in manifest["policy"]
     for arm in ("pro", "flash"):
-        NAMES[arm] = manifest["models"][arm].replace("gemini-", "Gemini ").replace("-preview", "").replace("-", " ")
+        NAMES[arm] = (manifest["models"][arm].replace("gemini-", "Gemini ")
+                     .replace("-preview", "").replace("-", " ")
+                     .replace(" pro", " Pro").replace(" flash", " Flash"))
         if manifest["arms"][arm]["incumbent"] == "seed":
             NAMES[arm] += " (seed)"
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10,
@@ -144,6 +146,8 @@ def main():
     text.extend(["", "Estimates include thinking tokens, conservatively charge cached input at the full standard rate, "
         "and exclude credit/discount effects. They are not Cloud Billing invoices. The separate cap ledger uses "
         "higher tariffs and retains pessimistic reservations for unknown calls. "
+        "Reported call counts cover this campaign; standard estimates and cap charges also include any explicitly "
+        "recorded infrastructure-attempt carryover, available separately in the budget fields. "
         "[Pricing source](https://cloud.google.com/vertex-ai/generative-ai/pricing), checked 2026-09-05.", "",
         "## Accuracy", "", "![Headline comparison](headline.png)", ""])
     for split in ("training", "test"):
