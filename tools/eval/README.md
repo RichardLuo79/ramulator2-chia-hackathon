@@ -5,9 +5,11 @@ cycle-level Ramulator oracle and published immediate-response baselines. Runners
 record per-core cycles, controller statistics, and request traces. Metrics are
 derived only after all required artifacts have been validated.
 
-The first CHIA proof of concept executes only SimpleO3 + DDR5. The same harness
-contains forward plumbing for LPDDR5, LPDDR6, HBM4, ChampSim, and gem5; those
-targets require their own full campaigns before any accuracy claim.
+The first CHIA proof of concept used only SimpleO3 + DDR5. New CHIA preparations
+use a configurable larger SimpleO3 cohort and post-selection ChampSim/gem5
+transfer, still at DDR5; see
+[the frontend-transfer protocol](../../doc/chia_ddr5_frontend_transfer.md).
+LPDDR5, LPDDR6 and HBM4 remain outside this campaign.
 
 ## Models
 
@@ -25,10 +27,14 @@ none is silently promoted to the oracle.
 
 ## Workload and run contracts
 
-The real Gemini experiment uses a fixed family-disjoint split:
+The historical real Gemini experiment used a fixed family-disjoint split:
 
 - Training: `429.mcf`, `519.lbm`
 - Final test: `433.milc`, `450.soplex`, `459.GemsFDTD`, `549.fotonik3d`
+
+The current default is an operator-owned 8/8 family-disjoint split in
+`tools/chia_loop/configs/ddr5_frontend_transfer_v1.json`. Preparation freezes
+that profile and the input identities. Prior roots keep their original split.
 
 Real trials use 20 million issued instructions/core, cold-start and fully
 drained, and reject shorter windows. The separate dummy configuration in
@@ -94,7 +100,8 @@ remain visible guardrails and diagnostics.
 | `metrics.py` | Model-neutral checksum-bound request metric caching and validation. |
 | `artifacts.py` | Transparent access to raw or verified per-file gzip traces. |
 | `archive_results.py` | Verified, atomic compression/verification/restoration of completed traces. |
-| `run_champsim.py`, `gem5/` | Future closed-loop frontend transfer plumbing. |
+| `run_champsim.py`, `gem5/` | Standalone frontend runners and matching contracts; not CHIA candidate selection. |
+| `../chia_loop/transfer.py` | Exact frozen-DSO ChampSim/gem5 DDR5 transfer with all four baselines. |
 | `synth.py`, `replay_screen.py` | Synthetic and open-loop diagnostics; never promotion evidence. |
 
 ## Direct use

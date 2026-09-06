@@ -5,6 +5,7 @@ import argparse
 import json
 import math
 import pathlib
+import shlex
 import sys
 import time
 
@@ -19,14 +20,18 @@ def main():
     ap.add_argument("root", type=pathlib.Path)
     args = ap.parse_args()
     root = args.root.resolve()
+    train = E.workloads(root, "training")
     tests = E.command([sys.executable, "-m", "pytest",
         "tests/unit_tests/test_chia_real.py", "tests/unit_tests/test_chia_loop.py",
         "tests/unit_tests/test_chia_run_records.py", "tests/unit_tests/test_chia_review_export.py",
+        "tests/unit_tests/test_chia_unattended.py", "tests/unit_tests/test_chia_evaluation_config.py",
+        "tests/unit_tests/test_chia_transfer.py",
+        "tests/unit_tests/test_chia_loop_config.py", "tests/unit_tests/test_chia_synthetic_diagnostics.py",
         "tests/unit_tests/test_eval_archive_recovery.py",
         "tests/unit_tests/test_eval_metrics.py", "tests/unit_tests/test_atomic_skeleton.py", "-q"],
         root / "logs/unit_tests.log")
     parity = []
-    for workload in E.TRAIN:
+    for workload in train:
         for model in ("seed", "oracle"):
             direct = root / "parity/simpleo3/DDR5" / workload / model
             protected = root / "training/simpleo3/DDR5" / workload / model
@@ -70,16 +75,16 @@ __attribute__((constructor)) void probe() {
   execve(args[0], args, env);
   std::fputs("ISOLATION_PROBE_OK\\n", stderr);
 }
-'''.replace("TRACE_PATH", json.dumps(E.C.trace_path(E.TRAIN[0])))
+'''.replace("TRACE_PATH", json.dumps(E.C.trace_path(train[0])))
         .replace("SENTINEL_PATH", json.dumps(str(sentinel))))
     E.sandbox_command(["/usr/bin/g++", "-O3", "-DNDEBUG", "-fPIC", "-shared", source,
                        "-o", probe_dir / "probe.so"], read=[probe_dir], write=[probe_dir],
                       cwd=probe_dir, log=probe_dir / "compile.log")
-    E.run_one(root, E.TRAIN[0], "fixedlat", "loaded_probe", str(probe_dir / "probe.so"), split="preflight")
-    log = root / "preflight/simpleo3/DDR5" / E.TRAIN[0] / "loaded_probe/simulation.log"
+    E.run_one(root, train[0], "fixedlat", "loaded_probe", str(probe_dir / "probe.so"), split="preflight")
+    log = root / "preflight/simpleo3/DDR5" / train[0] / "loaded_probe/simulation.log"
     assert "ISOLATION_PROBE_OK" in log.read_text()
     assert sentinel.read_text() == "private preflight sentinel, not model input\n"
-    E.archive_completed_run(root / "preflight/simpleo3/DDR5" / E.TRAIN[0] / "loaded_probe")
+    E.archive_completed_run(root / "preflight/simpleo3/DDR5" / train[0] / "loaded_probe")
     # Exercise the actual scoped parameter API in a loaded candidate DSO.
     # This fixed-delay interface probe is never exposed as an evolved design.
     from tools.chia_loop import real_core as P
@@ -89,18 +94,18 @@ __attribute__((constructor)) void probe() {
     parameter_probe = parameter_probe.replace("return m_clk + m_latency;", "return m_clk + static_cast<Clk_t>(probe_delay);")
     P.validate_source(seed, parameter_probe)
     parameter_plugin = E.compile_candidate(root, parameter_probe, root / "parameter_probe")
-    parameter_run = E.run_one(root, E.TRAIN[0], "candidate", "parameter_probe", parameter_plugin,
+    parameter_run = E.run_one(root, train[0], "candidate", "parameter_probe", parameter_plugin,
         split="preflight", candidate_overrides={"model_parameters": ["delay=7"]})
     assert parameter_run["controller_stats"]["avg_read_latency"] == 7
-    E.archive_completed_run(root / "preflight/simpleo3/DDR5" / E.TRAIN[0] / "parameter_probe")
-    inputs = {workload: E.C.file_provenance(E.C.trace_path(workload)) for workload in E.TRAIN + E.TEST}
+    E.archive_completed_run(root / "preflight/simpleo3/DDR5" / train[0] / "parameter_probe")
+    inputs = {workload: E.C.file_provenance(E.C.trace_path(workload)) for workload in train + E.workloads(root, "test")}
     hashes = [p["sha256"] for p in inputs.values()]
     assert len(set(hashes)) == len(hashes), "trace aliases cross the split"
     atomic_write_json(root / "preflight_pass.json", {
         "passed_at": time.time(), "parity": parity, "loaded_candidate_file_and_network_denial": True,
         "loaded_model_parameter_override": {"default": 3, "override": 7, "measured_read_latency": 7},
         "trace_inputs": inputs, "family_disjoint_split": True,
-        "unit_test_command": "pytest tests/unit_tests/test_chia_real.py tests/unit_tests/test_chia_loop.py tests/unit_tests/test_eval_metrics.py tests/unit_tests/test_atomic_skeleton.py -q",
+        "unit_test_command": shlex.join(tests["command"]),
         "unit_test_execution": tests,
         "operator_setup_notes": ["Full-window O3 parity and loaded-candidate isolation checked before paid calls.",
                                  "Live generation preflight is the first counted proposal in the individual model run."]})

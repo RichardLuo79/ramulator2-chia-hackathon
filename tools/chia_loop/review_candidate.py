@@ -20,6 +20,8 @@ def main():
     args = parser.parse_args()
     directory = args.directory.resolve()
     requested = json.loads((directory / "review_needed.json").read_text())
+    if "reviewer_backend" in requested.get("policy", {}):
+        raise RuntimeError("this unattended protocol requires its pinned API review; external decisions cannot replace it")
     digest = sha((directory / "atomic_controller.cpp").read_bytes())
     if digest != requested["source_sha256"]:
         raise RuntimeError("candidate source changed after requesting review")

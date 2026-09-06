@@ -17,10 +17,13 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 
 from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.real_core import MUTABLE, sha
+from tools.chia_loop import recovery as R
+from tools.chia_loop import evaluation_config as W
 
 REPO = pathlib.Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(REPO / "python"), str(REPO / "tools")]
@@ -31,6 +34,9 @@ from eval import artifacts as A
 COMPARISONS = ["fixedlat", "md1", "wmg1", "mess"]
 TRAIN = ["429.mcf", "519.lbm"]
 TEST = ["433.milc", "450.soplex", "459.GemsFDTD", "549.fotonik3d"]
+# Backward-compatible constants describe historical roots only. Every actual
+# workload selection, prompt, and diagnostic uses the run-local profile.
+workloads = W.workloads
 # Use the established full single-core ROI, not the infrastructure-smoke ROI.
 INSTS = C.INSTS_SINGLE
 SIM_CPU_SECONDS = 600
@@ -42,15 +48,19 @@ def evaluation_insts(root):
     """Operator-owned configuration, shared by evaluation and agent prompts."""
     path = pathlib.Path(root) / "window_policy.json"
     value = json.loads(path.read_text())["instructions_per_core"] if path.exists() else INSTS
+    if (pathlib.Path(root) / "evaluation_config.json").exists():
+        expected = W.load(root)["simpleo3"]["instructions_per_core"]
+        if value != expected:
+            raise ValueError("window policy differs from frozen evaluation profile")
     if isinstance(value, bool) or not isinstance(value, int) or value < C.INSTS_SINGLE:
         raise ValueError("real evaluations require at least 20,000,000 instructions per core")
     return value
 
 
-def command(args, log, *, cwd=REPO, timeout=240, env=None):
+def command(args, log, *, cwd=REPO, timeout=240, env=None, pass_fds=()):
     start = time.time()
     proc = subprocess.run([str(a) for a in args], cwd=cwd, capture_output=True,
-                          text=True, timeout=timeout, env=env)
+                          text=True, timeout=timeout, env=env, pass_fds=pass_fds)
     log = pathlib.Path(log)
     log.parent.mkdir(parents=True, exist_ok=True)
     log.write_text(shlex.join([str(a) for a in args]) + "\n" + proc.stdout + "\n" + proc.stderr)
@@ -61,7 +71,7 @@ def command(args, log, *, cwd=REPO, timeout=240, env=None):
 
 
 def sandbox_command(args, *, read, write, cwd, log, library_path="", cpu=120,
-                    file_bytes=256 * 1024**2):
+                    file_bytes=256 * 1024**2, lease_fd=None):
     policy = {"read": SYSTEM_READ + [str(p) for p in read],
               "write": [str(p) for p in write], "cwd": str(cwd),
               "cpu_seconds": cpu, "memory_bytes": 4 * 1024**3,
@@ -69,7 +79,8 @@ def sandbox_command(args, *, read, write, cwd, log, library_path="", cpu=120,
     policy_path = pathlib.Path(log).with_suffix(".policy.json")
     atomic_write_json(policy_path, policy)
     return command([sys.executable, REPO / "tools/chia_loop/sandbox.py", policy_path,
-                    "--", *args], log, cwd=cwd, timeout=cpu + 60)
+                    "--", *args], log, cwd=cwd, timeout=cpu + 60,
+                   pass_fds=() if lease_fd is None else (lease_fd,))
 
 
 def prepare_runtime(root):
@@ -113,6 +124,7 @@ def prepare_runtime(root):
              "-ldl", "-l:libseccomp.so.2", "-Wl,-rpath," + str(runtime),
              "-o", runtime / "isolated_sim"], root / "logs/driver_build.log")
     payload = {"object_sha256": objects, "binding_sha256": sha(binding),
+               "synthetic_generator_sha256": sha((REPO / "src/ramulator/frontend/impl/memory_trace/synthetic_pattern.cpp").read_bytes()),
                "interleave_body_sha256": sha(body), "driver_sha256": sha(driver.read_bytes()),
                "library_sha256": sha((runtime / "libramulator.so").read_bytes()),
                "executable_sha256": sha((runtime / "isolated_sim").read_bytes()),
@@ -123,9 +135,22 @@ def prepare_runtime(root):
     return payload
 
 
-def compile_candidate(root, source, output_dir):
+def compile_candidate(root, source, output_dir, *, resume=False):
     root, output_dir = pathlib.Path(root), pathlib.Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    with R.exclusive_lock(output_dir / ".build.lock") as lease:
+        if resume and (output_dir / "build.json").exists():
+            record = R.read_json(output_dir / "build.json")
+            if (record["source_sha256"] != sha(source)
+                    or sha((output_dir / "atomic_controller.cpp").read_bytes()) != sha(source)
+                    or record["plugin_sha256"] != sha((output_dir / "candidate.so").read_bytes())
+                    or record["optimization"] != "-O3"):
+                raise R.OperationalPause("cached build identity changed", retryable=False)
+            return str(output_dir / "candidate.so")
+        return _compile_candidate(root, source, output_dir, lease.fileno())
+
+
+def _compile_candidate(root, source, output_dir, lease_fd):
     file = output_dir / "atomic_controller.cpp"
     file.write_text(source)
     manifest = json.loads((root / "runtime_manifest.json").read_text())
@@ -134,7 +159,7 @@ def compile_candidate(root, source, output_dir):
             "-Wl,-z,defs", file, "-L" + str(runtime), "-lramulator",
             "-o", output_dir / "candidate.so"]
     evidence = sandbox_command(args, read=[root / "export", runtime, output_dir],
-        write=[output_dir], cwd=output_dir, log=output_dir / "compile.log", cpu=180)
+        write=[output_dir], cwd=output_dir, log=output_dir / "compile.log", cpu=180, lease_fd=lease_fd)
     evidence.update({"source_sha256": sha(source), "plugin_sha256": sha((output_dir / "candidate.so").read_bytes()),
                      "optimization": "-O3"})
     atomic_write_json(output_dir / "build.json", evidence)
@@ -159,10 +184,19 @@ def audit_candidate_trace(path, stats):
         raise RuntimeError("candidate committed departures disagree with callback latency sum")
 
 
-def run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candidate_overrides=None):
+def run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candidate_overrides=None, resume=False):
+    R.check_stop(root)
+    R.check_storage(root)
+    directory = pathlib.Path(root) / split / "simpleo3/DDR5" / wl / label
+    with R.exclusive_lock(directory / ".evaluation.lock") as lease:
+        return _run_one_locked(root, wl, model, label, plugin, split=split, runtime_root=runtime_root,
+            candidate_overrides=candidate_overrides, resume=resume, lease_fd=lease.fileno())
+
+
+def _run_one_locked(root, wl, model, label, plugin, *, split, runtime_root, candidate_overrides, resume, lease_fd):
     try:
         result = _run_one(root, wl, model, label, plugin, split=split,
-            runtime_root=runtime_root, candidate_overrides=candidate_overrides)
+            runtime_root=runtime_root, candidate_overrides=candidate_overrides, resume=resume, lease_fd=lease_fd)
         archive_completed_run(pathlib.Path(root) / split / "simpleo3/DDR5" / wl / label)
         return result
     except Exception as exc:
@@ -184,7 +218,8 @@ def run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candida
         raise
 
 
-def _run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candidate_overrides=None):
+def _run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candidate_overrides=None,
+             resume=False, lease_fd=None):
     import ramulator
     import yaml
     root = pathlib.Path(root)
@@ -193,7 +228,28 @@ def _run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candid
     out = root / split / "simpleo3/DDR5" / wl / label
     out.mkdir(parents=True, exist_ok=True)
     if (out / "manifest.json").exists():
+        if resume:
+            if candidate_overrides:
+                raise RuntimeError("resume with ad hoc candidate overrides is not supported")
+            return completed_evaluation(root, out, wl, model, label, plugin, runtime_root)
         raise RuntimeError("refusing to overwrite a completed evaluation")
+    if resume:
+        # Preserve abandoned attempts in place; never overwrite their logs or
+        # confuse partial traces with a completed/cacheable evaluation.
+        previous = [p for p in out.iterdir() if p.name not in {".evaluation.lock", "interrupted_attempts"}]
+        if previous:
+            archive_root = out / "interrupted_attempts"
+            archive_root.mkdir(exist_ok=True)
+            destination = pathlib.Path(tempfile.mkdtemp(prefix="attempt-", dir=archive_root))
+            for path in previous:
+                shutil.move(str(path), destination / path.name)
+            atomic_write_json(destination / "interruption.json", {
+                "time": time.time(), "eligible_for_metrics": False, "reason": "recovered an unfinished evaluation"})
+            if not (destination / "failure.json").exists():
+                atomic_write_json(destination / "failure.json", {
+                    "time": time.time(), "complete": False, "eligible_for_metrics": False,
+                    "error": "worker interrupted before evaluation completed"})
+            archive_failed_run(destination)
     staging = C.stage_run_directory(out, "manifest.json")
     trace = C.trace_path(wl)
     trace_input = C.file_provenance(trace)
@@ -215,7 +271,7 @@ def _run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candid
     stats_file = staging / "stats.yaml"
     evidence = sandbox_command([runtime / "isolated_sim", out / "config.json", plugin or "-", staging, stats_file],
         read=read, write=[staging], cwd=staging, library_path=runtime, log=out / "simulation.log",
-        cpu=SIM_CPU_SECONDS, file_bytes=SIM_FILE_BYTES)
+        cpu=SIM_CPU_SECONDS, file_bytes=SIM_FILE_BYTES, lease_fd=lease_fd)
     stats = yaml.safe_load(stats_file.read_text())
     logical_rows = S._validate_logical_request_trace(staging / "trace.csv.ch0")
     S._validate_fixed_roi_frontend_stats(stats["frontend"], core_count=1, insts_per_core=insts, logical_rows=logical_rows)
@@ -248,16 +304,45 @@ def _run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candid
         staging / "controller_trace.csv.ch0", out / "controller_trace.csv.ch0", out / "manifest.json", payload)
     shutil.move(stats_file, out / "stats.yaml")
     staging.rmdir()
-    return payload
+    # Fresh and resumed callers receive the same canonical record, including
+    # trace identities added by the publisher.
+    return R.read_json(out / "manifest.json")
 
 
-def evaluate(root, models, *, plugin=None, label=None, split="training", workers=2):
+def completed_evaluation(root, directory, workload, model, label, plugin, runtime_root):
+    """Only byte-identified completed work can be reused after an interruption."""
+    from eval import archive_results as AR
+    record = R.read_json(directory / "manifest.json")
+    expected = {"frontend": "SimpleO3", "std": "DDR5", "workload": workload,
+                "model": model, "label": label, "insts_per_core": evaluation_insts(root),
+                "optimization": "-O3", "runtime_manifest_sha256": sha((runtime_root / "runtime_manifest.json").read_bytes())}
+    if any(record.get(key) != value for key, value in expected.items()):
+        raise R.OperationalPause("completed evaluation identity/configuration changed", retryable=False)
+    if record["trace_inputs"][0]["sha256"] != C.file_provenance(C.trace_path(workload))["sha256"]:
+        raise R.OperationalPause("completed evaluation input changed", retryable=False)
+    if plugin and (record.get("candidate_plugin") or {}).get("sha256") != sha(pathlib.Path(plugin).read_bytes()):
+        raise R.OperationalPause("completed evaluation candidate changed", retryable=False)
+    if record["native_library"]["sha256"] != sha((runtime_root / "runtime/libramulator.so").read_bytes()):
+        raise R.OperationalPause("completed evaluation runtime changed", retryable=False)
+    archive_completed_run(directory)
+    AR.verify(directory / "archive_manifest.json")
+    archived = R.read_json(directory / "archive_manifest.json")
+    for name, entry in archived["artifacts"].items():
+        key = "controller_trace" if name.startswith("controller") else "raw_trace"
+        if entry["raw_sha256"] != record[key]["sha256"] or entry["raw_size"] != record[key]["size"]:
+            raise R.OperationalPause("cached trace archive disagrees with its evaluation", retryable=False)
+    return record
+
+
+def evaluate(root, models, *, plugin=None, label=None, split="training", workers=2, resume=False):
     root = pathlib.Path(root)
-    workloads = TRAIN if split == "training" else TEST
-    jobs = [(wl, model) for wl in workloads for model in models]
+    cohort = workloads(root, split)
+    if type(workers) is not int or not 1 <= workers <= 12:
+        raise ValueError("evaluation workers must be in [1, 12]")
+    jobs = [(wl, model) for wl in cohort for model in models]
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
         futures = [pool.submit(run_one, root, wl, model, label if model == "candidate" else model,
-                               plugin if model == "candidate" else None, split=split) for wl, model in jobs]
+                               plugin if model == "candidate" else None, split=split, resume=resume) for wl, model in jobs]
         for f in concurrent.futures.as_completed(futures):
             result = f.result()
             archive_completed_run(root / split / "simpleo3/DDR5" / result["workload"] / result["label"])
@@ -265,11 +350,26 @@ def evaluate(root, models, *, plugin=None, label=None, split="training", workers
     if not labels:
         return {}
     report = root / split / "reports" / ((label or "comparisons") + ".json")
+    receipt_path = root / split / "report_receipts" / report.name
+    inputs = {str(path.relative_to(root)): sha(path.read_bytes())
+        for wl in cohort for name in ["oracle", *labels]
+        for path in [root / split / "simpleo3/DDR5" / wl / name / "manifest.json"]}
+    identity = {"manifests": inputs, "models": labels,
+                "postprocess_sha256": sha((REPO / "tools/eval/postprocess.py").read_bytes())}
+    if resume and receipt_path.exists():
+        receipt = R.read_json(receipt_path)
+        if receipt["identity"] != identity or receipt["report_sha256"] != sha(report.read_bytes()):
+            raise R.OperationalPause("cached metric report/input identity changed", retryable=False)
+        return R.read_json(report)["models"]
     env = os.environ.copy()
     env["EVAL_OUT"] = str(root / split)
+    log = root / "logs" / (split + "_" + (label or "comparisons") + "_metrics.log")
+    if R.exists(log):
+        log = log.with_name(log.stem + f"_recovery_{time.time_ns()}.log")
     command([sys.executable, REPO / "tools/eval/postprocess.py", "--frontend", "simpleo3", "--std", "DDR5",
-             "--workloads", *workloads, "--models", ",".join(labels), "--output", report],
-            root / "logs" / (split + "_" + (label or "comparisons") + "_metrics.log"), env=env, timeout=3600)
+             "--workloads", *cohort, "--models", ",".join(labels), "--output", report],
+            log, env=env, timeout=3600)
+    atomic_write_json(receipt_path, {"identity": identity, "report_sha256": sha(report.read_bytes())})
     return json.loads(report.read_text())["models"]
 
 
@@ -319,6 +419,18 @@ def verify_run_archives(root):
                 manifest["artifacts"][relative] = {**entry, "raw_path": relative,
                     "archive_path": str(stored.relative_to(root))}
                 count += 1
+    auxiliary_runs = list((root / "transfer").glob("*/DDR5/*/*/manifest.json"))
+    auxiliary_runs += list((root / "diagnostics/synthetic").glob("*/*/manifest.json"))
+    for run in sorted(auxiliary_runs):
+        archive_completed_run(run.parent)
+        archive = run.parent / "archive_manifest.json"
+        AR.verify(archive)
+        for entry in json.loads(archive.read_text())["artifacts"].values():
+            raw, stored = AR._entry_paths(entry, archive)
+            relative = str(raw.relative_to(root))
+            manifest["artifacts"][relative] = {**entry, "raw_path": relative,
+                "archive_path": str(stored.relative_to(root))}
+            count += 1
     if not count:
         raise RuntimeError("no completed trace archives to verify")
     atomic_write_json(root / "archive_manifest.json", manifest)
@@ -328,7 +440,7 @@ def verify_run_archives(root):
 def training_diagnostics(root, label, workload, kind="extremes", limit=40, *,
                          start_row=0, arrival_min=None, arrival_max=None, request_type=None):
     """Only training IDs, caller-owned label; paths never come from model input."""
-    if workload not in TRAIN or kind not in {"extremes", "logical", "controller", "stats"}:
+    if workload not in workloads(root, "training") or kind not in {"extremes", "logical", "controller", "stats"}:
         raise ValueError("unknown training diagnostic")
     limit = max(1, min(int(limit), 200))
     start_row = max(0, int(start_row))

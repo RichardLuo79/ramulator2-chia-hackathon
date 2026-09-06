@@ -13,7 +13,7 @@ experiment's settings, not constants to embed in the candidate implementation.
 Keep the controller parameterized by its resolved configuration and DRAM
 specification. Simulation speed and bounded resource usage also matter.
 
-The supplied FixedLat, MD1, WMG1, and MESS comparisons provide training context.
+When enabled in this run, FixedLat, MD1, WMG1, and MESS comparisons provide training context.
 The evaluator measures correctness and accuracy; do not claim an improvement
 before it has been measured.
 
@@ -68,10 +68,11 @@ before it has been measured.
 ## Information and tool access
 
 Use only the files and tools explicitly supplied by this campaign. You may
-inspect the exposed public reference implementation and DRAM specification,
-and use training-only diagnostic tools. Your own earlier candidates,
-explanations, accepted/rejected proposals, and training results are available
-and should inform the next proposal.
+inspect allowlisted source and use the enabled training-only diagnostic tools.
+The run's resolved loop configuration and tool manifest specify which source,
+comparison feedback, history, and diagnostics are available. Disabled features
+are deliberately withheld for ablations; do not try to recover them indirectly.
+Use your supplied parent and the enabled evidence to inform the next proposal.
 
 Do not seek other campaigns, repository history, archived implementations,
 operator handovers, or another agent's results. Held-out inputs and results are
@@ -155,7 +156,7 @@ and evaluate under its fixed workload and resource configuration.
 
 Before proposing, you may instead return a JSON inspection action:
 `{"status":"inspect","requests":[{"tool":"read_file","path":"<allowlisted path>","start_line":1,"max_lines":200}]}`.
-The other available tool is
+When enabled, another tool is
 `{"tool":"training_diagnostics","workload":"<training ID>","kind":"extremes|logical|controller","limit":20}`.
 It returns paired signed extremes or the first logical/controller rows of the
 parent and oracle; logical and controller traces use different clock domains.
@@ -172,8 +173,25 @@ Tool responses are supplied in the next message. Each requested tool counts
 against the generous inspection safety limit, up to 16 requests per turn.
 The last two model turns are reserved for submission/repair or no_change.
 
+When `synthetic_diagnostics` is enabled, you can request controlled experiments:
+`{"status":"inspect","requests":[{"tool":"synthetic_diagnostics","cases":[{"mlp":16,"bank_spread":4,"row_run":16}],"limit":8}]}`.
+Choose the parameters to test your own hypothesis. The runtime tool manifest
+describes all generic axes and limits; no model-specific diagnostic cases are
+supplied. Each case runs the generic SyntheticPattern generator against the
+reference and your supplied parent DSO. `num_requests` means reads PER STREAM;
+both frontend and memory clocks are DRAM cycles, with no CPU or LLC model.
+The result includes final statistics, normalized paired read errors, and bounded
+first-read and signed-extreme trace slices. Pairing uses per-stream read ordinal
+in admission order, with exact read population and address checks. These are
+independent closed-loop schedules; timestamps are not aligned. Adaptive write
+timing may differ. Synthetic elapsed cycles are NOT application core cycles.
+The experiments are training-only evidence, never promotion objectives. Raw
+traces remain compressed in this run; repeated identical requests reuse verified
+results. You cannot supply candidate source paths, arbitrary scripts, workload
+files, or controller overrides. Cases for different parent DSOs are distinct.
+
 After a proposal the runner assembles the protected scaffold, checks the source,
 builds with -O3, obtains a recorded compliance-only review, and runs the two
-full-window training cases. Build, compliance, or runtime rejection is returned
+full-window training cohort. Build, compliance, or runtime rejection is returned
 to you for repair in this conversation. Only you may modify your model: neither
 the runner nor reviewer silently fixes it. You cannot evaluate held-out cases.

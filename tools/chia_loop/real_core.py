@@ -124,7 +124,19 @@ class Ledger:
             data["carryover"] = carryover
         self._transaction(update)
 
-    def reserve(self, payload: str, iteration: int, turn: int, input_tokens=None):
+    def initialize(self):
+        """Create an owned empty ledger, including for runs that make no calls."""
+        self._transaction(lambda data: None)
+
+    def reserve(self, payload: str, iteration: int, turn: int, input_tokens=None, *,
+                purpose="proposal", backend=None, operation_key=None):
+        # A run still has one proposing model. Its isolated reviewer is a
+        # separately identified service, charged to this SAME authorization.
+        backend = self.arm if backend is None else backend
+        if backend not in MODELS or purpose not in {"proposal", "review"}:
+            raise ValueError("invalid generation role/backend")
+        if purpose == "proposal" and backend != self.arm:
+            raise ValueError("cannot substitute a different proposing model")
         size = len(payload.encode("utf-8"))
         if size > MAX_CONTEXT_BYTES:
             raise BudgetExhausted("finite context-byte limit reached")
@@ -132,7 +144,7 @@ class Ledger:
                 not isinstance(input_tokens, int) or not 0 <= input_tokens <= MAX_INPUT_TOKENS):
             raise BudgetExhausted("input token limit reached or invalid token count")
         bound = size + 4096 if input_tokens is None else int(input_tokens * 1.1) + 4096
-        rates = PRICING["conservative_cap_rates"][self.arm]
+        rates = PRICING["conservative_cap_rates"][backend]
         reserve = (bound * rates["input"] + 2 * MAX_OUTPUT * rates["output"]) / 1e6
         def update(data):
             committed = data.get("carryover", {}).get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in data["calls"])
@@ -140,6 +152,8 @@ class Ledger:
                 raise BudgetExhausted(f"per-run ${data['cap_usd']:g} ceiling would be exceeded by next call")
             call_id = len(data["calls"])
             data["calls"].append({"id": call_id, "iteration": iteration, "turn": turn,
+                "purpose": purpose, "backend": backend, "model": MODELS[backend],
+                "operation_key": operation_key, "pricing": model_pricing(PRICING, backend),
                 "reserved_at": time.time(), "state": "reserved", "payload_sha256": sha(payload),
                 "counted_input_tokens": input_tokens,
                 "reserved_usd": reserve, "cap_charge_usd": reserve,
@@ -150,6 +164,14 @@ class Ledger:
     def settle(self, call_id: int, usage: dict | None, error: str | None = None, http_status=None):
         def update(data):
             row = data["calls"][call_id]
+            if row["state"] == "usage_recorded":
+                if usage == row.get("usage") and error is None and http_status is None:
+                    return  # Idempotent replay preserves the original receipt time.
+                raise RuntimeError("cannot replace a settled provider usage receipt")
+            if row["state"] == "unbilled_http_error":
+                if http_status == row.get("http_status") and usage is None:
+                    return
+                raise RuntimeError("cannot replace a recorded HTTP error with a different outcome")
             row.update({"usage": usage, "error": error, "settled_at": time.time()})
             if isinstance(http_status, int) and 400 <= http_status <= 599:
                 # Google's published policy bills only HTTP 200 responses.
@@ -166,11 +188,12 @@ class Ledger:
             output = max(output, (usage.get("total_token_count") or 0) - prompt)
             if any(not isinstance(n, int) or n < 0 for n in (prompt, output)):
                 raise RuntimeError("invalid provider token usage")
-            rate = PRICING[self.arm]
+            backend = row.get("backend", self.arm)
+            rate = PRICING[backend]
             long = prompt > 200_000
             row["estimated_standard_usd"] = (prompt * rate["long_input" if long else "input"]
                 + output * rate["long_output" if long else "output"]) / 1e6
-            guard = PRICING["conservative_cap_rates"][self.arm]
+            guard = PRICING["conservative_cap_rates"][backend]
             row["cap_charge_usd"] = (prompt * guard["input"] + output * guard["output"]) / 1e6
             row["billed_output_including_thinking"] = output
             row["state"] = "usage_recorded"
@@ -194,6 +217,14 @@ class Ledger:
             "prompt_tokens": sum((c.get("usage") or {}).get("prompt_token_count") or 0 for c in calls),
             "thinking_tokens": sum((c.get("usage") or {}).get("thoughts_token_count") or 0 for c in calls),
             "output_tokens_including_thinking": sum(c.get("billed_output_including_thinking", 0) for c in calls)}
+
+    def calls(self):
+        """Read the durable journal; the runner/operation locks serialize dispatch."""
+        if not self.path.exists():
+            return []
+        data = json.loads(self.path.read_text())
+        self._check_owner(data)
+        return data["calls"]
 
 
 def regions(source: str):

@@ -100,6 +100,7 @@ class SyntheticPattern : public IFrontEnd, public Implementation {
   int64_t s_total_read_latency = 0;
   float s_avg_read_latency = 0.0f;
   size_t s_reads_done = 0;
+  size_t s_writes_done = 0;
 
  public:
   void init() override {
@@ -196,6 +197,8 @@ class SyntheticPattern : public IFrontEnd, public Implementation {
     m_stats.add("cycles", m_clk);
     m_stats.add("reads_sent", s_reads_sent);
     m_stats.add("writes_sent", s_writes_sent);
+    m_stats.add("reads_completed", s_reads_done);
+    m_stats.add("writes_completed", s_writes_done);
     m_stats.add("total_read_latency", s_total_read_latency);
     m_stats.add("avg_read_latency", s_avg_read_latency);
   }
@@ -218,7 +221,9 @@ class SyntheticPattern : public IFrontEnd, public Implementation {
     for (const auto& st : m_s) {
       if (!st.finished()) return false;
     }
-    return true;
+    // The last read callback can enqueue a writeback. Sending that write is
+    // not its completion: keep ticking until every admitted callback returns.
+    return s_writes_done == s_writes_sent;
   }
 
   void update_stats() override {
@@ -404,7 +409,7 @@ class SyntheticPattern : public IFrontEnd, public Implementation {
     return av;
   }
 
-  Request make_request(const AddrVec_t& av, int type, int source_id) const {
+  Request make_request(const AddrVec_t& av, int type, int source_id) {
     Request req(av, type);
     int bank_flat = 0;
     for (size_t i = 0; i < m_bank_positions.size(); i++) {
@@ -415,6 +420,11 @@ class SyntheticPattern : public IFrontEnd, public Implementation {
                                    static_cast<int64_t>(av[m_row_pos]) * m_num_cls + cls);
     req.source_id = source_id;
     req.size_bytes = m_memory_system->get_tx_bytes();
+    if (type == Request::Type::Write) {
+      // A coalesced write may call back synchronously inside send(). Counting
+      // cumulative completions also handles that convention without underflow.
+      req.callback = [this](Request&) { s_writes_done++; };
+    }
     return req;
   }
 };

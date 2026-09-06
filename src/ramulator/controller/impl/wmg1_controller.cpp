@@ -49,7 +49,7 @@ class WMG1Controller final : public IController, public Implementation {
   void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
     if (!m_trace_path.empty()) {
       m_trace_file.open(fmt::format("{}.ch{}", m_trace_path, m_channel_id));
-      m_trace_file << "arrive,depart,type,source,addr,cls,wbank,wact,wbus,clamped\n";
+      m_trace_file << "arrive,depart,type,source,addr,cls,wbank,wact,wbus,clamped,frontend_id,frontend_sub_id,admission_ordinal\n";
     }
     m_stats.add("cycles", m_measured_clk);
     m_stats.add("num_read_reqs", s_num_read_reqs);
@@ -111,7 +111,8 @@ class WMG1Controller final : public IController, public Implementation {
     Clk_t depart = t + m_rl + wait;
     if (m_trace_file.is_open()) {
       m_trace_file << m_clk << ',' << depart << ',' << req.type_id << ','
-                   << req.source_id << ',' << req.addr << ",0,0,0,0,0\n";
+                   << req.source_id << ',' << req.addr << ",0,0,0,0,0,"
+                   << req.frontend_id << ',' << req.frontend_sub_id << ',' << req.admission_ordinal << '\n';
     }
     if (is_read) {
       req.arrive = m_clk;

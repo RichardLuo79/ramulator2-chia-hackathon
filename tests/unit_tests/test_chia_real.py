@@ -12,6 +12,14 @@ from tools.chia_loop.core import atomic_write_json
 REPO = pathlib.Path(__file__).resolve().parents[2]
 
 
+@pytest.fixture
+def isolated_cpu_lease_pool(tmp_path, monkeypatch):
+    """Mocked orchestration must not acquire the live experiments' CPU slots."""
+    from tools.chia_loop import recovery
+    acquire = recovery.cpu_lease
+    monkeypatch.setattr(recovery, "cpu_lease", lambda directory, count: acquire(tmp_path / "test_cpu_leases", count))
+
+
 def test_reservation_survives_restart_and_refuses_overspend(tmp_path):
     ledger = P.Ledger(tmp_path / "ledger.json", "pro")
     for _ in range(40):
@@ -240,11 +248,11 @@ def test_real_loop_repairs_drafts_inside_one_evaluated_iteration(tmp_path, monke
 
 @pytest.mark.parametrize("mode,expected_status,expected_calls", [
     ("recover", "no_change", 2),
-    ("repeat_failure", "failed", 2),
+    ("repeat_failure", "operational_pause", 3),
     ("budget", "budget_stop", 1),
-    ("attempt_cap", "failed", 1),
+    ("attempt_cap", "limit_stop", 1),
     ("stop", "stopped", 1),
-    ("local_error", "failed", 1),
+    ("local_error", "operational_pause", 1),
 ])
 def test_transport_retry_preserves_caps_context_and_stop(tmp_path, monkeypatch,
                                                        mode, expected_status, expected_calls):
@@ -284,12 +292,12 @@ def test_transport_retry_preserves_caps_context_and_stop(tmp_path, monkeypatch,
         assert kwargs["http_options"].retry_options.attempts == 1
         return SimpleNamespace(models=Models(), close=lambda: closed.append(True))
     monkeypatch.setattr(genai, "Client", client)
-    monkeypatch.setattr(G.time, "sleep", lambda _: None)
+    monkeypatch.setattr(G.generation, "wait_until", lambda *args: None)
     result = G.propose._chia_original(str(tmp_path), "flash", 1, "contract", "initial prompt", {})
     records = json.loads((tmp_path / "ledger.json").read_text())["calls"]
     assert result["status"] == expected_status
     assert len(calls) == len(records) == expected_calls
-    assert closed == [True]
+    assert closed == [True] * (expected_calls + (mode == "budget"))
     assert all(r["iteration"] == r["turn"] == 1 for r in records)
     assert len(set(calls)) == 1  # retry the same context; never splice in partial output
     assert records[0]["state"] == "usage_unknown_reservation_retained"
@@ -299,7 +307,10 @@ def test_transport_retry_preserves_caps_context_and_stop(tmp_path, monkeypatch,
         assert records[1]["state"] == "usage_recorded"
         assert ledger.totals()["unknown_usage_calls"] == 1
     elif mode == "repeat_failure":
-        assert ledger.totals()["unknown_usage_calls"] == 2
+        assert ledger.totals()["unknown_usage_calls"] == 3
+        assert result["retryable"] is True
+    elif mode == "local_error":
+        assert result["retryable"] is False
 
 
 def test_only_transient_provider_failures_are_retryable():
@@ -377,15 +388,15 @@ def test_traffic_adequacy_counts_dram_owners_not_llc_hits(tmp_path):
     assert result["L"] == 18
 
 
-def test_paid_runner_rejects_stale_short_training_before_calls(tmp_path, monkeypatch):
+def test_paid_runner_rejects_stale_short_training_before_calls(tmp_path, monkeypatch, isolated_cpu_lease_pool):
     from tools.chia_loop import gemini_loop as G
     atomic_write_json(tmp_path / "preflight_pass.json", {})
     directory = tmp_path / "training/simpleo3/DDR5/429.mcf/oracle"
     directory.mkdir(parents=True)
     atomic_write_json(directory / "manifest.json", {"insts_per_core": 50_000})
     monkeypatch.setattr(sys, "argv", ["gemini_loop.py", "--root", str(tmp_path), "--model", "pro"])
-    with pytest.raises(RuntimeError, match="prepared training ROI"):
-        G.main()
+    assert G.main() == 78
+    assert "prepared training ROI" in json.loads((tmp_path / "launch_pause.json").read_text())["reason"]
 
 
 def test_ledger_cannot_mix_models_or_run_identities(tmp_path):
@@ -418,13 +429,15 @@ def test_explicit_higher_budget_is_pinned_and_cannot_reset(tmp_path):
 
 
 @pytest.mark.parametrize("backend", ["pro", "flash"])
-def test_single_model_main_records_own_freeze_and_test_only(tmp_path, monkeypatch, backend):
+def test_single_model_main_records_own_freeze_and_test_only(tmp_path, monkeypatch, backend, isolated_cpu_lease_pool):
     """Exercise orchestration with no provider, compiler, Ray worker, or simulator."""
     from types import SimpleNamespace
     from tools.chia_loop import gemini_loop as G
+    loop = G.L.install(tmp_path)
     atomic_write_json(tmp_path / "preflight_pass.json", {})
     atomic_write_json(tmp_path / "preparation_manifest.json", {
         "run_id": tmp_path.name, "model": P.MODELS[backend], "seed_sha256": "seed",
+        "loop_configuration": loop, "loop_configuration_sha256": G.L.identity(loop),
         "limits": {"maximum_iterations": 25, "usd_cap": 100, "cpu_budget": 6}})
     for workload in G.E.TRAIN:
         for label in ("oracle", "seed", *G.E.COMPARISONS):
@@ -432,6 +445,7 @@ def test_single_model_main_records_own_freeze_and_test_only(tmp_path, monkeypatc
             directory.mkdir(parents=True)
             atomic_write_json(directory / "manifest.json", {"insts_per_core": 20_000_000})
     state = {"run_id": tmp_path.name, "model": P.MODELS[backend], "status": "frozen",
+        "termination": "iteration_limit",
         "incumbent": backend + "_001", "frozen_at": 1,
         "selected": {"sha256": "candidate", "plugin": "mock-plugin"}}
     evolved, evaluated = [], []
@@ -444,6 +458,7 @@ def test_single_model_main_records_own_freeze_and_test_only(tmp_path, monkeypatc
         evaluated.append(kwargs["split"])
         return {"aggregate": {"fixture": 1}}
     monkeypatch.setattr(G, "run_model", evolve)
+    monkeypatch.setattr(G, "verify_pinned_run", lambda *args: None)
     monkeypatch.setattr(G.E, "evaluate", evaluate)
     monkeypatch.setattr(G, "score", SimpleNamespace(chia_remote=lambda *args: evaluate(args[0], split=args[3])))
     monkeypatch.setattr(G, "get", lambda value: value)

@@ -24,6 +24,8 @@ from tools.chia_loop import real_core as P, real_eval as E
 from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.traffic import traffic_population
 from tools.chia_loop.run_records import validate_limits
+from tools.chia_loop import evaluation_config as W, transfer, recovery as R
+from tools.chia_loop import loop_config as L
 
 
 def progress(stage, **extra):
@@ -35,6 +37,10 @@ def main():
     ap.add_argument("--root", type=pathlib.Path, required=True)
     ap.add_argument("--model", choices=P.MODELS, required=True)
     ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--evaluation-config", type=pathlib.Path, default=W.DEFAULT,
+                    help="operator-owned DDR5 workload/transfer profile; frozen before generation")
+    ap.add_argument("--loop-config", type=pathlib.Path, default=L.DEFAULT,
+                    help="operator-owned feature/feedback/search ablation profile")
     ap.add_argument("--max-iterations", type=int, default=P.MAX_ITERATIONS)
     ap.add_argument("--usd-cap", type=float, default=P.CAP_USD,
         help="explicit per-run authorization; never increases an existing run's budget")
@@ -48,9 +54,17 @@ def main():
         ap.error(str(exc))
     if not 1 <= args.workers <= args.cpus:
         ap.error("workers must be in [1, cpus]")
+    with R.cpu_lease(REPO / "eval_out/chia/.cpu_leases", args.cpus):
+        return prepare(args, limits)
+
+
+def prepare(args, limits):
     root = args.root.resolve()
     arm, model = args.model, P.MODELS[args.model]
     root.mkdir(parents=True, exist_ok=False)
+    evaluation = W.install(root, args.evaluation_config)
+    loop = L.install(root, getattr(args, "loop_config", None))
+    train = E.workloads(root, "training")
     if args.carry_budget_from:
         origin = args.carry_budget_from.resolve()
         previous = json.loads((origin / "run_manifest.json").read_text())
@@ -67,10 +81,10 @@ def main():
             "reason": "infrastructure attempt charges retained within the original per-run authorization"}
         atomic_write_json(root / "budget_carryover.json", carried)
     atomic_write_json(root / "window_policy.json", {
-        "instructions_per_core": E.C.INSTS_SINGLE,
+        "instructions_per_core": evaluation["simpleo3"]["instructions_per_core"],
         "initialization": "cold caches and DRAM; full prefix with drain; no unscored warmup",
         "roi_selection": "established single-core 20M instruction default; not selected by candidate scores",
-        "minimum_oracle_owner_reads": 10_000,
+        "minimum_oracle_owner_reads": evaluation["simpleo3"]["minimum_oracle_owner_reads"],
         "sustained_traffic": "report time-decile counts; legitimate idle phases are not excluded"})
     seed = (REPO / P.MUTABLE).read_text()
     _, regions = P.regions(seed)
@@ -79,6 +93,7 @@ def main():
         raise RuntimeError("fresh campaign requires the unchanged fixed-delay skeleton")
     prep = {"status": "preparing", "started_at": time.time(), "run_id": root.name,
         "backend": arm, "model": model, "limits": limits,
+        "loop_configuration": loop, "loop_configuration_sha256": L.identity(loop),
         "seed_sha256": P.sha(seed), "seed_source": P.MUTABLE,
         "maximum_output_tokens": P.MAX_OUTPUT, "output_limit_source":
             "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/" +
@@ -89,31 +104,25 @@ def main():
         "changes": [f"{model}, HIGH and 65,536 output tokens; independent single-model run",
             "complete editable-region bodies, with build/compliance/runtime repair feedback",
             "editable model parameters and read-only resolved controller behavior",
-            "48 model turns, 192 inspections, and 12 drafts per evaluated iteration",
+            "frozen, operator-configured inspection, feedback and search limits",
             f"token-counted context and model-specific conservative USD {args.usd_cap:g} ledger",
             "fresh full 20M instruction evolution; immediate verified trace compression"],
         "live_generation_preflight": "first counted proposal in this run; no separate paid probe",
+        "review_mode": "automatic isolated API reviewer, same frozen rubric/model across runs; cost shares this run's cap",
+        "recovery": "journaled proposals and API attempts; bounded operational recovery never opens final test",
         "heldout_exposure": "operator has seen these families in earlier evaluation; fresh agents see training only"}
     atomic_write_json(root / "preparation_manifest.json", prep)
     progress("optimized_runtime")
     E.prepare_runtime(root)
+    transfer.prepare(root)
     plugin = E.compile_candidate(root, seed, root / "seed")
-    inputs = {}
-    for workload in E.TRAIN + E.TEST:
-        path = E.C.trace_path(workload)
-        count = subprocess.run(["awk", '{n++; inst += $1 + ($2 != -1)} END {printf "%d %.0f\\n", n, inst}', path],
-            capture_output=True, text=True, check=True)
-        records, instructions = map(int, count.stdout.split())
-        if instructions < E.evaluation_insts(root):
-            raise RuntimeError("ROI would wrap input trace: " + workload)
-        inputs[workload] = {**E.C.file_provenance(path), "records": records,
-            "available_instructions": instructions, "wraps": False}
-    atomic_write_json(root / "input_inventory.json", inputs)
+    W.inventory(root, E.C.trace_path, E.C.file_provenance)
     progress("training_oracle_and_four_comparisons")
     E.evaluate(root, ["oracle", *E.COMPARISONS], split="training", workers=args.workers)
     progress("training_seed")
     E.evaluate(root, ["candidate"], plugin=plugin, label="seed", split="training", workers=min(2, args.workers))
-    populations = [traffic_population(root / "training/simpleo3/DDR5" / w / "oracle", 10_000) for w in E.TRAIN]
+    populations = [traffic_population(root / "training/simpleo3/DDR5" / w / "oracle",
+        evaluation["simpleo3"]["minimum_oracle_owner_reads"]) for w in train]
     atomic_write_json(root / "training_traffic_coverage.json", populations)
     if not all(p["owner_count_pass"] for p in populations):
         raise RuntimeError("training lacks sufficient oracle DRAM traffic")
@@ -122,7 +131,7 @@ def main():
     env["EVAL_OUT"] = str(root / "parity")
     env["PYTHONPATH"] = ":".join(str(REPO / p) for p in ("python", "tools", "."))
     E.command([sys.executable, REPO / "tools/eval/run_simpleo3.py", "--std", "DDR5",
-        "--workloads", *E.TRAIN, "--models", "oracle,candidate", "--candidate-label", "seed",
+        "--workloads", *train, "--models", "oracle,candidate", "--candidate-label", "seed",
         "--insts-per-core", str(E.evaluation_insts(root)), "--workers", str(min(4, args.workers))],
         root / "logs/standard_parity.log", timeout=1800, env=env)
     progress("unit_tests_parity_and_loaded_isolation")

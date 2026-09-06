@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "name": "full_diagnostics_v1",
+  "features": {
+    "synthetic_diagnostics": true,
+    "training_statistics": true,
+    "logical_trace_diagnostics": true,
+    "controller_trace_diagnostics": true,
+    "request_extremes": true,
+    "per_workload_feedback": true,
+    "comparison_feedback": true,
+    "evolution_history": true,
+    "oracle_source": true,
+    "comparison_source": true
+  },
+  "search": {
+    "parent_selection": "pareto_round_robin",
+    "promotion": "two_objective_pareto"
+  },
+  "limits": {
+    "model_turns_per_proposal": 48,
+    "diagnostic_calls_per_proposal": 192,
+    "drafts_per_iteration": 12,
+    "initial_extreme_rows": 3
+  },
+  "synthetic": {
+    "default_requests_per_stream": 50000,
+    "max_total_reads_per_case": 200000,
+    "max_cases_per_call": 4,
+    "max_unique_cases_per_run": 128,
+    "max_trace_rows": 100,
+    "cpu_seconds_per_simulation": 120
+  }
+}

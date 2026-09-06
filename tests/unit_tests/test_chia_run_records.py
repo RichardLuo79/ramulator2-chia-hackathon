@@ -72,6 +72,7 @@ def test_finalization_preserves_single_run_schema(tmp_path, monkeypatch):
 
 def test_extended_limits_survive_worker_imports_and_cannot_change_after_start(tmp_path):
     from tools.chia_loop import gemini_loop as G
+    G.L.install(tmp_path)
     limits = validate_limits(25, 100, 6)
     atomic_write_json(tmp_path / "preparation_manifest.json", {"limits": limits})
     assert execution_limits(tmp_path) == limits

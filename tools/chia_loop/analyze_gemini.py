@@ -159,6 +159,8 @@ def main():
         "higher tariffs and retains pessimistic reservations for unknown calls. "
         "Reported call counts cover each individual run; standard estimates and cap charges also include any explicitly "
         "recorded infrastructure-attempt carryover, available separately in the budget fields. "
+        + ("The proposing model and isolated API reviewer share this run's cap; the audit records calls and costs by role. "
+           if "review_service" in manifest else "") +
         "[Pricing source](https://cloud.google.com/vertex-ai/generative-ai/pricing), checked 2026-09-05.", "",
         "## Accuracy", "", "![Headline comparison](headline.png)", ""])
     for split in ("training", "test"):
@@ -195,9 +197,11 @@ def main():
         "The MESS curve provenance remains in the run configuration. Historical feasibility-study scores are not "
         "used here because they are not this fresh branch's matched experiment.", "",
         "The no-command-scheduler/immutable-departure contract is enforced by frozen lifecycle code, static "
-        "source restrictions, isolated builds, runtime file/network denial, and recorded orchestrating-agent "
-        "semantic reviews. No human modeling hint was supplied. These reviews mean this is a Gemini proposal "
-        "loop with an external compliance reviewer, not a single-model search with no external supervision.", "",
+        "source restrictions, isolated builds, runtime file/network denial, and recorded "
+        + ("automatic isolated API semantic reviews. The reviewer uses a frozen rubric and sees no history or scores. "
+           if "review_service" in manifest else "orchestrating-agent semantic reviews. ") +
+        "No human modeling hint was supplied. This is a proposal loop with a separate compliance reviewer, "
+        "not an unreviewed single-model search or a formal correctness proof.", "",
         "The protected driver copies the original simulation interleave exactly. Preflight found identical "
         "raw traces, core cycles, and integer stats. Floating diagnostic-stat serialization has lower precision "
         "than the Python dictionary; scored metrics are calculated from unchanged raw traces. "

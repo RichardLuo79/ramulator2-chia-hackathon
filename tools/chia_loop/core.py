@@ -29,6 +29,12 @@ def atomic_write_json(path: pathlib.Path, payload: object) -> None:
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temporary, path)
+        # Persist the rename as well as the file contents for durable journals.
+        descriptor = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)

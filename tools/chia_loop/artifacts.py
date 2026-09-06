@@ -86,15 +86,29 @@ def _gzip_verified(raw: pathlib.Path, level: int) -> tuple[pathlib.Path, dict]:
 
 
 def compress(root: pathlib.Path, manifest: pathlib.Path, *,
-             min_bytes: int = 1_048_576, level: int = 6) -> dict:
+             min_bytes: int = 1_048_576, level: int = 6, parts=None) -> dict:
     """Compress finalized large logs/transcripts, leaving small files readable."""
     root = root.resolve()
     manifest = manifest.resolve()
+    parts = {"logs", "interactions", "profiles"} if parts is None else set(parts)
+    if not parts <= {"logs", "interactions", "profiles", "supervisor_logs"}:
+        raise ValueError("only finalized auxiliary artifact classes can be compressed")
+    # A direct CLI invocation may redirect stdout into the run's logs. Never
+    # unlink that still-open file while this process is printing archival work.
+    active_stdio = set()
+    for descriptor in (0, 1, 2):
+        try:
+            target = os.readlink(f"/proc/self/fd/{descriptor}")
+            if target.startswith("/"):
+                active_stdio.add(pathlib.Path(target).resolve())
+        except OSError:
+            pass
     candidates = sorted(
         path for path in root.rglob("*")
         if path.is_file() and path != manifest and not path.name.endswith(".gz")
+        and path.resolve() not in active_stdio
         and path.stat().st_size >= min_bytes
-        and any(part in {"logs", "interactions", "profiles"} for part in path.parts)
+        and any(part in parts for part in path.relative_to(root).parts)
     )
     payload = json.loads(manifest.read_text()) if manifest.exists() else {
         "schema_version": SCHEMA_VERSION,

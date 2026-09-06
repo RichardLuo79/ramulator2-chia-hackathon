@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "name": "ablation_no_synthetic_v1",
+  "features": {
+    "synthetic_diagnostics": false
+  }
+}

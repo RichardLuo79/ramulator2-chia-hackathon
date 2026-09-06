@@ -13,10 +13,12 @@ import gzip
 import hashlib
 import json
 import pathlib
+import re
 import time
 
 from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.run_records import reporting_view, frozen_selections
+from tools.chia_loop import compliance
 
 
 def load(path):
@@ -64,6 +66,8 @@ def main():
         assert 1 <= len(state["history"]) <= policy["maximum_iterations"]
         assert state["selected"]["sha256"] == frozen[arm]["source_sha256"]
         assert state["status"] == "frozen"
+        if "terminal_search_statuses" in policy:
+            assert state["termination"] in policy["terminal_search_statuses"]
         drafts = [d for h in state["history"] for d in h.get("drafts", [])]
         for draft in drafts:
             outcome = load(pathlib.Path(draft["directory"]) / "outcome.json")
@@ -77,6 +81,11 @@ def main():
             if candidate_id != "seed":
                 review = load(pathlib.Path(candidate["source_path"]).parent / "review.json")
                 assert review["approved"] is True and review["source_sha256"] == candidate["sha256"]
+                if "review_service" in manifest:
+                    assert review["reviewer_kind"] == "api_agent" and review["human_intervention"] is False
+                    assert review["reviewer"] == manifest["review_service"]["model"]
+                    assert review["rubric_sha256"] == manifest["review_service"]["rubric_sha256"]
+                    assert compliance.validate_decision(review, candidate["sha256"]) == "pass"
         run_directory = manifest["run_directories"][arm]
         ledger = load(run_directory / "ledger.json")
         assert ledger.get("backend", ledger.get("arm")) == arm
@@ -91,9 +100,14 @@ def main():
         assert len(ledger["calls"]) == state["budget"]["api_attempts"]
         adjusted_cost = 0.0
         for call in ledger["calls"]:
+            purpose = call.get("purpose", "proposal")
+            assert purpose in {"proposal", "review"}
             base = run_directory / "interactions" / f"iter_{call['iteration']:03d}" / f"call_{call['id']:03d}"
             request = load(base.with_suffix(".request.json"))
-            assert request["model"] == manifest["models"][arm]
+            expected_model = manifest["models"][arm] if purpose == "proposal" else manifest["review_service"]["model"]
+            assert request["model"] == expected_model
+            if call.get("operation_key"):
+                assert hashlib.sha256(json.dumps(request, sort_keys=True, ensure_ascii=False).encode()).hexdigest() == call["payload_sha256"]
             assert request["config"]["thinking_config"]["thinking_level"] == policy["thinking_level"]
             assert request["config"]["max_output_tokens"] == policy["maximum_output_tokens"]
             if "maximum_input_tokens" in policy:
@@ -102,9 +116,20 @@ def main():
             for workload in manifest["final_test"]:
                 assert workload not in json.dumps(request), "held-out identity in paid request"
             sent_prompt = request["contents"][0]["parts"][0]["text"]
-            prompt = run_directory / "candidates" / f"{arm}_{call['iteration']:03d}/prompt.md"
-            assert sent_prompt == prompt.read_text()
+            if purpose == "proposal":
+                prompt = run_directory / "candidates" / f"{arm}_{call['iteration']:03d}/prompt.md"
+                assert sent_prompt == prompt.read_text()
+            else:
+                key = re.fullmatch(r"review_(\d+)_draft_(\d+)_(\d+)", call["operation_key"])
+                assert key and int(key[1]) == call["iteration"]
+                directory = run_directory / "candidates" / f"{arm}_{call['iteration']:03d}" / f"draft_{int(key[2]):03d}"
+                submitted = load(directory / "review_input.json")
+                assert sent_prompt == json.dumps(submitted, sort_keys=True)
+                assert submitted["source_sha256"] == digest(directory / "atomic_controller.cpp")
+                assert set(submitted) == {"source", "source_sha256", "explanation"}
+                assert set(submitted["explanation"]) == set(compliance.EXPLANATION_FIELDS)
             row = {"run_id": manifest["run_ids"][arm], "backend": arm, "iteration": call["iteration"], "call_id": call["id"],
+                "purpose": purpose, "service_model": expected_model,
                 "turn": call["turn"], "state": call["state"], "finish_reason": "NO_RESPONSE",
                 "prompt_tokens": 0, "cached_tokens": 0, "thinking_tokens": 0, "answer_tokens": 0,
                 "billed_output_tokens": 0, "standard_usd": call["estimated_standard_usd"],
@@ -123,7 +148,7 @@ def main():
                     "answer_tokens": tokens.get("candidates_token_count") or 0,
                     "billed_output_tokens": call["billed_output_including_thinking"],
                     "wall_seconds": evidence["wall_s"], "model_version": raw.get("model_version")})
-                rate = manifest["pricing"][arm]
+                rate = manifest["pricing"][arm] if purpose == "proposal" else manifest["review_service"]["pricing"]["standard_rates"]
                 input_rate = rate["long_input" if row["prompt_tokens"] > 200_000 else "input"]
                 output_rate = rate["long_output" if row["prompt_tokens"] > 200_000 else "output"]
                 adjusted_cost += ((row["prompt_tokens"] - .9 * row["cached_tokens"]) * input_rate
@@ -136,6 +161,11 @@ def main():
             "promotions": sum(bool(h.get("promoted")) for h in state["history"]),
             "stop_reason": state.get("stop_reason"), "budget": state["budget"],
             "finish_reasons": dict(collections.Counter(r["finish_reason"] for r in this_arm)),
+            "generation_attempts_by_role": dict(collections.Counter(r["purpose"] for r in this_arm)),
+            "finish_reasons_by_role": {role: dict(collections.Counter(r["finish_reason"] for r in this_arm if r["purpose"] == role))
+                                       for role in ("proposal", "review")},
+            "known_standard_usd_by_role": {role: sum((r["standard_usd"] or 0) for r in this_arm if r["purpose"] == role)
+                                            for role in ("proposal", "review")},
             "cache_adjusted_estimate_known_calls_usd": adjusted_cost,
             "peak_billed_output_tokens": max((r["billed_output_tokens"] for r in this_arm), default=0),
             "maximum_answer_tokens": max((r["answer_tokens"] for r in this_arm), default=0)}
@@ -180,7 +210,7 @@ def main():
                     pairings += r["matched"]
     failed_archives = 0
     from tools.eval import archive_results as AR
-    for archive in root.glob("training/simpleo3/DDR5/*/*/failed_archive_manifest.json"):
+    for archive in root.rglob("failed_archive_manifest.json"):
         failure = load(archive.parent / "failure.json")
         assert failure["complete"] is False and failure["eligible_for_metrics"] is False
         assert not (archive.parent / "manifest.json").exists()

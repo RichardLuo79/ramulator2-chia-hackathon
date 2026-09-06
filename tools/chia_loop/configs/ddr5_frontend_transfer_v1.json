@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "name": "ddr5_frontend_transfer_v1",
+  "standard": "DDR5",
+  "simpleo3": {
+    "training": ["429.mcf", "519.lbm", "401.bzip2", "436.cactusADM", "462.libquantum", "483.xalancbmk", "434.zeusmp", "482.sphinx3"],
+    "test": ["433.milc", "450.soplex", "459.GemsFDTD", "549.fotonik3d", "403.gcc", "471.omnetpp", "435.gromacs", "444.namd"],
+    "instructions_per_core": 20000000,
+    "minimum_oracle_owner_reads": 10000
+  },
+  "transfer": {
+    "champsim": {
+      "workloads": ["603.bwaves_s-1080B", "605.mcf_s-1554B", "619.lbm_s-2676B", "623.xalancbmk_s-165B", "649.fotonik3d_s-1176B", "654.roms_s-1021B"],
+      "warmup_instructions": 2000000,
+      "roi_instructions": 20000000
+    },
+    "gem5": {
+      "workloads": ["stream", "gups", "ptrchase", "matmul", "bfs", "pr", "pb_atax", "pb_mvt", "pb_bicg", "pb_gemm", "pb_jacobi2d", "pb_heat3d"],
+      "run_to_exit": true
+    }
+  }
+}

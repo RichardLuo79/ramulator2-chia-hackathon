@@ -133,6 +133,12 @@ def export_review(root, destination):
             "submitted_drafts": sum(len(h.get("drafts", [])) for h in history),
             "promotions": sum(bool(h.get("promoted")) for h in history),
             "generation_finish_reasons": generation.get("finish_reasons", {}),
+            "generation_attempts_by_role": generation.get("generation_attempts_by_role", {}),
+            "generation_finish_reasons_by_role": generation.get("finish_reasons_by_role", {}),
+            "known_standard_usd_by_role": generation.get("known_standard_usd_by_role", {}),
+            "compliance_review": {key: manifest.get("review_service", {})[key]
+                for key in ("model", "rubric_sha256", "cost_in_same_run_cap", "cross_run_information")
+                if key in manifest.get("review_service", {})},
             "cache_adjusted_estimate_current_calls_usd": generation.get("cache_adjusted_estimate_known_calls_usd"),
             "budget": budget,
             "training_metrics": selected["metrics"]["aggregate"],
