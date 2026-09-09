@@ -1,7 +1,9 @@
 # The import package and CLI are named `chia`; the PyPI distribution is not.
 chialoops==1.0.1
+pydantic==2.12.4
 google-genai==2.8.0
 httpx==0.28.1
+mcp==1.27.1
 numpy>=2.0,<3
 pandas>=2.2,<4
 matplotlib>=3.8,<4

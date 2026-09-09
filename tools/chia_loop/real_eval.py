@@ -1,7 +1,7 @@
 """Trusted, isolated adapter around the existing SimpleO3 measurements.
 
 Metric calculation and logical trace validation are imported unchanged. The
-simulation interleave is copied verbatim from the pinned Python binding. The
+simulation interleave is shared with the Python binding. The
 candidate DSO is loaded only after input traces have been closed and Landlock
 has removed access to them. This is not a C++ memory-safety proof: immutable
 lifecycle code, static checks, and semantic review additionally restrict code.
@@ -9,7 +9,6 @@ lifecycle code, static checks, and semantic review additionally restrict code.
 from __future__ import annotations
 
 import concurrent.futures
-import csv
 import json
 import os
 import pathlib
@@ -24,6 +23,7 @@ from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.real_core import MUTABLE, sha
 from tools.chia_loop import recovery as R
 from tools.chia_loop import evaluation_config as W
+from tools.eval.simpleo3 import audit_candidate_trace
 
 REPO = pathlib.Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(REPO / "python"), str(REPO / "tools")]
@@ -83,56 +83,11 @@ def sandbox_command(args, *, read, write, cwd, log, library_path="", cpu=120,
                    pass_fds=() if lease_fd is None else (lease_fd,))
 
 
-def prepare_runtime(root):
-    root = pathlib.Path(root)
-    runtime = root / "runtime"
-    runtime.mkdir(parents=True)
-    include = root / "export"
-    # Export headers only, not old results, arbitrary working-tree files, or git.
-    for directory in ("src", "ext/fmt/include", "ext/yaml-cpp/include"):
-        for source in (REPO / directory).rglob("*"):
-            if source.is_file() and source.suffix in {".h", ".hpp"}:
-                dest = include / source.relative_to(REPO)
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(source, dest)
-    build = REPO / "build-bench"
-    C.optimized_build_provenance(build)
-    link = shlex.split((build / "CMakeFiles/ramulator.dir/link.txt").read_text())
-    new_link = []
-    objects = {}
-    i = 0
-    while i < len(link):
-        token = link[i]
-        if token == "-o":
-            new_link.extend(["-o", str(runtime / "libramulator.so")]); i += 2; continue
-        if token.endswith("atomic_controller.cpp.o"):
-            i += 1; continue
-        if token.endswith((".o", ".a")):
-            source = (build / token).resolve()
-            objects[str(source.relative_to(build))] = sha(source.read_bytes())
-            token = str(source)
-        new_link.append(token); i += 1
-    command(new_link, root / "logs/trusted_link.log", cwd=build)
-    binding = (REPO / "src/ramulator/python/bindings.cpp").read_text()
-    body = binding.split("  void run() {", 1)[1].split("\n  void finalize()", 1)[0].rsplit("\n  }", 1)[0]
-    driver_template = (REPO / "tools/chia_loop/isolated_sim.cpp").read_text()
-    driver = runtime / "isolated_sim.cpp"
-    driver.write_text(driver_template.replace("  // CHIA_INTERLEAVE_BODY", body))
-    flags = ["-O3", "-DNDEBUG", "-std=c++20", "-I" + str(include / "src"),
-             "-I" + str(include / "ext/fmt/include"), "-I" + str(include / "ext/yaml-cpp/include")]
-    command(["/usr/bin/g++", *flags, driver, "-L" + str(runtime), "-lramulator",
-             "-ldl", "-l:libseccomp.so.2", "-Wl,-rpath," + str(runtime),
-             "-o", runtime / "isolated_sim"], root / "logs/driver_build.log")
-    payload = {"object_sha256": objects, "binding_sha256": sha(binding),
-               "synthetic_generator_sha256": sha((REPO / "src/ramulator/frontend/impl/memory_trace/synthetic_pattern.cpp").read_bytes()),
-               "interleave_body_sha256": sha(body), "driver_sha256": sha(driver.read_bytes()),
-               "library_sha256": sha((runtime / "libramulator.so").read_bytes()),
-               "executable_sha256": sha((runtime / "isolated_sim").read_bytes()),
-               "optimization": "-O3", "compile_flags": flags,
-               "export_hashes": {str(p.relative_to(include)): sha(p.read_bytes())
-                                 for p in include.rglob("*") if p.is_file()}}
-    atomic_write_json(root / "runtime_manifest.json", payload)
-    return payload
+def prepare_runtime(root, *, cpus=1):
+    # Compatibility entry point for historical tools. New orchestration calls
+    # the same source-bound builder directly; no old provider runner is involved.
+    from tools.chia_loop.framework.build import prepare_runtime as build_runtime
+    return build_runtime(REPO, pathlib.Path(root), cpus=cpus, model_api=False)
 
 
 def compile_candidate(root, source, output_dir, *, resume=False):
@@ -164,24 +119,6 @@ def _compile_candidate(root, source, output_dir, lease_fd):
                      "optimization": "-O3"})
     atomic_write_json(output_dir / "build.json", evidence)
     return str(output_dir / "candidate.so")
-
-
-def audit_candidate_trace(path, stats):
-    """Check committed departures without retaining millions of CSV objects."""
-    counts = {"0": 0, "1": 0}
-    latency_sum = 0
-    with pathlib.Path(path).open(newline="") as stream:
-        for row in csv.DictReader(stream):
-            counts[row["type"]] += 1
-            latency = int(row["depart"]) - int(row["arrive"])
-            if latency <= 0:
-                raise RuntimeError("candidate committed a non-positive latency")
-            if row["type"] == "0":
-                latency_sum += latency
-    if counts["0"] != stats["num_read_reqs"] or counts["1"] != stats["num_write_reqs"]:
-        raise RuntimeError("candidate admission trace/count mismatch")
-    if latency_sum != stats["read_latency"]:
-        raise RuntimeError("candidate committed departures disagree with callback latency sum")
 
 
 def run_one(root, wl, model, label, plugin, *, split, runtime_root=None, candidate_overrides=None, resume=False):

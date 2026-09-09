@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "protocols": {
+    "openai_response": {
+      "source": "https://developers.openai.com/api/reference/cli/resources/responses/methods/retrieve",
+      "input_includes_cache": true,
+      "output_includes_reasoning": true,
+      "fields": {
+        "input_tokens": ["input_tokens"],
+        "cached_input_tokens": ["input_tokens_details", "cached_tokens"],
+        "cache_write_input_tokens": ["input_tokens_details", "cache_write_tokens"],
+        "output_tokens": ["output_tokens"],
+        "reasoning_output_tokens": ["output_tokens_details", "reasoning_tokens"],
+        "total_tokens": ["total_tokens"]
+      },
+      "zero_fields": ["tool_input_tokens"]
+    },
+    "openai_cli": {
+      "source": "https://learn.chatgpt.com/docs/non-interactive-mode",
+      "input_includes_cache": true,
+      "output_includes_reasoning": true,
+      "fields": {
+        "input_tokens": ["input_tokens"],
+        "cached_input_tokens": ["cached_input_tokens"],
+        "cache_write_input_tokens": ["cache_write_input_tokens"],
+        "output_tokens": ["output_tokens"],
+        "reasoning_output_tokens": ["reasoning_output_tokens"],
+        "total_tokens": ["total_tokens"]
+      },
+      "zero_fields": ["tool_input_tokens"]
+    },
+    "anthropic_api": {
+      "source": "https://code.claude.com/docs/en/agent-sdk/cost-tracking",
+      "input_includes_cache": false,
+      "output_includes_reasoning": true,
+      "fields": {
+        "input_tokens": ["input_tokens"],
+        "cached_input_tokens": ["cache_read_input_tokens"],
+        "cache_write_input_tokens": ["cache_creation_input_tokens"],
+        "cache_write_5m_tokens": ["cache_creation", "ephemeral_5m_input_tokens"],
+        "cache_write_1h_tokens": ["cache_creation", "ephemeral_1h_input_tokens"],
+        "output_tokens": ["output_tokens"]
+      },
+      "zero_fields": ["tool_input_tokens"]
+    },
+    "anthropic_model": {
+      "source": "https://code.claude.com/docs/en/agent-sdk/python",
+      "input_includes_cache": false,
+      "output_includes_reasoning": true,
+      "fields": {
+        "input_tokens": ["inputTokens"],
+        "cached_input_tokens": ["cacheReadInputTokens"],
+        "cache_write_input_tokens": ["cacheCreationInputTokens"],
+        "output_tokens": ["outputTokens"]
+      },
+      "zero_fields": ["tool_input_tokens"]
+    },
+    "vertex_v1": {
+      "source": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/reference/rest/v1/GenerateContentResponse",
+      "input_includes_cache": true,
+      "output_includes_reasoning": false,
+      "fields": {
+        "input_tokens": ["prompt_token_count"],
+        "cached_input_tokens": ["cached_content_token_count"],
+        "output_tokens": ["candidates_token_count"],
+        "reasoning_output_tokens": ["thoughts_token_count"],
+        "tool_input_tokens": ["tool_use_prompt_token_count"],
+        "total_tokens": ["total_token_count"]
+      },
+      "zero_fields": ["cache_write_input_tokens"],
+      "notes": "For this generate-content interface, cache creation is not a separate input token class. Explicit cache-storage/API charges are outside token estimates. Tool-use input is separate from output."
+    }
+  },
+  "backends": {
+    "codex_cli": {
+      "collection": "cli_aggregate",
+      "protocol": "openai_cli",
+      "terminal_types": ["turn.completed", "turn.failed"],
+      "usage_path": ["usage"],
+      "scope": "native_cli_turn"
+    },
+    "claude_cli": {
+      "collection": "cli_aggregate",
+      "protocol": "anthropic_api",
+      "terminal_types": ["result"],
+      "usage_path": ["usage"],
+      "scope": "main_agent_cli_turn",
+      "per_model_path": ["modelUsage"],
+      "per_model_protocol": "anthropic_model",
+      "per_model_scope": "native_cli_turn_including_subagents"
+    },
+    "vertex_gemini": {
+      "collection": "sdk_events",
+      "protocol": "vertex_v1",
+      "usage_path": ["usage_metadata"],
+      "model_path": ["model_version"],
+      "scope": "provider_request"
+    }
+  }
+}

@@ -6,3 +6,7 @@ doc/results/*/*_selected.cpp whitespace=-blank-at-eol
 doc/results/**/selected.cpp whitespace=-blank-at-eol
 doc/results/**/*.svg whitespace=-blank-at-eol
 doc/results/**/*.csv whitespace=cr-at-eol
+
+# A unified diff represents a blank context line with one leading space.
+# Keep the checksummed upstream patch byte-for-byte, including these markers.
+tools/chia_loop/framework/upstream/session-hooks.patch whitespace=-blank-at-eol

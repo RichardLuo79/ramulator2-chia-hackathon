@@ -1,0 +1,954 @@
+diff --git a/chia/base/llm_call.py b/chia/base/llm_call.py
+index 049d79b..8a6b896 100644
+--- a/chia/base/llm_call.py
++++ b/chia/base/llm_call.py
+@@ -1,7 +1,7 @@
+ 
+ import warnings
+ from typing import List, Optional
+-from dataclasses import dataclass
++from dataclasses import dataclass, field
+ from abc import ABC, abstractmethod
+ from chia.base.tools.ChiaTool import ChiaTool
+ 
+@@ -33,6 +33,44 @@ class QueryResult:
+     stderr: str
+     stream_result: str
+     success: bool = False
++    # Unabridged UTF-8 CLI output is separate from the human-readable preview.
++    # Keyword-only fields preserve positional construction by existing callers.
++    raw_stdout: str = field(default="", kw_only=True)
++    error: Optional[BaseException] = field(default=None, kw_only=True)
++
++
++def single_attempt(run, restore, capture, result_type, classify=None) -> QueryResult:
++    """Run once and return failure evidence with the newest native continuation.
++
++    A workflow with its own durable attempt ledger must not invoke an invisible
++    retry loop. Adapters still own native parsing/capture/restore and error
++    types. In particular, capture happens before error classification, including
++    timeout paths. Failure to restore/capture is an infrastructure exception,
++    not permission to repeat a possibly charged request.
++    """
++    restore()
++    try:
++        result = run()
++    except BaseException as exc:
++        # subprocess.TimeoutExpired can carry acknowledged native output.
++        def text(value):
++            return value.decode("utf-8", errors="replace") if isinstance(value, bytes) else (value or "")
++
++        result = result_type(
++            result="", returncode=-1, stderr=text(getattr(exc, "stderr", None)) or str(exc),
++            stream_result="", raw_stdout=text(getattr(exc, "stdout", None)), error=exc,
++        )
++        if not isinstance(exc, Exception):
++            capture(result)
++            raise
++    capture(result)
++    if result.error is None and classify is not None:
++        try:
++            classify(result)
++        except Exception as exc:
++            result.error = exc
++    result.success = result.error is None and result.returncode == 0
++    return result
+ 
+ class LLMCallBase(ABC):
+     """
+diff --git a/chia/models/claude.py b/chia/models/claude.py
+index 5d4e734..4d3d698 100644
+--- a/chia/models/claude.py
++++ b/chia/models/claude.py
+@@ -9,13 +9,14 @@ import tempfile
+ from dataclasses import dataclass
+ from datetime import datetime, timedelta, timezone
+ import threading
++import io
+ from typing import TYPE_CHECKING, List, Optional
+ from uuid import uuid4
+ 
+ import ray
+ 
+ from chia.base.ChiaFunction import ChiaFunction, ObjectRefCallback
+-from chia.base.llm_call import QueryResult, LLMCallBase, UNSET
++from chia.base.llm_call import QueryResult, LLMCallBase, UNSET, single_attempt
+ 
+ if TYPE_CHECKING:
+     from chia.base.tools.ChiaTool import ChiaTool
+@@ -40,6 +41,7 @@ class ClaudeCodeQueryResult(QueryResult):
+ 
+     session_transcript: Optional[bytes] = None
+     session_transcript_path: Optional[str] = None
++    session_id: Optional[str] = None
+ 
+ 
+ # ``CLIResult`` is the generic alias for any LLM result — kept pointing at
+@@ -369,6 +371,15 @@ class ClaudeCodeLLM(LLMCallBase):
+         max_tool_iterations: int = 100,
+         dangerously_skip_permissions: bool = True,
+         config=UNSET,
++        process_runner=None,
++        append_system_message: bool = False,
++        session_id: Optional[str] = None,
++        claude_bin: str = "claude",
++        work_dir: Optional[str] = None,
++        temporary_directory: Optional[str] = None,
++        native_file_reader=None,
++        native_file_writer=None,
++        tool_token_env=None,
+     ):
+         super().__init__(system_message=system_message,
+                          dangerously_skip_permissions=dangerously_skip_permissions,
+@@ -382,6 +393,15 @@ class ClaudeCodeLLM(LLMCallBase):
+         self.logger = logging.getLogger(logging_name)
+         self.log_stream = log_stream
+         self.log_all = log_all
++        self.process_runner = process_runner
++        self.append_system_message = append_system_message
++        self.claude_bin = claude_bin
++        self.work_dir = work_dir
++        self.temporary_directory = temporary_directory
++        self.native_file_reader = native_file_reader
++        self.native_file_writer = native_file_writer
++        # Use Claude's native environment expansion, not a credential in JSON.
++        self.tool_token_env = tool_token_env
+ 
+         # Backend selection: "cli" (default, the ``claude --print`` subprocess)
+         # or "api" (the Anthropic Python SDK; see the Anthropic API backend
+@@ -424,7 +444,11 @@ class ClaudeCodeLLM(LLMCallBase):
+             )
+ 
+         self._call_counter = 0
+-        self._session_id = str(uuid4()) if resume_session else None
++        if session_id is not None:
++            from uuid import UUID
++            if not resume_session or str(UUID(session_id)) != session_id:
++                raise ValueError("session_id requires resume_session and a canonical UUID")
++        self._session_id = (session_id or str(uuid4())) if resume_session else None
+         self._last_metadata: dict = {}  # populated by _process_event_line
+         self._rate_limit_event: Optional[dict] = None  # populated by _process_event_line
+ 
+@@ -480,14 +504,7 @@ class ClaudeCodeLLM(LLMCallBase):
+                 # Paste any carried transcript onto this machine so a --resume
+                 # run finds the conversation, regardless of which worker the
+                 # previous call landed on. No-op when not resuming.
+-                self._restore_transcript()
+-                if self.backend == "api":
+-                    cli = self._run_api(user_message, tools)
+-                elif self.log_stream:
+-                    cli = self._run_claude_streaming(user_message, tools)
+-                else:
+-                    cli = self._run_claude(user_message, tools)
+-                self._call_counter += 1
++                cli = self.prompt_once(user_message, tools)
+                 self._last_metadata["model"] = self.model
+                 self._last_metadata["tools"] = [
+                     {"name": t.name, "hostname": getattr(t, "hostname", None),
+@@ -500,13 +517,8 @@ class ClaudeCodeLLM(LLMCallBase):
+                     profiler.add_info(self._last_metadata)
+ 
+                 # Classify and raise typed errors
+-                self._classify_error(cli)
+-
+-                # Read the freshly-written transcript back into memory (and
+-                # onto the ClaudeCodeQueryResult) so the caller can resume on another worker.
+-                self._capture_transcript(cli)
+-
+-                cli.success = True
++                if cli.error is not None:
++                    raise cli.error
+                 return cli
+ 
+             # -- Never retry: propagate immediately --
+@@ -555,6 +567,21 @@ class ClaudeCodeLLM(LLMCallBase):
+                 )
+         return ClaudeCodeQueryResult(result="", returncode=-1, stderr="", stream_result="", success=False)
+ 
++    def prompt_once(self, user_message: str, tools=None) -> ClaudeCodeQueryResult:
++        """One native invocation with failure-state capture, without retrying."""
++        self._last_metadata = {}
++        self._rate_limit_event = None
++        runner = self._run_api if self.backend == "api" else (
++            self._run_claude_streaming if self.log_stream else self._run_claude
++        )
++        result = single_attempt(
++            lambda: runner(user_message, tools or []),
++            self._restore_transcript, self._capture_transcript,
++            ClaudeCodeQueryResult, self._classify_error,
++        )
++        self._call_counter += 1
++        return result
++
+     def _sync_transcript(self, cli: ClaudeCodeQueryResult) -> ClaudeCodeQueryResult:
+         """Copy a worker-captured transcript off *cli* onto this instance.
+ 
+@@ -719,9 +746,12 @@ class ClaudeCodeLLM(LLMCallBase):
+         if self._session_id is None or self._session_transcript is None:
+             return
+         path = self._transcript_path()
+-        os.makedirs(os.path.dirname(path), exist_ok=True)
+-        with open(path, "wb") as fh:
+-            fh.write(self._session_transcript)
++        if self.native_file_writer is not None:
++            self.native_file_writer(path, self._session_transcript)
++        else:
++            os.makedirs(os.path.dirname(path), exist_ok=True)
++            with open(path, "wb") as fh:
++                fh.write(self._session_transcript)
+         self._session_transcript_path = path
+         if self._call_counter == 0:
+             self._call_counter = 1
+@@ -735,10 +765,14 @@ class ClaudeCodeLLM(LLMCallBase):
+         """
+         if self._session_id is None:
+             return
++        cli.session_id = self._session_id
+         path = self._transcript_path()
+         if path and os.path.exists(path):
+-            with open(path, "rb") as fh:
+-                data = fh.read()
++            if self.native_file_reader is not None:
++                data = self.native_file_reader(path)
++            else:
++                with open(path, "rb") as fh:
++                    data = fh.read()
+             self._session_transcript = data
+             self._session_transcript_path = path
+             cli.session_transcript = data
+@@ -757,6 +791,11 @@ class ClaudeCodeLLM(LLMCallBase):
+                 "type": "http",
+                 "url": f"http://{tool.hostname}:{port}/{tool.name}/mcp",
+             }
++            if self.tool_token_env is not None:
++                name = self.tool_token_env(tool)
++                if not isinstance(name, str) or not re.fullmatch(r"[A-Z_][A-Z0-9_]*", name):
++                    raise ValueError("MCP authentication needs an environment-variable name")
++                servers[tool.name]["headers"] = {"Authorization": "Bearer ${" + name + "}"}
+         return {"mcpServers": servers}
+ 
+     def _build_allowed_tools(self, tools: List[ChiaTool]) -> List[str]:
+@@ -776,7 +815,7 @@ class ClaudeCodeLLM(LLMCallBase):
+         argument-length limits with long prompts.
+         """
+         cmd = [
+-            "claude",
++            self.claude_bin,
+             "--print",
+             "--model", self.model,
+         ]
+@@ -790,7 +829,8 @@ class ClaudeCodeLLM(LLMCallBase):
+             cmd += ["--output-format", "stream-json", "--verbose"]
+ 
+         if self.system_message:
+-            cmd += ["--system-prompt", self.system_message]
++            cmd += ["--append-system-prompt" if self.append_system_message else "--system-prompt",
++                    self.system_message]
+ 
+         if self._session_id is not None:
+             if self._call_counter > 0:
+@@ -801,7 +841,7 @@ class ClaudeCodeLLM(LLMCallBase):
+         if tools:
+             cfg = self._build_mcp_config(tools)
+             tmp = tempfile.NamedTemporaryFile(
+-                mode="w", suffix=".json", delete=False
++                mode="w", suffix=".json", delete=False, dir=self.temporary_directory
+             )
+             json.dump(cfg, tmp)
+             tmp.close()
+@@ -824,13 +864,14 @@ class ClaudeCodeLLM(LLMCallBase):
+         self.logger.info("Running: %s", " ".join(cmd[:6]) + " ...")
+         env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
+ 
+-        result = subprocess.run(
++        result = (self.process_runner or subprocess.run)(
+             cmd,
+             input=user_message,
+             capture_output=True,
+             text=True,
+             timeout=self.timeout_seconds,
+             env=env,
++            cwd=self.work_dir,
+         )
+ 
+         if result.returncode != 0:
+@@ -851,6 +892,7 @@ class ClaudeCodeLLM(LLMCallBase):
+             returncode=result.returncode,
+             stderr=result.stderr,
+             stream_result="",
++            raw_stdout=result.stdout,
+         )
+ 
+     # ------------------------------------------------------------------
+@@ -878,6 +920,23 @@ class ClaudeCodeLLM(LLMCallBase):
+         self.logger.info("Running: %s", " ".join(cmd[:6]) + " ...")
+         env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
+ 
++        if self.process_runner is not None:
++            # The workflow can provide a scoped launcher with durable raw output
++            # and process-group deadlines. Native parsing is still CHIA's.
++            result = self.process_runner(
++                cmd, input=user_message, capture_output=True, text=True,
++                timeout=self.timeout_seconds, env=env,
++                cwd=self.work_dir,
++            )
++            stream = io.StringIO()
++            final = []
++            for line in result.stdout.splitlines():
++                self._process_event_line(line, stream, final)
++            return ClaudeCodeQueryResult(
++                result="".join(final), returncode=result.returncode, stderr=result.stderr,
++                stream_result=stream.getvalue(), raw_stdout=result.stdout,
++            )
++
+         result_text_parts: list[str] = []
+         stderr_parts: list[str] = []
+         stream_parts: list[str] = []
+@@ -1408,4 +1467,3 @@ class ClaudeCodeLLM(LLMCallBase):
+             return UnknownClaudeError(node_id=node_id, raw_message=msg, stderr=msg)
+ 
+         return None
+-
+diff --git a/chia/models/codex.py b/chia/models/codex.py
+index b68e2ba..a46a994 100644
+--- a/chia/models/codex.py
++++ b/chia/models/codex.py
+@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Any
+ import ray
+ 
+ from chia.base.ChiaFunction import ChiaFunction, ObjectRefCallback
+-from chia.base.llm_call import QueryResult, LLMCallBase, UNSET
++from chia.base.llm_call import QueryResult, LLMCallBase, UNSET, single_attempt
+ 
+ if TYPE_CHECKING:
+     from chia.base.tools.ChiaTool import ChiaTool
+@@ -95,18 +95,19 @@ _RESET_RE = re.compile(
+ _ERROR_PATTERNS: tuple[tuple[type[CodexError], tuple[str, ...]], ...] = (
+     (
+         AuthenticationError,
+-        ("not logged in", "login", "authentication", "unauthorized", "401", "api key", "auth token"),
++        ("not logged in", "login", "authentication", "unauthorized", "api key", "auth token"),
+     ),
+-    (BillingError, ("billing", "payment", "402", "credit", "quota exceeded")),
++    (BillingError, ("billing", "payment", "credit", "quota exceeded")),
+     (
+         InvalidRequestError,
+         ("invalid request", "malformed", "bad request", "invalid model", "unknown model",
+-         "invalid config", "unrecognized option", "400"),
++         "invalid config", "unrecognized option"),
+     ),
+     (
+         ServerError,
+-        ("500", "503", "server error", "overloaded", "internal error", "service unavailable",
+-         "connection", "timeout", "timed out"),
++        ("server error", "overloaded", "internal error", "service unavailable",
++         "connection", "timeout", "timed out", "stream disconnected",
++         "stream closed before response.completed", "selected model is at capacity"),
+     ),
+     (
+         MaxOutputTokensError,
+@@ -138,9 +139,12 @@ _UUID_RE = re.compile(
+ )
+ 
+ _CODEX_SESSION_STATE_PATTERNS = (
+-    "state_*.sqlite",
+-    "state_*.sqlite-wal",
+-    "state_*.sqlite-shm",
++    "state_*.sqlite", "state_*.sqlite-wal", "state_*.sqlite-shm",
++)
++_CODEX_PRIVATE_STATE_PATTERNS = tuple(
++    f"{name}_*.sqlite{suffix}"
++    for name in ("state", "thread_history", "goals", "memories", "queue")
++    for suffix in ("", "-wal", "-shm")
+ )
+ 
+ 
+@@ -324,6 +328,14 @@ class CodexLLM(LLMCallBase):
+         resume_session: bool = False,
+         auto_compact_token_limit: int | None = 200_000,
+         config=UNSET,
++        process_runner=None,
++        codex_home: str | None = None,
++        temporary_directory: str | None = None,
++        native_file_reader=None,
++        native_file_writer=None,
++        tool_token_env=None,
++        mcp_approval_policy: str | None = None,
++        capture_all_sessions: bool = False,
+     ):
+         # codex's bypass also disables the sandbox, so it keeps its own
+         # (more specific) kwarg; mirror it onto the canonical base flag.
+@@ -355,6 +367,21 @@ class CodexLLM(LLMCallBase):
+         self._session_state_paths: tuple[str, ...] = ()
+         self._last_metadata: dict = {}
+         self._log_prefix = None
++        self.process_runner = process_runner
++        self.codex_home = codex_home
++        self.temporary_directory = temporary_directory
++        self.native_file_reader = native_file_reader
++        self.native_file_writer = native_file_writer
++        # Optional callable(tool) -> environment-variable name. Never put the
++        # credential itself in argv, the prompt, or native session metadata.
++        self.tool_token_env = tool_token_env
++        if mcp_approval_policy not in (None, "auto", "prompt", "writes", "approve"):
++            raise ValueError("unknown native MCP approval policy")
++        self.mcp_approval_policy = mcp_approval_policy
++        # Opt in only for a fresh, role-private profile; never a shared login home.
++        if capture_all_sessions and codex_home is None:
++            raise ValueError("capturing a session tree requires an explicit private Codex home")
++        self.capture_all_sessions = capture_all_sessions
+ 
+         self.logger.warning("CodexLLM is experimental and has not been production-validated.")
+         if self.model is None:
+@@ -382,9 +409,7 @@ class CodexLLM(LLMCallBase):
+             try:
+                 tool_list = tools or []
+                 self._last_metadata = {}
+-                self._restore_session_state()
+-                cli = self._run_codex(user_message, tool_list)
+-                self._call_counter += 1
++                cli = self.prompt_once(user_message, tool_list)
+                 self._last_metadata.update({
+                     "model": self.model or "codex-default",
+                     "tools": [
+@@ -395,9 +420,8 @@ class CodexLLM(LLMCallBase):
+                 })
+                 if profiler.enabled:
+                     profiler.add_info(self._last_metadata)
+-                self._classify_error(cli)
+-                self._capture_session_state(cli)
+-                cli.success = True
++                if cli.error is not None:
++                    raise cli.error
+                 return cli
+             except (RateLimitError, AuthenticationError, BillingError, InvalidRequestError):
+                 raise
+@@ -432,6 +456,17 @@ class CodexLLM(LLMCallBase):
+             session_state_paths=self._session_state_paths,
+         )
+ 
++    def prompt_once(self, user_message: str, tools=None) -> CodexQueryResult:
++        """One native CLI invocation; the caller owns retries and settlement."""
++        self._last_metadata = {}
++        result = single_attempt(
++            lambda: self._run_codex(user_message, tools or []),
++            self._restore_session_state, self._capture_session_state,
++            CodexQueryResult, self._classify_error,
++        )
++        self._call_counter += 1
++        return result
++
+     def _sync_session(self, cli: CodexQueryResult) -> CodexQueryResult:
+         """Copy worker-captured Codex session state onto this instance."""
+         if not self._resume_session:
+@@ -462,6 +497,16 @@ class CodexLLM(LLMCallBase):
+             port = getattr(tool, "port", 8000)
+             url = f"http://{tool.hostname}:{port}/{tool.name}/mcp"
+             args += ["-c", f"mcp_servers.{_toml_key(tool.name)}.url={_toml(url)}"]
++            if self.mcp_approval_policy is not None:
++                key = f"mcp_servers.{_toml_key(tool.name)}"
++                args += ["-c", f"{key}.default_tools_approval_mode={_toml(self.mcp_approval_policy)}"]
++            if self.tool_token_env is not None:
++                name = self.tool_token_env(tool)
++                if not isinstance(name, str) or not re.fullmatch(r"[A-Z_][A-Z0-9_]*", name):
++                    raise ValueError("MCP authentication needs an environment-variable name")
++                key = f"mcp_servers.{_toml_key(tool.name)}"
++                args += ["-c", f"{key}.bearer_token_env_var={_toml(name)}",
++                         "-c", f"{key}.required=true"]
+         return args
+ 
+     def _build_cmd(
+@@ -491,6 +536,9 @@ class CodexLLM(LLMCallBase):
+             cmd.append("--ignore-rules")
+         if self.dangerously_bypass_approvals_and_sandbox:
+             cmd.append("--dangerously-bypass-approvals-and-sandbox")
++        elif resume_session_id:
++            # exec resume accepts native config overrides, but not --sandbox.
++            cmd += ["-c", f"sandbox_mode={_toml(self.sandbox)}"]
+         else:
+             cmd += ["--sandbox", self.sandbox]
+         if output_last_message_path:
+@@ -506,11 +554,11 @@ class CodexLLM(LLMCallBase):
+         return cmd + ["-"]
+ 
+     def _run_codex(self, user_message: str, tools: list[ChiaTool] | None = None) -> CodexQueryResult:
+-        fd, output_path = tempfile.mkstemp(suffix=".txt")
++        fd, output_path = tempfile.mkstemp(suffix=".txt", dir=self.temporary_directory)
+         os.close(fd)
+         try:
+             resume_session_id = self._session_id if self._resume_session else None
+-            result = subprocess.run(
++            result = (self.process_runner or subprocess.run)(
+                 self._build_cmd(
+                     tools or [],
+                     output_last_message_path=output_path,
+@@ -523,11 +571,16 @@ class CodexLLM(LLMCallBase):
+                 cwd=self.work_dir or None,
+                 env=os.environ.copy(),
+             )
+-            with open(output_path) as f:
+-                final_text = f.read()
++            if self.native_file_reader is not None:
++                final_text = self.native_file_reader(output_path).decode("utf-8")
++            else:
++                with open(output_path) as f:
++                    final_text = f.read()
+             stream, meta, fallback = self._parse_jsonl_stream(result.stdout, result.stderr)
+             parsed_session_id = parse_session_id(result.stdout)
+             if self._resume_session and parsed_session_id:
++                if self._session_id is not None and self._session_id != parsed_session_id:
++                    raise ValueError("Codex returned a different native session id")
+                 self._session_id = parsed_session_id
+             if self._session_id:
+                 meta["session_id"] = self._session_id
+@@ -543,6 +596,7 @@ class CodexLLM(LLMCallBase):
+                 result.stderr,
+                 stream,
+                 session_id=self._session_id,
++                raw_stdout=result.stdout,
+             )
+         finally:
+             try:
+@@ -551,12 +605,13 @@ class CodexLLM(LLMCallBase):
+                 pass
+ 
+     def _codex_home(self) -> str:
+-        return os.environ.get("CODEX_HOME") or os.path.join(os.path.expanduser("~"), ".codex")
++        return self.codex_home or os.environ.get("CODEX_HOME") or os.path.join(os.path.expanduser("~"), ".codex")
+ 
+     def _session_state_files(self) -> list[tuple[str, str]]:
+         home = self._codex_home()
+         paths: list[tuple[str, str]] = []
+-        for pattern in _CODEX_SESSION_STATE_PATTERNS:
++        patterns = _CODEX_PRIVATE_STATE_PATTERNS if self.capture_all_sessions else _CODEX_SESSION_STATE_PATTERNS
++        for pattern in patterns:
+             dirname = os.path.dirname(pattern)
+             basename = os.path.basename(pattern)
+             root = os.path.join(home, dirname)
+@@ -585,7 +640,8 @@ class CodexLLM(LLMCallBase):
+             return []
+         home = self._codex_home()
+         paths: list[tuple[str, str]] = []
+-        pattern = os.path.join(home, "sessions", "**", f"rollout-*{self._session_id}*.jsonl")
++        filename = "rollout-*.jsonl" if self.capture_all_sessions else f"rollout-*{self._session_id}*.jsonl"
++        pattern = os.path.join(home, "sessions", "**", filename)
+         for full_rollout in glob(pattern, recursive=True):
+             rel_rollout = self._path_relative_to_codex_home(full_rollout)
+             if rel_rollout is not None and os.path.isfile(full_rollout):
+@@ -600,15 +656,28 @@ class CodexLLM(LLMCallBase):
+             if os.path.isabs(rel_path) or rel_path.startswith(".."):
+                 continue
+             path = os.path.join(home, rel_path)
++            if self.native_file_writer is not None:
++                self.native_file_writer(path, data)
++                continue
+             os.makedirs(os.path.dirname(path), exist_ok=True)
+             with open(path, "wb") as f:
+                 f.write(data)
+ 
+     def _capture_session_state(self, cli: CodexQueryResult) -> None:
++        # A timeout can occur after thread.started but before _run_codex parses
++        # the stream. Its partial stdout still identifies the native session.
++        parsed = parse_session_id(cli.raw_stdout)
++        if self._resume_session and parsed:
++            if self._session_id is not None and self._session_id != parsed:
++                raise ValueError("Codex returned a different native session id")
++            self._session_id = parsed
+         if not self._resume_session or self._session_id is None:
+             return
+         state: dict[str, bytes] = {}
+         for rel_path, path in self._session_state_files() + self._session_rollout_files():
++            if self.native_file_reader is not None:
++                state[rel_path] = self.native_file_reader(path)
++                continue
+             try:
+                 with open(path, "rb") as f:
+                     state[rel_path] = f.read()
+@@ -717,7 +786,58 @@ class CodexLLM(LLMCallBase):
+                     meta[dest] = meta.get(dest, 0) + cache[source]
+ 
+     def _classify_error(self, cli: QueryResult) -> None:
+-        combined = "\n".join(part for part in (cli.stderr, cli.result, cli.stream_result) if part)
++        # Only native failure events describe a provider failure. Generated
++        # answers, reasoning and tool output may contain any error vocabulary.
++        failure = None
++        terminal = None
++        for line in cli.raw_stdout.splitlines():
++            event = self._json_or_none(line)
++            if not isinstance(event, dict):
++                continue
++            kind = event.get("type")
++            if kind in {"turn.failed", "turn.completed"}:
++                terminal = kind
++                failure = event.get("error") if kind == "turn.failed" else None
++            elif kind == "error":
++                failure = event.get("error", event)
++        if cli.returncode == 0 and terminal != "turn.failed":
++            return
++        if not isinstance(failure, dict):
++            failure = {}
++        message = failure.get("message")
++        # stderr is for CLI startup failures that have no native error event.
++        combined = message if isinstance(message, str) and message else cli.stderr
++        info = failure.get("codexErrorInfo", failure.get("codex_error_info"))
++        tag = info if isinstance(info, str) else ""
++        if isinstance(info, dict):
++            tag = next(iter(info), "")
++        native_types = {
++            "Unauthorized": AuthenticationError,
++            "BadRequest": InvalidRequestError,
++            "UsageLimitExceeded": RateLimitError,
++            "ContextWindowExceeded": MaxOutputTokensError,
++            "ResponseStreamDisconnected": ServerError,
++            "ResponseStreamConnectionFailed": ServerError,
++            "ResponseTooManyFailedAttempts": ServerError,
++            "InternalServerError": ServerError,
++        }
++        error_cls = native_types.get(tag)
++        status = re.search(
++            r"\b(?:HTTP(?:/\d(?:\.\d)?)?(?: status)?|status(?: code)?)\s*[:=]?\s*([45]\d\d)\b",
++            combined, re.IGNORECASE,
++        )
++        if error_cls is None and status:
++            code = int(status[1])
++            error_cls = {
++                400: InvalidRequestError, 401: AuthenticationError, 402: BillingError,
++                403: AuthenticationError, 408: ServerError, 429: RateLimitError,
++            }.get(code)
++            if code >= 500:
++                error_cls = ServerError
++        if error_cls is not None:
++            raise error_cls(
++                node_id=self._get_node_id(), exit_code=cli.returncode, raw_message=combined[:300],
++            )
+         lower = combined.lower()
+         if (
+             any(k in lower for k in ("rate limit", "usage limit", "too many requests"))
+@@ -729,8 +849,6 @@ class CodexLLM(LLMCallBase):
+                 raw_message=combined[:300],
+                 exit_code=cli.returncode,
+             )
+-        if cli.returncode == 0:
+-            return
+         node_id = self._get_node_id()
+         for error_cls, patterns in _ERROR_PATTERNS:
+             if any(pattern in lower for pattern in patterns):
+diff --git a/chia/models/vertex.py b/chia/models/vertex.py
+index d103349..32ac511 100644
+--- a/chia/models/vertex.py
++++ b/chia/models/vertex.py
+@@ -25,13 +25,15 @@ from __future__ import annotations
+ import json
+ import logging
+ import os
++from dataclasses import dataclass, field
++from itertools import count
+ from datetime import datetime, timedelta, timezone
+ from typing import TYPE_CHECKING, List, Optional
+ 
+ import ray
+ 
+ from chia.base.ChiaFunction import ChiaFunction
+-from chia.base.llm_call import QueryResult, LLMCallBase, UNSET
++from chia.base.llm_call import QueryResult, LLMCallBase, UNSET, single_attempt
+ from chia.models.openai_compat import OpenAICompatLLM
+ 
+ if TYPE_CHECKING:
+@@ -204,6 +206,14 @@ def _unwrap_exception_group(exc):
+     return leaves[0]
+ 
+ 
++@dataclass
++class VertexQueryResult(QueryResult):
++    """Native SDK Content state, including thought signatures, for continuation."""
++
++    session_state: dict | None = None
++    native_events: list[dict] = field(default_factory=list)
++
++
+ class VertexGeminiLLM(LLMCallBase):
+     """Gemini-on-Vertex LLM backend with client-side MCP tool execution.
+ 
+@@ -228,6 +238,10 @@ class VertexGeminiLLM(LLMCallBase):
+         client_kwargs: Optional[dict] = None,
+         dangerously_skip_permissions=UNSET,
+         config=UNSET,
++        resume_session: bool = False,
++        generation_config: Optional[dict] = None,
++        event_callback=None,
++        tool_http_client_factory=None,
+     ):
+         # Raw-API backend: no permission gate. Forwarded so passing either arg
+         # warns it's ignored.
+@@ -250,6 +264,17 @@ class VertexGeminiLLM(LLMCallBase):
+         self.client_kwargs = client_kwargs or {}
+         self.logger = logging.getLogger(logging_name)
+         self._last_metadata: dict = {}
++        self._resume_session = resume_session
++        self._session_contents = []
++        self._open_user_message = None
++        self._pending_tools = False
++        self._native_events = []
++        self.generation_config = generation_config or {}
++        self.event_callback = event_callback
++        self.tool_http_client_factory = tool_http_client_factory
++        reserved = {"tools", "system_instruction", "max_output_tokens", "automatic_function_calling", "http_options"}
++        if reserved.intersection(self.generation_config):
++            raise ValueError("generation_config cannot override native task/tool settings")
+ 
+         self.logger.warning(
+             "VertexGeminiLLM is experimental: only exercised by unit tests so far, "
+@@ -286,7 +311,7 @@ class VertexGeminiLLM(LLMCallBase):
+         for attempt in range(self.retries):
+             try:
+                 self._last_metadata = {}
+-                cli = self._run_generate(user_message, tools)
++                cli = self.prompt_once(user_message, tools)
+                 self._last_metadata["model"] = self.model
+                 self._last_metadata["tools"] = [
+                     {"name": t.name, "hostname": getattr(t, "hostname", None),
+@@ -297,7 +322,8 @@ class VertexGeminiLLM(LLMCallBase):
+                 if profiler.enabled and self._last_metadata:
+                     profiler.add_info(self._last_metadata)
+ 
+-                cli.success = True
++                if cli.error is not None:
++                    raise cli.error
+                 return cli
+ 
+             # -- Never retry: propagate immediately --
+@@ -338,6 +364,48 @@ class VertexGeminiLLM(LLMCallBase):
+                 )
+         return QueryResult(result="", returncode=-1, stderr="", stream_result="", success=False)
+ 
++    def prompt_once(self, user_message: str, tools=None) -> VertexQueryResult:
++        """Run one agent turn, without outer retries or flattening SDK history.
++
++        The native tool loop may make multiple provider requests; event_callback
++        observes each one separately. The workflow owns durable accounting.
++        """
++        self._last_metadata = {}
++        self._native_events = []
++
++        def capture(result):
++            result.session_state = self.session_state() if self._resume_session else None
++            result.native_events = list(self._native_events)
++
++        return single_attempt(
++            lambda: self._run_generate(user_message, tools or []),
++            lambda: None, capture, VertexQueryResult,
++        )
++
++    def session_state(self) -> dict:
++        """Serialize through the SDK, preserving bytes/signatures and call IDs."""
++        return {"contents": [c.model_dump(mode="json", exclude_none=True) for c in self._session_contents],
++                "open_user_message": self._open_user_message, "pending_tools": self._pending_tools}
++
++    def restore_session(self, state: dict) -> None:
++        from google.genai import types
++
++        if not self._resume_session or set(state) != {"contents", "open_user_message", "pending_tools"}:
++            raise ValueError("unexpected Vertex native continuation")
++        if type(state["pending_tools"]) is not bool or (
++            state["open_user_message"] is not None and not isinstance(state["open_user_message"], str)
++        ):
++            raise ValueError("invalid Vertex continuation checkpoint")
++        self._session_contents = [types.Content.model_validate(c) for c in state["contents"]]
++        self._open_user_message = state["open_user_message"]
++        self._pending_tools = state["pending_tools"]
++
++    def _native_event(self, kind: str, payload: dict):
++        event = {"kind": kind, "payload": payload}
++        self._native_events.append(event)
++        if self.event_callback is not None:
++            self.event_callback(event, self.session_state() if self._resume_session else None)
++
+     def _get_node_id(self) -> str:
+         try:
+             return ray.get_runtime_context().get_node_id()
+@@ -403,6 +471,11 @@ class VertexGeminiLLM(LLMCallBase):
+         from mcp import ClientSession
+         from mcp.client.streamable_http import streamable_http_client
+ 
++        if self._resume_session and self._pending_tools:
++            raise RuntimeError("Vertex has an unresolved tool checkpoint; reconcile it before continuing")
++        if self._resume_session and self._open_user_message not in (None, user_message):
++            raise ValueError("cannot replace an unfinished Vertex turn with a different prompt")
++
+         client = genai.Client(
+             vertexai=True,
+             project=self.project,
+@@ -420,29 +493,36 @@ class VertexGeminiLLM(LLMCallBase):
+         stream_parts.append(f"[User Message]\n{truncated}\n\n")
+ 
+         async with AsyncExitStack() as stack:
++            if callable(getattr(client, "close", None)):
++                stack.callback(client.close)
+             # --- Connect to every MCP server and gather function declarations ---
+             function_decls = []
+             dispatch: dict = {}  # gemini function name -> (session, mcp tool name)
+             for tool in tools or []:
+                 port = getattr(tool, "port", 8000)
+                 url = f"http://{tool.hostname}:{port}/{tool.name}/mcp"
+-                transport = await stack.enter_async_context(streamable_http_client(url))
++                transport_options = {}
++                if self.tool_http_client_factory is not None:
++                    transport_options["http_client"] = await stack.enter_async_context(
++                        self.tool_http_client_factory(tool)
++                    )
++                transport = await stack.enter_async_context(streamable_http_client(url, **transport_options))
+                 read, write = transport[0], transport[1]
+                 session = await stack.enter_async_context(ClientSession(read, write))
+                 await session.initialize()
+                 listed = await session.list_tools()
+                 for fn in listed.tools:
+-                    api_name = f"{tool.name}__{fn.name}"[:64]
++                    api_name = f"{tool.name}__{fn.name}"
++                    if len(api_name) > 64 or api_name in dispatch:
++                        raise ValueError("duplicate or overlong Gemini tool name")
+                     function_decls.append(types.FunctionDeclaration(
+                         name=api_name,
+                         description=fn.description or " ",
+-                        parameters=self._sanitize_schema(
+-                            fn.inputSchema or {"type": "object", "properties": {}}
+-                        ),
++                        parameters_json_schema=fn.inputSchema or {"type": "object", "properties": {}},
+                     ))
+                     dispatch[api_name] = (session, fn.name)
+ 
+-            config_kwargs: dict = {
++            config_kwargs: dict = {**self.generation_config,
+                 "max_output_tokens": self.max_tokens,
+                 # We run the loop ourselves; don't let the SDK auto-call.
+                 "automatic_function_calling": types.AutomaticFunctionCallingConfig(
+@@ -455,13 +535,21 @@ class VertexGeminiLLM(LLMCallBase):
+                 config_kwargs["tools"] = [types.Tool(function_declarations=function_decls)]
+             config = types.GenerateContentConfig(**config_kwargs)
+ 
+-            contents = [types.Content(
+-                role="user", parts=[types.Part.from_text(text=user_message)]
+-            )]
++            contents = self._session_contents if self._resume_session else []
++            if not self._resume_session or self._open_user_message is None:
++                contents.append(types.Content(role="user", parts=[types.Part.from_text(text=user_message)]))
++                if self._resume_session:
++                    self._open_user_message = user_message
+             meta = {"input_tokens": 0, "output_tokens": 0, "num_turns": 0}
+             final_text = ""
+ 
+-            for _ in range(self.max_tool_iterations):
++            for turn in count():
++                if self.max_tool_iterations is not None and turn >= self.max_tool_iterations:
++                    raise RuntimeError("max_tool_iterations reached before a terminal response")
++                self._native_event("request", {
++                    "model": self.model, "contents": [c.model_dump(mode="json", exclude_none=True) for c in contents],
++                    "config": config.model_dump(mode="json", exclude_none=True),
++                })
+                 try:
+                     resp = await asyncio.to_thread(
+                         client.models.generate_content,
+@@ -470,6 +558,7 @@ class VertexGeminiLLM(LLMCallBase):
+                         config=config,
+                     )
+                 except Exception as exc:
++                    self._native_event("request_error", {"type": type(exc).__name__, "message": str(exc)})
+                     translated = self._translate_error(exc)
+                     if translated is not None:
+                         raise translated from exc
+@@ -480,9 +569,11 @@ class VertexGeminiLLM(LLMCallBase):
+                 if usage is not None:
+                     meta["input_tokens"] += getattr(usage, "prompt_token_count", 0) or 0
+                     meta["output_tokens"] += getattr(usage, "candidates_token_count", 0) or 0
++                self._last_metadata = dict(meta)
+ 
+                 candidate = (resp.candidates or [None])[0]
+                 if candidate is None or candidate.content is None:
++                    self._native_event("response", resp.model_dump(mode="json", exclude_none=True))
+                     # No candidate at all -> the prompt itself may have been
+                     # blocked (safety etc.); surface that rather than returning
+                     # a silent empty success.
+@@ -492,7 +583,7 @@ class VertexGeminiLLM(LLMCallBase):
+                             node_id=self._get_node_id(), block_reason=block,
+                             raw_message=f"prompt blocked: {block}",
+                         )
+-                    break
++                    raise UnknownVertexError(node_id=self._get_node_id(), raw_message="response has no usable content")
+ 
+                 finish = getattr(candidate, "finish_reason", None)
+                 finish_name = getattr(finish, "name", str(finish) if finish else "")
+@@ -521,6 +612,8 @@ class VertexGeminiLLM(LLMCallBase):
+                 # Echo the model turn back verbatim (function_call parts must
+                 # round-trip for the follow-up request).
+                 contents.append(candidate.content)
++                self._pending_tools = bool(function_calls)
++                self._native_event("response", resp.model_dump(mode="json", exclude_none=True))
+ 
+                 if finish_name == "MAX_TOKENS":
+                     raise MaxOutputTokensError(
+@@ -539,11 +632,19 @@ class VertexGeminiLLM(LLMCallBase):
+                     )
+ 
+                 if not function_calls:
++                    self._open_user_message = None
++                    self._native_event("turn_complete", {"finish_reason": finish_name})
+                     break
+ 
+                 # --- Execute each requested tool over its MCP server ---
+                 response_parts = []
++                # Keep partial tool replies too. A crash while this group is
++                # pending is explicit ambiguity, never a reason to rerun tools.
++                replies = types.Content(role="user", parts=[])
++                contents.append(replies)
+                 for fc in function_calls:
++                    self._native_event("tool_request", fc.model_dump(mode="json", exclude_none=True))
++                    raw_tool_result = None
+                     session, fn_name = dispatch.get(fc.name, (None, None))
+                     if session is None:
+                         result_text = f"Unknown tool: {fc.name}"
+@@ -555,25 +656,26 @@ class VertexGeminiLLM(LLMCallBase):
+                             )
+                             result_text = self._mcp_result_to_text(mcp_result)
+                             is_error = bool(getattr(mcp_result, "isError", False))
++                            raw_tool_result = mcp_result.model_dump(mode="json", exclude_none=True) if hasattr(mcp_result, "model_dump") else None
+                         except Exception as exc:
+                             result_text = f"Tool execution error: {exc}"
+                             is_error = True
++                    # The persistence callback is outside the tool-error catch:
++                    # a failed checkpoint must stop the turn, not become a model
++                    # tool reply followed by another potentially charged call.
++                    self._native_event("tool_response", raw_tool_result or {"result": result_text, "isError": is_error})
+                     logged = result_text
+                     if len(logged) > 2000:
+                         logged = logged[:2000] + "\n... [truncated]"
+                     label = "Tool Result (error)" if is_error else "Tool Result"
+                     stream_parts.append(f"[{label}]\n{logged}\n\n")
+-                    response_parts.append(types.Part.from_function_response(
+-                        name=fc.name,
+-                        response={"error": result_text} if is_error
+-                        else {"result": result_text},
+-                    ))
+-
+-                contents.append(types.Content(role="user", parts=response_parts))
+-            else:
+-                stream_parts.append(
+-                    f"[DEBUG] Reached max_tool_iterations={self.max_tool_iterations}\n"
+-                )
++                    response_parts.append(types.Part(function_response=types.FunctionResponse(
++                        name=fc.name, id=fc.id,
++                        response={"error": result_text} if is_error else {"result": result_text},
++                    )))
++                    replies.parts = list(response_parts)
++                self._pending_tools = False
++                self._native_event("tools_complete", replies.model_dump(mode="json", exclude_none=True))
+ 
+         # --- Metadata + log file ---
+         self._last_metadata = {k: v for k, v in meta.items() if v}
+@@ -583,7 +685,7 @@ class VertexGeminiLLM(LLMCallBase):
+             with open(f"{self._log_prefix}.log", "a") as f:
+                 f.write("".join(stream_parts))
+ 
+-        return QueryResult(
++        return VertexQueryResult(
+             result=final_text,
+             returncode=0,
+             stderr="",

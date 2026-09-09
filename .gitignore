@@ -47,6 +47,9 @@ AGENTS.md
 DRAM_STANDARD_MODELING_AUDIT.md
 claudestandardsaudit/
 doc/atomic_chia_*.md
+# Detailed operator run/recovery notes stay local; publish the concise status instead.
+doc/chia_cache_reruns_20260907.md
+doc/chia_clean_paid_runs_20260909.md
 # Historical operator-only recovery/analysis helpers; frozen copies remain local.
 tools/chia_loop/analyze_representative.py
 tools/chia_loop/audit_representative.py
@@ -55,4 +58,8 @@ tools/chia_loop/representative_eval.py
 tools/chia_loop/smoke_diagnostics.py
 !tools/chia_loop/smoke.json
 !tools/chia_loop/configs/*.json
+!tools/eval/gem5/public_suite.json
+!tools/chia_loop/framework/archive_schema.json
+!tools/chia_loop/framework/usage_protocols.json
+!tools/chia_loop/framework/upstream/session-hooks.json
 !doc/results/**/summary.json

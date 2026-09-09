@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CHIA campaign ZIP64 inventory, version 1",
+  "description": "The manifest inventories every payload except itself. The closed archive's SHA-256 belongs in the publication receipt. Hashes establish identity, not authenticated authorship or scientific eligibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "format", "metadata", "compression", "members"],
+  "properties": {
+    "schema_version": {"const": 1, "type": "integer"},
+    "format": {"const": "chia-campaign-zip64"},
+    "metadata": {"type": "object"},
+    "compression": {"type": "object"},
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "stored_sha256", "stored_bytes", "logical_sha256", "logical_bytes", "codec", "executable"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1, "description": "Unique relative POSIX path, with no empty, dot, parent, backslash, colon or control-character components. No directories, symlinks or parent/file conflicts."},
+          "stored_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "stored_bytes": {"type": "integer", "minimum": 0},
+          "logical_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "logical_bytes": {"type": "integer", "minimum": 0},
+          "codec": {"enum": ["none", "gzip", "xz"]},
+          "executable": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

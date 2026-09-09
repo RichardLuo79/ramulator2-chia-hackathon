@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "distribution": "chialoops",
+  "version": "1.0.1",
+  "revision": "16c35e92aaaf9511c6453bf94cd5cf589698f4e3",
+  "patch_sha256": "1d476580364f67e760b4a8b1e2d0841a16ec5b41651b43259b3d955e8b134d85",
+  "original_files": {
+    "chia/base/llm_call.py": "d5517cd3e027c641079fab5a6e96105765c84976a6f16b5ff7d971925568a5f7",
+    "chia/models/claude.py": "1f5b710895baac7b3925d4b592bf451bfb0dd8f8f2d2aa2e04114c9e4ac3d5fb",
+    "chia/models/codex.py": "3e7b209097560b7d2bee3fd8d7ea4369491398223ed881809af4a7bcb8f936ea",
+    "chia/models/vertex.py": "c6e11065b4f29c137fe4ae7468194cf9895d165ddce60e8d724c5e60c21bd6c2"
+  },
+  "patched_files": {
+    "chia/base/llm_call.py": "398b9a88cd7efaa73e26dcadf132ad9b5e512f2df3640a26bf30d902fb28df14",
+    "chia/models/claude.py": "5059045869fc4a027e485582706badc514c59c8a826cd37d7775c95f04bfd435",
+    "chia/models/codex.py": "9758ae6ddb20dd64c85ba06f912242170e8d3d52f5ae589a1749cf6f65ab5046",
+    "chia/models/vertex.py": "abf790bed7cec0a6b78423ac836c5fe3cd1c3f15c161cbd1fa4909f379168d32"
+  }
+}
