@@ -28,24 +28,15 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "tools"))
 from eval import artifacts as A
 from eval import config as C
 from eval import matchlib
+from eval import metrics
 
 SAFE_LABEL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
 
 
 def cycles_metrics(om, mm):
-    o, m = om["per_core_cycles"], mm["per_core_cycles"]
-    if not o or len(o) != len(m):
-        raise ValueError("oracle/model per-core cycle vectors must be non-empty and equal length")
-    if any(isinstance(value, bool) or not isinstance(value, (int, float))
-           or not np.isfinite(value) or value <= 0 for value in (*o, *m)):
-        raise ValueError("per-core cycles must be finite positive numbers")
-    per_core = [100 * (mc - oc) / oc for oc, mc in zip(o, m)]
-    return {
-        "per_core_dev_pct": [round(d, 4) for d in per_core],
-        "mean_abs_per_core_pct": round(float(np.mean(np.abs(per_core))), 4),
-        "makespan_dev_pct": round(100 * (max(m) - max(o)) / max(o), 4),
-        "legacy_signed_mean_pct": round(float(np.mean(per_core)), 4),
-    }
+    raw = metrics.cycles_metrics(om, mm)
+    return {key: [round(item, 4) for item in value] if isinstance(value, list) else round(value, 4)
+            for key, value in raw.items()}
 
 
 def request_metrics(oracle_trace, model_trace):

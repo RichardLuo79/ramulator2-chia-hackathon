@@ -163,6 +163,24 @@ def compress(paths, manifest_path: pathlib.Path, level: int, *, keep_raw=False,
     raw_paths = _discover_raw(paths, allow_incomplete=allow_incomplete)
     if not raw_paths:
         raise RuntimeError("no uncompressed *.chN trace artifacts found")
+    compress_files(raw_paths, manifest_path, level, keep_raw=keep_raw)
+
+
+def compress_files(paths, manifest_path: pathlib.Path, level: int, *, keep_raw=False) -> None:
+    """Archive an explicit inventory without assuming channel-suffixed names.
+
+    The caller establishes completion/eligibility. This shares the existing gzip,
+    identity, manifest and removal workflow; it performs no directory discovery.
+    The legacy command's *.chN selection and incomplete-run policy are unchanged.
+    """
+    raw_paths = []
+    for item in paths:
+        path = pathlib.Path(item)
+        if path.is_symlink() or not path.is_file() or path.suffix == A.GZIP_SUFFIX:
+            raise ValueError(f"explicit archive input must be an uncompressed regular file: {path}")
+        raw_paths.append(path.resolve())
+    if not raw_paths or len(raw_paths) != len(set(raw_paths)):
+        raise ValueError("explicit archive inventory must be nonempty and unique")
     manifest = _load_manifest(manifest_path)
     artifacts = manifest["artifacts"]
     total_raw = sum(path.stat().st_size for path in raw_paths)

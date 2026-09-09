@@ -20,6 +20,10 @@ _STABLE_COLUMNS = ("frontend_id", "frontend_sub_id", "admission_ordinal")
 _IDENTITY_COLUMNS = ("src", "frontend_id", "frontend_sub_id")
 
 
+class RequestIdentityError(ValueError):
+    """Well-formed observations do not establish valid cross-run request IDs."""
+
+
 def _load_frame(path):
     stored_path = A.resolve(path)
     header = pd.read_csv(stored_path, nrows=0, on_bad_lines="error")
@@ -118,7 +122,7 @@ def _stable_pairs(oracle, model, oracle_path, model_path):
     eligible_m = model[model["frontend_id"] >= 0].copy()
     for frame, path in ((eligible_o, oracle_path), (eligible_m, model_path)):
         if frame.duplicated(list(_IDENTITY_COLUMNS)).any():
-            raise ValueError(f"{path}: duplicate stable request identity")
+            raise RequestIdentityError(f"{path}: duplicate stable request identity")
 
     pairs = eligible_o.merge(
         eligible_m,
@@ -134,7 +138,7 @@ def _stable_pairs(oracle, model, oracle_path, model_path):
 def _raise_address_mismatch(pairs):
     mismatch = pairs.loc[pairs["addr_o"] != pairs["addr_m"]].iloc[0]
     identity = tuple(int(mismatch[column]) for column in _IDENTITY_COLUMNS)
-    raise ValueError(
+    raise RequestIdentityError(
         "stable request identity maps to different addresses: "
         f"identity={identity}, oracle={int(mismatch['addr_o'])}, "
         f"model={int(mismatch['addr_m'])}"
@@ -182,7 +186,7 @@ def match(oracle_path, model_path, *, champsim_filter_physical_mismatches=False)
         )
     else:
         if champsim_filter_physical_mismatches:
-            raise ValueError(
+            raise RequestIdentityError(
                 "ChampSim physical-mismatch filtering requires eligible stable IDs"
             )
         pairs = _legacy_pairs(oracle, model)

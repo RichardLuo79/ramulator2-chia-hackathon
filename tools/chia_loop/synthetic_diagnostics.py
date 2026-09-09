@@ -15,6 +15,7 @@ import time
 
 from tools.chia_loop import loop_config as L, real_core as P, real_eval as E, recovery as R
 from tools.chia_loop.core import atomic_write_json
+from tools.eval import synthetic as synthetic_metrics
 
 GENERATOR = "src/ramulator/frontend/impl/memory_trace/synthetic_pattern.cpp"
 AXES = {"mlp": 16, "dep_frac": 0.0, "think_time": 0, "jitter": 0, "row_run": 32,
@@ -223,56 +224,12 @@ def run_side(root, directory, parent, identity, side, dram, layout, lease_fd):
 
 
 def read_population(directory, params, record):
-    import pandas as pd
-    # ReqTraceRecorder writes in completion order. Reconstruct generator read
-    # ordinals by admission time, never by completion or repeated-address order.
-    with E.A.open_text(directory / "controller_trace.csv.ch0") as stream:
-        frame = pd.read_csv(stream, usecols=["arrive", "depart", "type", "source", "addr"],
-            dtype={"arrive": "int64", "depart": "int64", "type": "int64", "source": "int64", "addr": "uint64"})
-    if (not frame["type"].isin([0, 1]).all() or (frame["arrive"] < 0).any()
-            or (frame["depart"] < frame["arrive"]).any()
-            or ((frame["type"] == 0) & (frame["depart"] == frame["arrive"])).any()):
-        raise RuntimeError("invalid synthetic trace type/latency")
-    reads = frame[frame["type"] == 0].sort_values(["source", "arrive"]).copy()
-    counts = reads.groupby("source").size().to_dict()
-    if counts != {i: params["num_requests"] for i in range(params["streams"])} or reads.duplicated(["source", "arrive"]).any():
-        raise RuntimeError("synthetic read population or admission order is ambiguous")
-    reads["ordinal"] = reads.groupby("source").cumcount()
-    reads["latency"] = reads["depart"] - reads["arrive"]
-    stats = record["frontend_stats"]
-    if (len(reads) != stats["reads_sent"] or len(frame) - len(reads) != stats["writes_sent"]
-            or int(reads["latency"].sum()) != stats["total_read_latency"]):
-        raise RuntimeError("synthetic trace/callback statistics disagree")
-    return reads
+    return synthetic_metrics.read_population(directory / "controller_trace.csv.ch0", params,
+                                             record["frontend_stats"])
 
 
 def summarize(oracle, candidate, records, limit):
-    import numpy as np
-    paired = oracle.merge(candidate, on=["source", "ordinal"], suffixes=("_oracle", "_candidate"),
-        how="outer", validate="one_to_one", indicator=True)
-    if paired.empty or not (paired["_merge"] == "both").all() or not (paired["addr_oracle"] == paired["addr_candidate"]).all():
-        raise RuntimeError("synthetic exact read pairing failed; no partial score is returned")
-    delta = paired["latency_candidate"] - paired["latency_oracle"]
-    scale = float(paired["latency_oracle"].mean())
-    if not math.isfinite(scale) or scale <= 0:
-        raise RuntimeError("synthetic oracle mean latency is not positive and finite")
-    paired["error"] = delta
-    samples = paired.drop(columns="_merge")
-    oracle_cycles = records["oracle"]["frontend_stats"]["cycles"]
-    candidate_cycles = records["candidate"]["frontend_stats"]["cycles"]
-    if any(type(v) is not int or v <= 0 for v in (oracle_cycles, candidate_cycles)):
-        raise RuntimeError("invalid synthetic elapsed cycle counts")
-    return {"matched_reads": len(paired), "read_coverage_oracle": 1.0, "read_coverage_candidate": 1.0,
-        "L": scale, "L_definition": "mean of all oracle synthetic read latencies in DRAM cycles",
-        "request_mae_over_L": float(np.abs(delta).mean()) / scale,
-        "signed_drift_over_L": float(delta.mean()) / scale, "abs_signed_drift_over_L": abs(float(delta.mean())) / scale,
-        "paired_p99_over_L": float(np.percentile(np.abs(delta), 99)) / scale,
-        "signed_min_cycles": int(delta.min()), "signed_max_cycles": int(delta.max()),
-        "synthetic_elapsed_error_pct": 100 * (candidate_cycles - oracle_cycles) / oracle_cycles,
-        "oracle": records["oracle"]["frontend_stats"], "candidate": records["candidate"]["frontend_stats"],
-        "slices": {"first_reads": samples.head(limit).to_dict("records"),
-                   "most_negative": samples.nsmallest(limit, "error").to_dict("records"),
-                   "most_positive": samples.nlargest(limit, "error").to_dict("records")}}
+    return synthetic_metrics.summarize(oracle, candidate, records, limit)
 
 
 def inspect(root, parent, request):

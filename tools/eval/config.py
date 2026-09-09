@@ -98,8 +98,12 @@ REQUEST_METRIC_SCHEMA_VERSION = 6
 
 
 def trace_path(wl):
-    p = TRACES / "chronus" / "cputraces" / wl
-    return str(p) if p.exists() else str(TRACES / "dpc4" / "converted" / f"{wl}.trace")
+    from . import artifacts
+
+    p = artifacts.resolve(TRACES / "chronus" / "cputraces" / wl)
+    return str(p) if p.is_file() else str(
+        artifacts.resolve(TRACES / "dpc4" / "converted" / f"{wl}.trace")
+    )
 
 
 def simpleo3_trace_inputs(workloads):
