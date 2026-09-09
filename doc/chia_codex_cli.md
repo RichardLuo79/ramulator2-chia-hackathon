@@ -1,5 +1,10 @@
 # Isolated Codex CLI backend for CHIA
 
+This describes the historical runner. New campaigns use the
+[common framework](../tools/chia_loop/framework/README.md), including its native
+session continuity and advisory-review policy. Limits and queue commands below
+apply only to the legacy protocol.
+
 This backend runs independent GPT-6 Astra xhigh/max experiments through the
 unmodified native CLI with the user's existing subscription login. Current
 fresh rich-DDR5 campaigns use 20-iteration guards, the eight-family training

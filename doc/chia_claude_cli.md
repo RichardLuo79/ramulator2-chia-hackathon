@@ -1,5 +1,11 @@
 # Independent Fable 5.1 CHIA pipelines
 
+This describes the historical runner. New campaigns use the
+[common framework](../tools/chia_loop/framework/README.md). Its native tools,
+continuous proposer sessions and same-effort advisory reviewer replace the
+legacy restrictions and blocking-review policy below. Fable max is currently
+on hold; see the [current status](chia_framework_implementation.md).
+
 Two fresh experiments use the unmodified Claude Code executable with the exact
 model `claude-fable-5-1`: one proposer at `xhigh`, the other at `max`. Both use an
 isolated **Fable 5.1 xhigh** compliance reviewer and the existing six-rule rubric.
@@ -63,35 +69,42 @@ disabled. Nothing resumes a native Claude session.
 
 Landlock/seccomp is installed before the CLI starts. It permits only the pinned
 binary, runtime files, that invocation's temporary workspace and **one explicit
-read-only native credential file**. Candidate C++ has a separate boundary and
+read-only credential file**. Candidate C++ has a separate boundary and
 cannot read that credential. Claude's bundled Bun runtime additionally needs
 its own `/proc/<pid>/maps` inventory; no process memory, environment, descriptors,
 other processes or broad `/proc` access is granted. Tests check absolute paths,
 parent traversal, escaping symlinks, sockets and non-gateway network ports.
 
-Authentication uses the user's existing subscription through the unmodified
-native CLI, not an API-key replacement client. A temporary read-only binding to
-the specified `.credentials.json` is outside the experiment's artifact tree;
-the entire host Claude directory is never copied. The transport forwards only
-the native CLI's audited Messages request to Anthropic's fixed endpoint. It
-does not implement OAuth login/refresh or record authorization headers.
+Authentication uses the user's subscription through the unmodified native CLI,
+not an API-key replacement client. Policy v2 freezes an explicit credential
+kind and file path with each run:
 
-**Current operational limitation:** credentials must have at least 2,000 seconds
-remaining before a new invocation. Expiring/revoked credentials stop safely;
-renewal uses the official Claude login flow. There is no API billing fallback,
-automatic extra-usage activation, or claim that subscription quotas are unlimited.
-The gateway/boundary assume a trusted installed CLI, runtime and host kernel.
+- `native_login` (default): a temporary read-only binding to the selected
+  `.credentials.json`. Its recorded access-token expiry must be at least 2,000
+  seconds away before each invocation. Official re-login renews this file;
+  the adapter does not implement refresh.
+- `setup_token`: one opaque subscription token in an owner-only regular file
+  outside the repository. The process boundary reads the file and injects
+  `CLAUDE_CODE_OAUTH_TOKEN` into the native CLI environment in memory only.
+  The token is never copied into saved configuration, command arguments,
+  prompts, logs or archived workspaces. The file is re-read for each invocation.
 
-Re-login updates the credential read by future invocations, but does not make
-its access token permanent. For unattended environments the official CLI also
-provides `claude setup-token`, documented as a one-year, inference-only
-subscription token. See [Claude authentication](https://code.claude.com/docs/en/authentication#generate-a-long-lived-token).
-Do not place such a token in prompts, Git, or reports. The current v1 adapter
-does **not** yet accept that token mode: inherited `CLAUDE_CODE_OAUTH_TOKEN` is
-deliberately scrubbed, and a shell export does not reconfigure an existing
-queue. Supporting it, or an authentication-only official-CLI renewal service,
-requires explicit integration and a new isolation preflight. Existing frozen
-campaign code must not be silently changed to bypass expiry checks.
+The official `claude setup-token` command creates a documented one-year,
+inference-only subscription token. See [Claude authentication](https://code.claude.com/docs/en/authentication#generate-a-long-lived-token).
+This opaque token's actual expiry and subscription tier are not inferred from
+its file age or contents: local status records them as unknown, and the provider
+remains authoritative. Expiry or revocation can still stop a run. A provider
+401 is not retried automatically, and any uncertain usage remains accounted for.
+Never paste a token into chat or place it in Git; configure only its private path.
+
+Both modes scrub inherited credentials and expose neither the host Claude
+directory nor other sessions. A shell export does not reconfigure a frozen
+queue. The transport forwards only the native CLI's audited Messages request
+to Anthropic's fixed endpoint and does not archive authorization headers.
+There is no API billing fallback, automatic extra-usage activation, or claim
+that subscription quotas are unlimited. The gateway/boundary assume a trusted
+installed CLI, runtime and host kernel. Mode changes require a fresh preflight
+and explicit run provenance; existing frozen campaigns are not silently upgraded.
 
 The actual outgoing request is checked for exact model, both top-level and
 turn-scoped effort, adaptive thinking, 128,000 maximum output tokens, no tools,
@@ -134,13 +147,14 @@ Use the project's existing Python environment. Prepare each effort separately:
 
 ```sh
 /tmp/ramulator-chia-smoke-venv/bin/python -m tools.chia_loop.claude_cli.queue \
-  --root eval_out/chia/fable_xhigh_rich_ddr5_20i_20260906 \
+  --root eval_out/chia/fable_xhigh_rich_ddr5_20i_oauth_20260906 \
   --effort xhigh --max-iterations 20 --cpus 3 \
-  --auth-file /home/dev/.claude/.credentials.json --prepare-only
+  --credential-kind setup_token \
+  --auth-file /home/dev/.claude/chia-oauth-token --prepare-only
 ```
 
 For the second independent job, use effort `max` and root
-`eval_out/chia/fable_max_rich_ddr5_20i_20260906`. Preparation verifies optimized
+`eval_out/chia/fable_max_rich_ddr5_20i_oauth_20260906`. Preparation verifies optimized
 runtime provenance, full-window native parity, loaded-candidate isolation,
 input identities, the unchanged seed and native-CLI offline tests. It makes
 **zero model calls**. A failure does not auto-launch or weaken a gate.
@@ -149,8 +163,14 @@ After preparation and explicit run authorization:
 
 ```sh
 /tmp/ramulator-chia-smoke-venv/bin/python -m tools.chia_loop.claude_cli supervise \
-  --root eval_out/chia/fable_xhigh_rich_ddr5_20i_20260906 --authorize-paid
+  --root eval_out/chia/fable_xhigh_rich_ddr5_20i_oauth_20260906 --authorize-paid
 ```
+
+Alternatively, replace the queue's `--prepare-only` with `--authorize-paid`
+to start generation automatically after every preparation gate passes. Native
+login mode remains available through `--credential-kind native_login` and the
+explicit private `.credentials.json` path. Store setup-token files with mode
+`600`; the token value must not appear in a command line or run configuration.
 
 Use `--resume` only for an interrupted same run, never to reopen a frozen search.
 The initial live proposal is the first counted model call; offline CLI checks
