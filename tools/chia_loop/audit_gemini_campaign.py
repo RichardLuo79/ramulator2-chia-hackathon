@@ -96,7 +96,10 @@ def main():
         if carry:
             assert digest(carry["prior_ledger"]) == carry["prior_ledger_sha256"]
             assert carry == manifest["budget_carryover"][arm]
-        assert carry.get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in ledger["calls"]) <= policy["usd_cap"]
+        if policy.get("iteration_guard"):
+            assert ledger.get("guard_mode") == "iterations" and ledger["cap_usd"] is None
+        else:
+            assert carry.get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in ledger["calls"]) <= policy["usd_cap"]
         assert len(ledger["calls"]) == state["budget"]["api_attempts"]
         adjusted_cost = 0.0
         for call in ledger["calls"]:

@@ -133,7 +133,7 @@ def main():
         ", ".join(f"`{identifier}`" for identifier in manifest["run_ids"].values()) + ".", "",
         f"HIGH thinking, at most {maximum_iterations} " +
         ("evaluated designs (with draft repair)" if repaired_protocol else "proposals") +
-        f" and USD {manifest['policy']['usd_cap']:g} per run. " +
+        (" and no USD stopping cap. " if manifest['policy'].get('iteration_guard') else f" and USD {manifest['policy']['usd_cap']:g} per run. ") +
         "Each starts from the same fixed-delay seed. Core cycles and read latencies come from closed-loop SimpleO3; "
         "the final test is evaluated only after selection is frozen. " +
         ("The historical shared execution waited for both selections; its raw records are unchanged."

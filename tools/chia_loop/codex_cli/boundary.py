@@ -50,11 +50,13 @@ def restrict(read, write, port):
                     raise OSError(ct.get_errno(), "landlock_add_path")
             finally:
                 os.close(handle)
-        if not 1 <= port <= 65535:
+        ports = [port] if isinstance(port, int) else list(port)
+        if not ports or any(type(p) is not int or not 1 <= p <= 65535 for p in ports):
             raise ValueError("invalid broker port")
-        rule = Net(2, port)  # Connect only; do not permit binding/listening.
-        if libc.syscall(445, fd, 2, ct.byref(rule), 0):
-            raise OSError(ct.get_errno(), "landlock_add_network")
+        for permitted in set(ports):
+            rule = Net(2, permitted)  # Connect only; never bind/listen.
+            if libc.syscall(445, fd, 2, ct.byref(rule), 0):
+                raise OSError(ct.get_errno(), "landlock_add_network")
         if libc.prctl(38, 1, 0, 0, 0) or libc.syscall(446, fd, 0):
             raise OSError(ct.get_errno(), "landlock_restrict_self")
     finally:

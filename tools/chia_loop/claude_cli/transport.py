@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import datetime
+import email.utils
 import gzip
 import http.server
 import json
@@ -23,7 +24,7 @@ import threading
 import time
 import urllib.parse
 
-from tools.chia_loop import real_core as P, recovery as R
+from tools.chia_loop import real_core as P, recovery as R, prompt_cache as K
 from tools.chia_loop.core import atomic_write_json
 from . import auth, usage as U
 from .stream import terminal_response, action, readable_thinking
@@ -32,6 +33,8 @@ MODEL = U.MODEL
 EFFORTS = ("xhigh", "max")
 MAX_OUTPUT = 128_000
 MAX_INPUT_BYTES = 900_000
+PROVIDER_TIMEOUT_SECONDS = 1800
+CLI_TIMEOUT_SECONDS = 1900
 HERE = pathlib.Path(__file__).resolve().parent
 Ledger = U.Ledger
 
@@ -60,6 +63,7 @@ def clean_environment(work, port, token, effort):
             "ANTHROPIC_CUSTOM_HEADERS": "X-CHIA-Token: " + token,
             "CLAUDE_CODE_EFFORT_LEVEL": effort, "CLAUDE_CODE_MAX_OUTPUT_TOKENS": str(MAX_OUTPUT),
             "CLAUDE_CODE_MAX_RETRIES": "0", "CLAUDE_CODE_MAX_TURNS": "1",
+            "API_TIMEOUT_MS": "1850000", "CLAUDE_STREAM_IDLE_TIMEOUT_MS": "1850000",
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1", "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
             "CLAUDE_CODE_DISABLE_WORKFLOWS": "1", "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1",
             "CLAUDE_CODE_DISABLE_NONSTREAMING_FALLBACK": "1", "CLAUDE_CODE_GZIP_REQUEST_BODIES": "0",
@@ -139,10 +143,58 @@ def safe_request(request):
     return value
 
 
+def retry_metadata(headers, status, *, now=None):
+    """Retain only typed rate-limit fields; never archive arbitrary headers."""
+    now = time.time() if now is None else now
+    safe, resets = {}, []
+    for key, value in headers.items():
+        key, value = key.lower(), str(value)
+        if key == "retry-after":
+            try:
+                if re.fullmatch(r"\d{1,9}(?:\.\d{1,3})?", value):
+                    deadline = now + float(value)
+                else:
+                    deadline = email.utils.parsedate_to_datetime(value).timestamp()
+                if now <= deadline <= now + 366 * 86400:
+                    safe[key] = deadline - now
+                    resets.append(deadline)
+            except (TypeError, ValueError, OverflowError):
+                pass
+        elif re.fullmatch(r"anthropic-ratelimit-(?:requests|(?:input-|output-)?tokens)-(?:limit|remaining|reset)", key):
+            if re.fullmatch(r"\d{1,12}", value):
+                safe[key] = int(value)
+            elif key.endswith("-reset") and re.fullmatch(r"\d{4}-\d{2}-\d{2}T[0-9:.]+(?:Z|\+00:00)", value):
+                safe[key] = value
+        elif re.fullmatch(r"anthropic-ratelimit-unified(?:-(?:5h|7d|7d-fable|7d-opus|7d-sonnet))?-(?:status|reset|utilization)", key):
+            if key.endswith("-status") and value in {"allowed", "allowed_warning", "rejected", "blocked"}:
+                safe[key] = value
+            elif re.fullmatch(r"\d{1,12}(?:\.\d{1,9})?", value):
+                safe[key] = float(value)
+    if status == 429:
+        for key, value in safe.items():
+            prefix = key.rsplit("-", 1)[0]
+            if key.endswith("-status") and value in {"rejected", "blocked"}:
+                reset = safe.get(prefix + "-reset")
+                if isinstance(reset, (int, float)) and now < reset <= now + 366 * 86400:
+                    resets.append(reset)
+            elif key.endswith("-remaining") and value == 0 and isinstance(safe.get(prefix + "-reset"), str):
+                try:
+                    reset = datetime.datetime.fromisoformat(safe[prefix + "-reset"].replace("Z", "+00:00")).timestamp()
+                    if now < reset <= now + 366 * 86400:
+                        resets.append(reset)
+                except ValueError:
+                    pass
+    # Missing reset information is unknown, not permission to retry every minute.
+    return {"rate_limit_headers": safe, "retry_at": max(resets or [now + (900 if status == 429 else 60)])}
+
+
 class Upstream:
     mode = "claude_subscription"
 
     def __call__(self, request, headers, directory):
+        return self.stream(request, headers, directory)
+
+    def stream(self, request, headers, directory, *, on_chunk=None):
         import httpx
         permitted = {"authorization", "anthropic-version", "anthropic-beta", "user-agent", "x-app"}
         forwarded = {key: value for key, value in headers.items() if key.lower() in permitted}
@@ -153,12 +205,13 @@ class Upstream:
         async def dispatch():
             raw = bytearray()
             try:
-                async with asyncio.timeout(1800):
-                    async with httpx.AsyncClient(timeout=1800, trust_env=False, follow_redirects=False) as client:
+                async with asyncio.timeout(PROVIDER_TIMEOUT_SECONDS):
+                    async with httpx.AsyncClient(timeout=PROVIDER_TIMEOUT_SECONDS, trust_env=False, follow_redirects=False) as client:
                         async with client.stream("POST", "https://api.anthropic.com/v1/messages?beta=true",
                                                  headers=forwarded, json=request) as response:
                             metadata.update(http_status=response.status_code,
-                                            provider_request_id=response.headers.get("request-id"))
+                                            provider_request_id=response.headers.get("request-id"),
+                                            **retry_metadata(response.headers, response.status_code))
                             atomic_write_json(directory / "provider_exchange.json", metadata)
                             response.raise_for_status()
                             with (directory / "provider_response.sse").open("xb") as output:
@@ -168,7 +221,10 @@ class Upstream:
                                         raise RuntimeError("provider response size guard")
                                     output.write(chunk)
                                     output.flush()
+                                    if on_chunk is not None:
+                                        on_chunk(chunk)
                                 os.fsync(output.fileno())
+                            metadata["status"] = "stream_received"
                             return bytes(raw)
             finally:
                 metadata.update(finished_at=time.time(), received_bytes=len(raw), received_sha256=P.sha(bytes(raw)))
@@ -202,6 +258,14 @@ def cli_receipt(path, response):
     if not terminal:
         return {"cli_usage_check": "unavailable_or_interrupted"}
     native, expected = U.normalized(terminal[0].get("usage")), U.normalized(response.get("usage"))
+    if (terminal[0].get("is_error") and native is not None
+            and all(v in (None, 0) for v in native.values())
+            and not terminal[0].get("modelUsage")
+            and not any(e.get("type") == "assistant" for e in events)):
+        # A disconnected consumer's zero receipt is not a contradictory paid
+        # usage receipt. The fully verified producer remains authoritative.
+        return {"cli_usage_check": "unavailable_or_interrupted", "cli_is_error": True,
+                "provider_usage_authoritative": True, "cli_native_turns": terminal[0].get("num_turns")}
     if native != expected:
         raise RuntimeError("CLI/provider token receipts disagree")
     if set(terminal[0].get("modelUsage", {})) != {MODEL} or terminal[0].get("subagent_stats", {}).get("spawned", 0):
@@ -218,17 +282,23 @@ def cli_receipt(path, response):
             "cli_native_turns": terminal[0].get("num_turns")}
 
 
-def invoke(root, operation, system, conversation, *, effort, role, cap, upstream, binary, auth_file):
+def invoke(root, operation, system, conversation, *, effort, role, cap, upstream, binary, auth_file,
+           credential_kind="native_login"):
     root = pathlib.Path(root).resolve()
     if effort not in EFFORTS or role not in {"proposal", "review"} or not re.fullmatch(r"[a-zA-Z0-9_]+", operation):
         raise ValueError("invalid model action")
+    if credential_kind not in auth.KINDS:
+        raise ValueError("unsupported explicit Claude credential kind")
     check_stop(root)
     R.check_storage(root)
     R.check_run_deadline(root)
+    cache_scope = K.scope(root, "claude", MODEL, effort, role)
+    system = K.scoped_system(system, cache_scope)
     directory = root / "interactions" / operation
     directory.mkdir(parents=True, exist_ok=True)
     ledger = Ledger(root, cap)
     identity = {"run_id": root.name, "model": MODEL, "effort": effort, "role": role,
+                "credential_kind": credential_kind,
                 "system_sha256": P.sha(system), "conversation_sha256": P.sha(json.dumps(conversation, sort_keys=True))}
     with R.exclusive_lock(directory / ".lock"):
         if R.exists(directory / "identity.json"):
@@ -268,11 +338,17 @@ def invoke(root, operation, system, conversation, *, effort, role, cap, upstream
                 return result["answer"]
         if len(attempts) >= 3:
             raise R.OperationalPause("three native CLI attempts exhausted", retryable=False)
-        auth.check(auth_file)  # no financial reservation until valid native request
+        if attempts and R.exists(attempts[-1] / "receipt.json"):
+            prior = R.read_json(attempts[-1] / "receipt.json")
+            if prior.get("retry_at", 0) > time.time():
+                raise R.OperationalPause("provider-indicated recovery cooldown", retry_at=prior["retry_at"],
+                                         retryable=prior.get("retryable", False))
+        auth.check(auth_file, credential_kind=credential_kind)  # no financial reservation until valid native request
         attempt = directory / f"attempt_{len(attempts) + 1:03d}"
         attempt.mkdir()
         outcome = {"started_at": time.time(), "attempt": len(attempts) + 1,
-                   "model": MODEL, "effort": effort, "auth_mode": "claude_subscription"}
+                   "model": MODEL, "effort": effort, "auth_mode": "claude_subscription",
+                   "credential_kind": credential_kind}
         token = secrets.token_hex(32)
 
         class Handler(http.server.BaseHTTPRequestHandler):
@@ -299,13 +375,36 @@ def invoke(root, operation, system, conversation, *, effort, role, cap, upstream
                     # on inherited context, tools, effort or output-limit drift.
                     atomic_write_json(attempt / "cli_request.json", safe_request(request))
                     validate_request(request, effort, conversation, system)
+                    if cache_scope:
+                        request, cache_receipt = K.claude_request(request, conversation=conversation, namespace=cache_scope)
+                        atomic_write_json(attempt / "cache_request.json", cache_receipt)
                     logged = safe_request(request)
                     atomic_write_json(attempt / "provider_request.json", logged)
                     call_id = ledger.reserve(logged, role, operation, attempt_path=str(attempt.relative_to(root)),
                                              attempt_number=len(attempts) + 1)
                     atomic_write_json(attempt / "reservation.json", {"call_id": call_id})
                     outcome["call_id"] = call_id
-                    raw = upstream(request, self.headers, attempt)
+                    def forward(chunk):
+                        if outcome.get("cli_consumer_disconnected"):
+                            return
+                        try:
+                            if not outcome.get("stream_started"):
+                                self.send_response(200)
+                                self.send_header("Content-Type", "text/event-stream")
+                                self.send_header("Connection", "close")
+                                self.end_headers()
+                                self.close_connection = True
+                                outcome["stream_started"] = True
+                                outcome["cli_first_byte_at"] = time.time()
+                            self.wfile.write(chunk)
+                            self.wfile.flush()
+                        except OSError:
+                            # Keep journaling the already-paid provider request.
+                            outcome["cli_consumer_disconnected"] = True
+                    if hasattr(upstream, "stream"):
+                        raw = upstream.stream(request, self.headers, attempt, on_chunk=forward)
+                    else:  # Offline fixture providers retain the byte-return API.
+                        raw = upstream(request, self.headers, attempt)
                     if not (attempt / "provider_response.sse").exists():
                         with (attempt / "provider_response.sse").open("xb") as output:
                             output.write(raw)
@@ -318,11 +417,8 @@ def invoke(root, operation, system, conversation, *, effort, role, cap, upstream
                     if response.get("stop_reason") != "end_turn":
                         raise RuntimeError("provider response truncated or nonfinal")
                     outcome.update(answer=action(response), response_sha256=P.sha(raw))
-                    self.send_response(200)
-                    self.send_header("Content-Type", "text/event-stream")
-                    self.send_header("Content-Length", str(len(raw)))
-                    self.end_headers()
-                    self.wfile.write(raw)
+                    if not outcome.get("stream_started") and not outcome.get("cli_consumer_disconnected"):
+                        forward(raw)
                 except Exception as exc:
                     # Never echo HTTP headers, credential values or raw errors.
                     outcome["error_kind"] = type(exc).__name__
@@ -330,7 +426,14 @@ def invoke(root, operation, system, conversation, *, effort, role, cap, upstream
                     outcome["http_status"] = status
                     outcome["retryable"] = status in (408, 429, 499, 500, 502, 503, 504) or type(exc).__name__ in {
                         "ConnectError", "ReadError", "WriteError", "ReadTimeout", "ConnectTimeout", "TimeoutError", "RemoteProtocolError"}
-                    self.send_error(502, "CHIA native CLI transport stopped; inspect trusted receipts")
+                    response_headers = getattr(getattr(exc, "response", None), "headers", {})
+                    outcome.update(retry_metadata(response_headers, status))
+                    if not outcome.get("stream_started"):
+                        try:
+                            self.send_error(status if status in (400, 401, 403, 408, 429, 499, 500, 502, 503, 504) else 502,
+                                            "CHIA native CLI transport stopped; inspect trusted receipts")
+                        except OSError:
+                            outcome["cli_consumer_disconnected"] = True
                 finally:
                     atomic_write_json(attempt / "receipt.json", outcome)
 
@@ -343,41 +446,53 @@ def invoke(root, operation, system, conversation, *, effort, role, cap, upstream
                 work = pathlib.Path(temporary)
                 for p in (work / "home/cache", work / "tmp"):
                     p.mkdir(parents=True)
-                credential = auth.bind(work, auth_file)
+                credential = auth.bind(work, auth_file, credential_kind=credential_kind)
                 (work / "system.md").write_text(system)
                 environment = clean_environment(work, server.server_port, token, effort)
                 policy = {"read": ["/usr", "/lib", "/lib64", "/bin", "/dev/null", "/dev/urandom",
                                      str(binary), str(work), str(credential)], "write": [str(work)],
                           "port": server.server_port, "cwd": str(work), "environment": environment}
+                if credential_kind == "setup_token":
+                    policy["setup_token_file"] = str(credential)
                 atomic_write_json(work / "boundary.json", policy)
                 argv = command(binary, work, effort)
                 atomic_write_json(attempt / "cli_command.json", {"argv": argv, "version_pinned": True,
-                    "native_tools": False, "fresh_process": True, "persistent_session": False})
+                    "native_tools": False, "fresh_process": True, "persistent_session": False,
+                    "credential_kind": credential_kind, "credential_in_argv_or_policy": False})
                 # The private auth binding is readable only by the trusted CLI,
                 # never by candidate C++ or a native model tool (none exist).
                 process = subprocess.run([sys.executable, str(HERE / "boundary.py"),
                     str(work / "boundary.json"), "--", *argv], input=json.dumps(conversation, sort_keys=True),
                     text=True, capture_output=True, close_fds=True, cwd=work,
-                    env={"PATH": "/usr/bin:/bin", "LANG": "C.UTF-8"}, timeout=1900)
+                    env={"PATH": "/usr/bin:/bin", "LANG": "C.UTF-8"}, timeout=CLI_TIMEOUT_SECONDS)
                 outcome["cli_exit_code"] = process.returncode
                 # Native output has no auth headers; additionally redact token
                 # shapes as defense in depth. No debug/credential files copied.
                 redact = lambda s: re.sub(r"(?:sk-ant-[A-Za-z0-9_-]+|Bearer\s+\S+)", "<redacted>", s).replace(token, "<broker-token>")
                 (attempt / "cli_events.jsonl").write_text(redact(process.stdout))
                 (attempt / "cli_stderr.log").write_text(redact(process.stderr))
-                if R.exists(attempt / "provider_response.sse"):
-                    try:
-                        response = terminal_response(response_bytes(attempt / "provider_response.sse"))
-                        outcome.update(cli_receipt(attempt / "cli_events.jsonl", response))
-                    except (RuntimeError, ValueError) as exc:
-                        outcome.pop("answer", None)
-                        outcome.update(error_kind=type(exc).__name__, cli_receipt_conflict=True, retryable=False)
         except (OSError, subprocess.TimeoutExpired) as exc:
             outcome.update(error_kind=type(exc).__name__, retryable=isinstance(exc, subprocess.TimeoutExpired))
         finally:
             server.shutdown()
             server.server_close()
             thread.join(timeout=5)
+            # HTTPServer processes one handler at a time. shutdown() waits for
+            # that producer to finish, including durable stream/ledger writes.
+            # Never compare a CLI receipt against a concurrently growing file.
+            if R.exists(attempt / "provider_response.sse"):
+                try:
+                    response = terminal_response(response_bytes(attempt / "provider_response.sse"))
+                except (RuntimeError, ValueError):
+                    outcome.pop("answer", None)
+                    outcome["provider_stream_incomplete"] = True
+                else:
+                    if (attempt / "cli_events.jsonl").exists():
+                        try:
+                            outcome.update(cli_receipt(attempt / "cli_events.jsonl", response))
+                        except (RuntimeError, ValueError) as exc:
+                            outcome.pop("answer", None)
+                            outcome.update(error_kind=type(exc).__name__, cli_receipt_conflict=True, retryable=False)
             outcome["finished_at"] = time.time()
             atomic_write_json(attempt / "receipt.json", outcome)
         if "answer" in outcome:
@@ -386,4 +501,4 @@ def invoke(root, operation, system, conversation, *, effort, role, cap, upstream
             atomic_write_json(directory / "result.json", result)
             return result["answer"]
         raise R.OperationalPause("Claude invocation stopped: " + outcome.get("error_kind", "native_cli_startup"),
-                                 retryable=outcome.get("retryable", False), retry_at=time.time() + 60)
+                                 retryable=outcome.get("retryable", False), retry_at=outcome.get("retry_at", time.time() + 60))

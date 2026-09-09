@@ -22,6 +22,7 @@ from tools.chia_loop import real_core as P, real_eval as E, recovery as R, artif
 from tools.chia_loop import compliance as C, gemini_loop as G
 from tools.chia_loop import evaluation_config as W, transfer
 from tools.chia_loop import loop_config as L
+from tools.chia_loop import prompt_cache as K
 from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.traffic import traffic_population
 from . import transport as T
@@ -29,11 +30,13 @@ from . import usage as U
 from . import retrospective as V
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
-POLICY = {"version": "claude_cli_individual_run_v1", "model": T.MODEL, "usage_schema": U.SCHEMA,
+POLICY = {"version": "claude_cli_individual_run_v4", "model": T.MODEL, "usage_schema": U.SCHEMA,
+          "authentication": "explicit native_login or private setup_token; no inherited credential or API fallback",
           "evaluation": "run-local DDR5 profile; frozen-source ChampSim/gem5 transfer excluded from feedback",
           "stream_output": "finalized output items reconciled with terminal response; no partial-answer fallback",
+          "transport": "live stream relay; durable producer finalized before native receipt reconciliation; server-indicated cooldowns",
           "financial_continuity": "all native CLI usage retained; iteration guard with Claude subscription",
-          "scientific_continuation": "not supported in v1; fresh skeleton only",
+          "scientific_continuation": "not supported; fresh skeleton only",
           "thinking": "adaptive; archive provider-exposed content only",
           "retrospective": "provider-exposed summaries and observable actions; no hidden chain of thought",
           "model_turns_per_proposal": 48, "diagnostic_calls_per_proposal": 192,
@@ -53,7 +56,7 @@ def load_config(root):
 
 
 def configured_policy(root):
-    return L.policy(root, POLICY)
+    return K.policy(root, L.policy(root, POLICY))
 
 
 def prepare(args):
@@ -62,7 +65,8 @@ def prepare(args):
                       iteration_guard=args.iteration_guard, auth_mode=args.auth_mode)
     root = args.root.resolve()
     T.check_stop(root)
-    T.auth.check(args.auth_file)
+    credential_kind = getattr(args, "credential_kind", "native_login")
+    credential_status = T.auth.check(args.auth_file, credential_kind=credential_kind)
     with R.cpu_lease(REPO / "eval_out/chia/.cpu_leases", limits["cpu_budget"]):
         source = (REPO / P.MUTABLE).read_text()
         _, regions = P.regions(source)
@@ -72,9 +76,11 @@ def prepare(args):
         root.mkdir(parents=True, exist_ok=False)
         evaluation = W.install(root, args.evaluation_config)
         loop = L.install(root, args.loop_config)
+        K.install(root, getattr(args, "prompt_cache", K.DEFAULT))
         policy = configured_policy(root)
         config = {**limits, "run_id": root.name, "model": T.MODEL, "effort": args.effort,
                   "auth_mode": args.auth_mode, "auth_file": str(args.auth_file.resolve()),
+                  "credential_kind": credential_kind,
                   "guard_mode": "iterations", "policy": policy,
                   "billing": "native Claude subscription; estimates are API-equivalent, not invoices",
                   "prior_design_exposed": False, "human_modeling_hints": False}
@@ -94,6 +100,7 @@ def prepare(args):
         version = subprocess.run([str(binary), "--version"], capture_output=True, text=True, check=True).stdout.strip()
         atomic_write_json(root / "cli_identity.json", {"version": version,
             "binary_sha256": P.sha((root / "runtime/claude").read_bytes()), "model": T.MODEL,
+            "credential_kind": credential_kind, "initial_auth_status": credential_status,
             "efforts": list(T.EFFORTS), "live_access": "not_tested_before_first_counted_proposal",
             "verification": "actual native requests checked by offline preflight and before every dispatch"})
         plugin = E.compile_candidate(root, source, root / "seed")
@@ -119,7 +126,8 @@ def prepare(args):
         E.command([sys.executable, REPO / "tools/chia_loop/preflight_real.py", root],
                   root / "logs/preflight.log", timeout=1800, env=env)
         E.command([sys.executable, "-m", "pytest", "-q", "tests/unit_tests/test_chia_claude_cli.py",
-                   "tests/unit_tests/test_chia_claude_runner.py"],
+                   "tests/unit_tests/test_chia_claude_runner.py", "tests/unit_tests/test_chia_prompt_cache.py",
+                   "tests/unit_tests/test_chia_launch_reliability.py"],
                   root / "logs/claude_preflight.log", timeout=240,
                   env={**env, "CHIA_CLAUDE_PREFLIGHT_BINARY": str(root / "runtime/claude")})
         E.verify_run_archives(root)
@@ -133,7 +141,8 @@ def prepare(args):
         files += [REPO / p for p in ("tools/chia_loop/champsim_trace_format.cpp", "tests/utils.py",
             "src/ramulator/frontend/impl/memory_trace/synthetic_pattern.cpp",
             "tools/chia_loop/codex_cli/boundary.py", "tests/unit_tests/test_chia_claude_cli.py",
-            "tests/unit_tests/test_chia_claude_runner.py")]
+            "tests/unit_tests/test_chia_claude_runner.py", "tests/unit_tests/test_chia_prompt_cache.py",
+            "tests/unit_tests/test_chia_launch_reliability.py")]
         protocol = {}
         for file in files:
             relative = str(file.relative_to(REPO))
@@ -143,7 +152,7 @@ def prepare(args):
             protocol[relative] = P.sha(file.read_bytes())
         pinned = [root / name for name in ("claude_config.json", "cli_identity.json", "preparation_manifest.json",
             "window_policy.json", "input_inventory.json", "runtime_manifest.json", "preflight_pass.json", "evaluation_config.json",
-            "loop_config.json", "loop_config_identity.json")]
+            "loop_config.json", "loop_config_identity.json", "prompt_cache.json")]
         if (root / "transfer_inputs.json").exists():
             pinned.append(root / "transfer_inputs.json")
             pinned += [p for p in (root / "transfer/runtime").rglob("*") if p.is_file()]
@@ -214,6 +223,8 @@ def verify(root):
     if manifest.get("python_version") != sys.version or manifest.get("usage_tariff") != U.TARIFF:
         raise RuntimeError("Python runtime or usage tariff changed")
     config = manifest["configuration"]
+    if config.get("credential_kind") not in T.auth.KINDS:
+        raise RuntimeError("frozen explicit credential kind missing or invalid")
     T.limits(config["maximum_iterations"], config["usd_cap"], config["cpu_budget"],
                iteration_guard=config.get("guard_mode") == "iterations", auth_mode=config["auth_mode"])
     for relative, digest in manifest["protocol_hashes"].items():
@@ -241,7 +252,8 @@ def generate(root, operation, system, conversation, role):
     config = load_config(root)
     effort = config["effort"] if role == "proposal" else POLICY["reviewer_effort"]
     return T.invoke(root, operation, system, conversation, effort=effort, role=role,
-        cap=config["usd_cap"], upstream=T.Upstream(), binary=root / "runtime/claude", auth_file=config["auth_file"])
+        cap=config["usd_cap"], upstream=T.Upstream(), binary=root / "runtime/claude", auth_file=config["auth_file"],
+        credential_kind=config["credential_kind"])
 
 
 def call(root, operation, system, conversation, role="proposal"):
@@ -284,7 +296,7 @@ def prompt(root, state, parent_id, iteration):
         "policy": configured_policy(root), "readable_files": L.visible_files(root, [P.MUTABLE, *G.VISIBLE]),
         "tool_manifest": L.tool_manifest(root, [P.MUTABLE, *G.VISIBLE]),
         "budget": T.Ledger(root, config["usd_cap"]).totals(), "human_modeling_hint": None}
-    return {"role": "user", "content": json.dumps(fields, sort_keys=True)}
+    return {"role": "user", "content": K.initial_fields(root, fields)}
 
 
 def review(root, source, proposal, directory, operation):
@@ -613,6 +625,7 @@ def main():
     prep.add_argument("--root", required=True, type=pathlib.Path)
     prep.add_argument("--effort", required=True, choices=T.EFFORTS)
     prep.add_argument("--auth-file", required=True, type=pathlib.Path)
+    prep.add_argument("--credential-kind", choices=T.auth.KINDS, default="native_login")
     prep.add_argument("--max-iterations", type=int, default=20)
     prep.add_argument("--iteration-guard", required=True, action="store_true")
     prep.set_defaults(usd_cap=None, auth_mode="claude_subscription")
@@ -620,6 +633,8 @@ def main():
     prep.add_argument("--evaluation-config", type=pathlib.Path, default=REPO / "tools/chia_loop/configs/ddr5_frontend_transfer_v1.json")
     prep.add_argument("--loop-config", type=pathlib.Path, default=L.DEFAULT)
     prep.add_argument("--claude-binary")
+    prep.add_argument("--prompt-cache", choices=K.MODES, default=K.DEFAULT,
+                      help="frozen cache-layout ablation; legacy retains the original request layout")
     prep.add_argument("--wait-for-cpus", action="store_true")
     for name in ("usage", "retrospective"):
         sub = commands.add_parser(name)

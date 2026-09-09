@@ -13,7 +13,7 @@ import time
 
 import httpx
 
-from tools.chia_loop import real_core as P
+from tools.chia_loop import real_core as P, prompt_cache as K
 from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.recovery import (OperationalPause, SearchLimit, check_stop, check_run_deadline, check_storage,
                                      exclusive_lock, exists, read_json, wait_until)
@@ -31,6 +31,8 @@ def generate(root, ledger, policy, *, project, backend, purpose, iteration, turn
     from google.genai import types
     root = pathlib.Path(root)
     check_stop(root)
+    cache_scope = K.scope(root, "gemini", P.MODELS[backend], "HIGH", purpose)
+    system = K.scoped_system(system, cache_scope)
     # Keys are runner-created, not provider-supplied paths.
     if not operation_key.replace("_", "").isalnum():
         raise ValueError("unsafe generation operation key")
@@ -121,6 +123,10 @@ def generate(root, ledger, policy, *, project, backend, purpose, iteration, turn
                     purpose=purpose, backend=backend, operation_key=operation_key)
                 prefix = directory / f"call_{call_id:03d}"
                 atomic_write_json(prefix.with_suffix(".request.json"), payload)
+                if cache_scope:
+                    atomic_write_json(prefix.with_suffix(".cache.json"), {
+                        "mode": K.DEFAULT, "namespace": cache_scope, "provider_cache": "implicit",
+                        "explicit_cache_resource_created": False, "native_history_and_signatures_preserved": True})
                 # Catch transport/provider failures ONLY around the API call.
                 # Disk, accounting and local serialization faults must fail closed.
                 try:

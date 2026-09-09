@@ -26,6 +26,7 @@ from tools.chia_loop.traffic import traffic_population
 from tools.chia_loop.run_records import validate_limits
 from tools.chia_loop import evaluation_config as W, transfer, recovery as R
 from tools.chia_loop import loop_config as L
+from tools.chia_loop import prompt_cache as K
 
 
 def progress(stage, **extra):
@@ -42,14 +43,21 @@ def main():
     ap.add_argument("--loop-config", type=pathlib.Path, default=L.DEFAULT,
                     help="operator-owned feature/feedback/search ablation profile")
     ap.add_argument("--max-iterations", type=int, default=P.MAX_ITERATIONS)
-    ap.add_argument("--usd-cap", type=float, default=P.CAP_USD,
+    ap.add_argument("--prompt-cache", choices=K.MODES, default=K.DEFAULT,
+                    help="frozen cache-layout ablation; no explicit billed cache resources")
+    guard = ap.add_mutually_exclusive_group()
+    guard.add_argument("--usd-cap", type=float,
         help="explicit per-run authorization; never increases an existing run's budget")
+    guard.add_argument("--iteration-guard", action="store_true",
+        help="explicit paid authorization without a USD cap; retain all usage accounting")
     ap.add_argument("--cpus", type=int, default=12, help="CPU budget for this run; concurrent run budgets must total <=12")
     ap.add_argument("--carry-budget-from", type=pathlib.Path,
         help="retain charges from an aborted infrastructure attempt; never imports model feedback")
     args = ap.parse_args()
+    if not args.iteration_guard and args.usd_cap is None:
+        args.usd_cap = P.CAP_USD
     try:
-        limits = validate_limits(args.max_iterations, args.usd_cap, args.cpus)
+        limits = validate_limits(args.max_iterations, args.usd_cap, args.cpus, args.iteration_guard)
     except ValueError as exc:
         ap.error(str(exc))
     if not 1 <= args.workers <= args.cpus:
@@ -61,9 +69,11 @@ def main():
 def prepare(args, limits):
     root = args.root.resolve()
     arm, model = args.model, P.MODELS[args.model]
+    budget_description = "no USD stopping cap (iteration guard)" if limits.get("iteration_guard") else f"USD {args.usd_cap:g}"
     root.mkdir(parents=True, exist_ok=False)
     evaluation = W.install(root, args.evaluation_config)
     loop = L.install(root, getattr(args, "loop_config", None))
+    cache_policy = K.install(root, getattr(args, "prompt_cache", K.DEFAULT))
     train = E.workloads(root, "training")
     if args.carry_budget_from:
         origin = args.carry_budget_from.resolve()
@@ -94,18 +104,19 @@ def prepare(args, limits):
     prep = {"status": "preparing", "started_at": time.time(), "run_id": root.name,
         "backend": arm, "model": model, "limits": limits,
         "loop_configuration": loop, "loop_configuration_sha256": L.identity(loop),
+        "prompt_cache": cache_policy,
         "seed_sha256": P.sha(seed), "seed_source": P.MUTABLE,
         "maximum_output_tokens": P.MAX_OUTPUT, "output_limit_source":
             "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/" +
             ("3-1-pro" if arm == "pro" else "3-8-flash"),
-        "authorization": f"At most {args.max_iterations} evaluated designs and USD {args.usd_cap:g} for this individual model run; paid execution requires user authorization",
+        "authorization": f"At most {args.max_iterations} evaluated designs and {budget_description}; paid execution requires user authorization",
         "previous_campaign_inputs_imported": False, "human_modeling_hints": False,
         "workers": args.workers, "optimization": "-O3",
         "changes": [f"{model}, HIGH and 65,536 output tokens; independent single-model run",
             "complete editable-region bodies, with build/compliance/runtime repair feedback",
             "editable model parameters and read-only resolved controller behavior",
             "frozen, operator-configured inspection, feedback and search limits",
-            f"token-counted context and model-specific conservative USD {args.usd_cap:g} ledger",
+            f"token-counted context and model-specific conservative usage accounting; {budget_description}",
             "fresh full 20M instruction evolution; immediate verified trace compression"],
         "live_generation_preflight": "first counted proposal in this run; no separate paid probe",
         "review_mode": "automatic isolated API reviewer, same frozen rubric/model across runs; cost shares this run's cap",
@@ -137,6 +148,9 @@ def prepare(args, limits):
     progress("unit_tests_parity_and_loaded_isolation")
     E.command([sys.executable, REPO / "tools/chia_loop/preflight_real.py", root],
         root / "logs/preflight.log", timeout=1800, env=env)
+    E.command([sys.executable, "-m", "pytest", "-q", "tests/unit_tests/test_chia_prompt_cache.py",
+               "tests/unit_tests/test_chia_launch_reliability.py"],
+        root / "logs/prompt_cache_preflight.log", timeout=240, env=env)
     progress("archive_verification")
     E.verify_run_archives(root)
     import google.auth

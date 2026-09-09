@@ -54,10 +54,16 @@ Account details and server diagnostics are discarded rather than logged.
     auth_file = pathlib.Path(auth_file).resolve(strict=True)
     if auth_file.name != "auth.json":
         raise ValueError("Codex-managed refresh requires its existing auth.json")
-    from .transport import DISABLED
+    # This auth-only helper must not import the superseded campaign transport.
+    disabled = ("apps", "plugins", "remote_plugin", "memories", "multi_agent", "multi_agent_v2",
+                "shell_tool", "unified_exec", "shell_snapshot", "code_mode", "code_mode_host",
+                "computer_use", "browser_use", "browser_use_external", "in_app_browser",
+                "image_generation", "view_image", "goals", "hooks", "in_app_local_automation",
+                "skill_search", "auth_elicitation", "unbounded_connection_retries",
+                "enable_request_compression")
     args = [str(binary), "app-server", "--stdio", "-c", 'model_provider="openai"',
             "-c", 'cli_auth_credentials_store="file"', "-c", "analytics.enabled=false"]
-    for feature in DISABLED:
+    for feature in disabled:
         args += ["--disable", feature]
     with tempfile.TemporaryDirectory(prefix="chia-codex-auth-") as scratch:
         # These child-only home settings do not change the orchestrator's home.

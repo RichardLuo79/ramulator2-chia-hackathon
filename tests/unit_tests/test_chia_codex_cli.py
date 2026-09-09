@@ -1,5 +1,6 @@
 """No provider calls: real CLI uses a local fake Responses broker."""
 import json
+import copy
 import base64
 import os
 import pathlib
@@ -244,6 +245,53 @@ def test_real_cli_has_fresh_context_and_only_brokered_json_actions(tmp_path, mon
     assert "Test contract" not in json.dumps(report)
     with pytest.raises(RuntimeError, match="checkpoint"):
         T.invoke(**{**args, "effort": "max" if effort == "xhigh" else "xhigh"})
+
+
+@pytest.mark.parametrize("auth_mode", ["chatgpt", "api"])
+@pytest.mark.parametrize("effort", ["xhigh", "max"])
+def test_real_cli_cache_layout_has_stable_prefix_without_shared_sessions(tmp_path, monkeypatch, auth_mode, effort):
+    from tools.chia_loop import prompt_cache as K
+    binary = os.environ.get("CHIA_CODEX_PREFLIGHT_BINARY") or shutil.which("codex")
+    assert binary, "cache preflight requires the actual native CLI"
+    root = tmp_path / "run"
+    K.install(root)
+    monkeypatch.setenv("CODEX_THREAD_ID", "PRIVATE_THREAD_CANARY")
+    (tmp_path / "AGENTS.md").write_text("PRIVATE_BRANCH_CANARY")
+    calls = []
+    class Fake:
+        mode = auth_mode
+        def __call__(self, request):
+            calls.append(copy.deepcopy(request))
+            assert "CANARY" not in json.dumps(request)
+            return fake_sse({"status": "no_change"}, summary="Offline cache test.")
+    conversation = [{"role": "user", "content": "stable fixture " * 4000}]
+    args = dict(root=root, system="Test contract, no tools.", conversation=conversation,
+                effort=effort, role="proposal", cap=100, upstream=Fake(), binary=pathlib.Path(binary).resolve())
+    assert T.invoke(operation="proposal_001_001", **args)["status"] == "no_change"
+    next_conversation = conversation + [{"role": "assistant", "content": "inspect"}, {"role": "user", "content": "own new data"}]
+    assert T.invoke(operation="proposal_001_002", **{**args, "conversation": next_conversation})["status"] == "no_change"
+    first, second = calls
+    assert first["prompt_cache_key"] == second["prompt_cache_key"]
+    assert first["input"][:-1] == second["input"][:-1]
+    first_text = [b["text"] for b in first["input"][-1]["content"]]
+    second_text = [b["text"] for b in second["input"][-1]["content"]]
+    assert second_text[:len(first_text) - 1] == first_text[:-1]
+    assert "".join(first_text) == json.dumps(conversation)
+    assert "".join(second_text) == json.dumps(next_conversation)
+    assert "proposal_001_" not in json.dumps(first["input"])
+    assert ("prompt_cache_options" in first) == (auth_mode == "api")
+    assert ("prompt_cache_breakpoint" in json.dumps(first)) == (auth_mode == "api")
+    assert not first.get("previous_response_id") and not first.get("conversation")
+    native = B.R.read_json(root / "interactions/proposal_001_001/attempt_001/cli_request.json")
+    # Framing drift, even inside a nominally allowed frame, must fail closed.
+    native["input"][2]["content"][0]["text"] += "PRIVATE_UNEXPECTED_CONTEXT"
+    with pytest.raises(RuntimeError, match="context changed"):
+        K.codex_request(native, work=root / "interactions/proposal_001_001/attempt_001/workspace",
+            conversation=conversation, system=K.scoped_system(args["system"], first["prompt_cache_key"]),
+            namespace=first["prompt_cache_key"], api_mode=auth_mode == "api")
+    B.artifacts.compress(root, root / "packed.json", min_bytes=1)
+    assert T.invoke(operation="proposal_001_002", **{**args, "conversation": next_conversation})["status"] == "no_change"
+    assert len(calls) == 2 and not B.U.report(root)["audit_issues"]
 
 
 @pytest.mark.parametrize("terminal_output", [True, False])

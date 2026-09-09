@@ -22,6 +22,7 @@ from tools.chia_loop import real_core as P, real_eval as E, recovery as R, artif
 from tools.chia_loop import compliance as C, gemini_loop as G
 from tools.chia_loop import evaluation_config as W, transfer
 from tools.chia_loop import loop_config as L
+from tools.chia_loop import prompt_cache as K
 from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.traffic import traffic_population
 from . import transport as T
@@ -29,7 +30,7 @@ from . import usage as U
 from . import retrospective as V
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
-POLICY = {"version": "codex_cli_individual_run_v7", "model": T.MODEL, "usage_schema": U.SCHEMA,
+POLICY = {"version": "codex_cli_individual_run_v8", "model": T.MODEL, "usage_schema": U.SCHEMA,
           "evaluation": "run-local DDR5 profile; frozen-source ChampSim/gem5 transfer excluded from feedback",
           "stream_output": "finalized output items reconciled with terminal response; no partial-answer fallback",
           "financial_continuity": "all prior usage retained; explicit iteration-only guard available for ChatGPT",
@@ -53,7 +54,7 @@ def load_config(root):
 
 
 def configured_policy(root):
-    return L.policy(root, POLICY)
+    return K.policy(root, L.policy(root, POLICY))
 
 
 def prepare(args):
@@ -68,9 +69,11 @@ def prepare(args):
         if continuation is not None:
             from . import continuation as H
             H.predecessor(continuation, args.effort, args.max_iterations)
+            K.check_continuation(continuation, getattr(args, "prompt_cache", K.DEFAULT))
         root.mkdir(parents=True, exist_ok=False)
         evaluation = W.install(root, getattr(args, "evaluation_config", None))
         loop = L.install(root, getattr(args, "loop_config", None))
+        K.install(root, getattr(args, "prompt_cache", K.DEFAULT))
         policy = configured_policy(root)
         if continuation is not None and (L.load(continuation) != loop or W.load(continuation) != evaluation):
             raise ValueError("continuation requires identical loop/evaluation profiles; ablations must start fresh")
@@ -142,7 +145,8 @@ def prepare(args):
         E.command([sys.executable, "-m", "pytest", "-q", "tests/unit_tests/test_chia_codex_cli.py",
                    "tests/unit_tests/test_chia_codex_usage.py", "tests/unit_tests/test_chia_codex_retrospective.py",
                    "tests/unit_tests/test_chia_codex_queue.py", "tests/unit_tests/test_chia_codex_stream.py",
-                   "tests/unit_tests/test_chia_codex_budget.py", "tests/unit_tests/test_chia_codex_continuation.py"],
+                   "tests/unit_tests/test_chia_codex_budget.py", "tests/unit_tests/test_chia_codex_continuation.py",
+                   "tests/unit_tests/test_chia_prompt_cache.py"],
                   root / "logs/codex_preflight.log", timeout=240,
                   env={**env, "CHIA_CODEX_PREFLIGHT_BINARY": str(root / "runtime/codex")})
         if continuation is not None:
@@ -168,7 +172,7 @@ def prepare(args):
             protocol[relative] = P.sha(file.read_bytes())
         pinned = [root / name for name in ("codex_config.json", "cli_identity.json", "preparation_manifest.json",
             "window_policy.json", "input_inventory.json", "runtime_manifest.json", "preflight_pass.json", "evaluation_config.json",
-            "loop_config.json", "loop_config_identity.json")]
+            "loop_config.json", "loop_config_identity.json", "prompt_cache.json")]
         if (root / "transfer_inputs.json").exists():
             pinned.append(root / "transfer_inputs.json")
             pinned += [p for p in (root / "transfer/runtime").rglob("*") if p.is_file()]
@@ -314,7 +318,7 @@ def prompt(root, state, parent_id, iteration):
         "policy": configured_policy(root), "readable_files": L.visible_files(root, [P.MUTABLE, *G.VISIBLE]),
         "tool_manifest": L.tool_manifest(root, [P.MUTABLE, *G.VISIBLE]),
         "budget": T.Ledger(root, config["usd_cap"]).totals(), "human_modeling_hint": None}
-    return {"role": "user", "content": json.dumps(fields, sort_keys=True)}
+    return {"role": "user", "content": K.initial_fields(root, fields)}
 
 
 def review(root, source, proposal, directory, operation):
@@ -651,6 +655,8 @@ def main():
     prep.add_argument("--loop-config", type=pathlib.Path, default=L.DEFAULT,
                       help="operator-owned feature/feedback/search ablation profile")
     prep.add_argument("--codex-binary")
+    prep.add_argument("--prompt-cache", choices=K.MODES, default=K.DEFAULT,
+                      help="frozen cache-layout ablation; legacy retains the original request layout")
     prep.add_argument("--carry-budget-from", type=pathlib.Path,
                       help="financial-only continuity from one stopped/completed same-effort run; never import its designs")
     prep.add_argument("--continue-training-from", type=pathlib.Path,

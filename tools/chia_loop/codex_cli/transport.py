@@ -20,7 +20,7 @@ import threading
 import time
 import uuid
 
-from tools.chia_loop import real_core as P, recovery as R
+from tools.chia_loop import real_core as P, recovery as R, prompt_cache as K
 from tools.chia_loop.core import atomic_write_json
 from . import usage as U
 from . import budget as F
@@ -335,6 +335,8 @@ def invoke(root, operation, system, conversation, *, effort, role, cap, upstream
     check_stop(root)
     R.check_storage(root)
     R.check_run_deadline(root)
+    cache_scope = K.scope(root, "codex", MODEL, effort, role)
+    system = K.scoped_system(system, cache_scope)
     directory = root / "interactions" / operation
     directory.mkdir(parents=True, exist_ok=True)
     ledger = Ledger(root, cap)
@@ -420,6 +422,10 @@ def invoke(root, operation, system, conversation, *, effort, role, cap, upstream
                     request.update(tools=[], store=False, stream=True)
                     request.pop("tool_choice", None)
                     request.pop("service_tier", None)  # Never inherit priority-price routing.
+                    if cache_scope:
+                        request, cache_receipt = K.codex_request(request, work=work, conversation=conversation,
+                            system=system, namespace=cache_scope, api_mode=getattr(upstream, "mode", "api") == "api")
+                        atomic_write_json(attempt / "cache_request.json", cache_receipt)
                     if getattr(upstream, "mode", "api") == "api":
                         request["max_output_tokens"] = MAX_OUTPUT
                     atomic_write_json(attempt / "provider_request.json", request)

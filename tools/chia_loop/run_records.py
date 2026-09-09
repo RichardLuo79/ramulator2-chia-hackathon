@@ -12,14 +12,19 @@ import pathlib
 import re
 
 
-def validate_limits(maximum_iterations=5, usd_cap=50.0, cpu_budget=12):
+def validate_limits(maximum_iterations=5, usd_cap=50.0, cpu_budget=12, iteration_guard=False):
     if isinstance(maximum_iterations, bool) or not isinstance(maximum_iterations, int) or maximum_iterations < 1:
         raise ValueError("maximum_iterations must be a positive integer")
-    if isinstance(usd_cap, bool) or not isinstance(usd_cap, (int, float)) or not math.isfinite(usd_cap) or usd_cap <= 0:
+    if type(iteration_guard) is not bool or (iteration_guard and usd_cap is not None):
+        raise ValueError("iteration-only authorization requires an explicit null USD cap")
+    if not iteration_guard and (isinstance(usd_cap, bool) or not isinstance(usd_cap, (int, float)) or not math.isfinite(usd_cap) or usd_cap <= 0):
         raise ValueError("usd_cap must be a finite positive amount authorized for this run")
     if isinstance(cpu_budget, bool) or not isinstance(cpu_budget, int) or not 3 <= cpu_budget <= 12:
         raise ValueError("cpu_budget must be an integer in [3, 12]")
-    return {"maximum_iterations": maximum_iterations, "usd_cap": float(usd_cap), "cpu_budget": cpu_budget}
+    result = {"maximum_iterations": maximum_iterations, "usd_cap": None if iteration_guard else float(usd_cap), "cpu_budget": cpu_budget}
+    if iteration_guard:
+        result["iteration_guard"] = True
+    return result
 
 
 def execution_limits(root):

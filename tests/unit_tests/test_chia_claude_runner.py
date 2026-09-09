@@ -162,22 +162,26 @@ def test_no_shared_mutation_or_automatic_launch_in_prepare():
 
 
 @pytest.mark.parametrize("paid", [False, True])
-def test_queue_separates_preparation_from_generation(tmp_path, monkeypatch, paid):
+@pytest.mark.parametrize("credential_kind", T.auth.KINDS)
+def test_queue_separates_preparation_from_generation(tmp_path, monkeypatch, paid, credential_kind):
     from types import SimpleNamespace
     from tools.chia_loop.claude_cli import queue as Q
     credential = tmp_path / "auth.json"
-    credentials(credential)
+    credentials(credential, credential_kind)
     binary = tmp_path / "claude"
     binary.write_text("fixture")
     args = SimpleNamespace(root=tmp_path / "independent", effort="max", max_iterations=20, cpus=3,
         prepare_only=not paid, authorize_paid=paid, claude_binary=str(binary), auth_file=credential,
+        credential_kind=credential_kind,
         evaluation_config=B.REPO / "tools/chia_loop/configs/ddr5_frontend_transfer_v1.json", loop_config=B.L.DEFAULT)
     monkeypatch.setattr(Q, "fingerprint", lambda *a: {"fixture": "pinned"})
     actions = []
     def prepare(got):
         actions.append("prepare")
         assert got.auth_mode == "claude_subscription" and got.usd_cap is None and got.iteration_guard
+        assert got.credential_kind == credential_kind
         got.root.mkdir()
+        Q.B.K.install(got.root, getattr(got, "prompt_cache", Q.B.K.DEFAULT))
     monkeypatch.setattr(Q.B, "prepare_with_wait", prepare)
     monkeypatch.setattr(Q.B, "verify", lambda *a: actions.append("verify"))
     def supervise(root):
@@ -189,6 +193,7 @@ def test_queue_separates_preparation_from_generation(tmp_path, monkeypatch, paid
     record = Q.R.read_json(args.root.with_name(args.root.name + ".queue.json"))
     assert record["generation_authorized"] == paid and not record["model_generation_started"]
     assert record["model"] == T.MODEL and record["effort"] == "max"
+    assert record["credential_kind"] == credential_kind
 
 
 def test_mismatched_cli_usage_is_not_replayed_as_success(tmp_path, monkeypatch):

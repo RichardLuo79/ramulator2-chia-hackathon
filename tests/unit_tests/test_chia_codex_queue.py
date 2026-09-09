@@ -61,6 +61,7 @@ def test_queue_waits_for_both_then_prepares_verifies_and_supervises(tmp_path, mo
         got.root.mkdir()
         Q.B.W.install(got.root)
         Q.B.L.install(got.root)
+        Q.B.K.install(got.root, getattr(got, "prompt_cache", Q.B.K.DEFAULT))
     monkeypatch.setattr(Q.B, "prepare_with_wait", prepare)
     monkeypatch.setattr(Q.B, "verify", lambda root: calls.append("verify"))
     def supervise(root):
@@ -75,7 +76,7 @@ def test_queue_waits_for_both_then_prepares_verifies_and_supervises(tmp_path, mo
     assert "PRIVATE" not in str(saved) and "DO_NOT_IMPORT" not in str(saved)
 
 
-@pytest.mark.parametrize("fail_at", ["implementation", "preparation", "verification"])
+@pytest.mark.parametrize("fail_at", ["implementation", "preparation", "cache_policy", "verification"])
 def test_gate_failure_never_launches_generation(tmp_path, monkeypatch, fail_at):
     args = args_for(tmp_path)
     monkeypatch.setattr(Q, "dependencies", lambda roots: [{"ready": True}])
@@ -87,6 +88,8 @@ def test_gate_failure_never_launches_generation(tmp_path, monkeypatch, fail_at):
         args.root.mkdir()
         Q.B.W.install(args.root)
         Q.B.L.install(args.root)
+        if fail_at != "cache_policy":
+            Q.B.K.install(args.root, getattr(args, "prompt_cache", Q.B.K.DEFAULT))
     def verify(root):
         raise RuntimeError("offline verification failure")
     monkeypatch.setattr(Q.B, "prepare_with_wait", prepare)

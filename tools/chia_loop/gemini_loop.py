@@ -30,12 +30,13 @@ from chia.trace.profiler import start_collector, stop_collector, get_collector, 
 from tools.chia_loop import artifacts, real_core as P, real_eval as E
 from tools.chia_loop import compliance, generation, recovery as R
 from tools.chia_loop import loop_config as L
+from tools.chia_loop import prompt_cache as K
 from tools.chia_loop.generation import transient_generation_error
 from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.run_records import model_pricing, execution_limits
 
 POLICY = {
-    "version": "gemini_individual_run_v11", "maximum_iterations": 5, "usd_cap": 50,
+    "version": "gemini_individual_run_v13", "maximum_iterations": 5, "usd_cap": 50,
     "evaluation": "run-local DDR5 profile; frozen-source ChampSim/gem5 transfer excluded from feedback",
     "iteration_unit": "successfully evaluated design; draft repairs stay inside the iteration",
     "thinking_level": "HIGH", "temperature": 1.0,
@@ -91,13 +92,17 @@ PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "ramulator-chia")
 
 
 def configured_policy(root):
-    return {**L.policy(root, POLICY), **execution_limits(root)}
+    policy = K.policy(root, {**L.policy(root, POLICY), **execution_limits(root)})
+    if policy.get("iteration_guard"):
+        policy["review_cost"] = "proposal/review/retry costs recorded together; explicitly authorized iteration-only guard, no USD stopping cap"
+    return policy
 
 
 def run_ledger(root, backend):
     root = pathlib.Path(root)
     return P.Ledger(root / "ledger.json", backend, run_id=root.name,
-                    cap_usd=configured_policy(root)["usd_cap"])
+                    cap_usd=configured_policy(root)["usd_cap"],
+                    iteration_guard=configured_policy(root).get("iteration_guard", False))
 
 
 def event(root, kind, **data):
@@ -345,7 +350,7 @@ def make_prompt(root, arm, iteration, candidates, incumbent, parent_id, history)
     comparisons = L.comparisons(root)
     history = history if L.enabled(root, "evolution_history") else []
     policy = configured_policy(root)
-    template = (root / "prompts/iteration_v1.md").read_text()
+    template = (root / "prompts" / ("iteration_cache_v1.md" if K.enabled(root) else "iteration_v1.md")).read_text()
     fields = {
         "iteration_number": iteration, "max_proposal_iterations": configured_policy(root)["maximum_iterations"],
         "parent_id": parent_id, "parent_source_sha256": parent["sha256"], "incumbent_id": incumbent,
@@ -584,7 +589,7 @@ def execute(args):
         "artifacts.py", "core.py", "gemini_loop.py", "real_core.py", "real_eval.py",
         "preflight_real.py", "prepare_gemini.py", "sandbox.py", "traffic.py",
         "review_candidate.py", "run_records.py", "analyze_gemini.py", "audit_gemini_campaign.py",
-        "generation.py", "recovery.py", "compliance.py", "supervise_gemini.py",
+        "generation.py", "recovery.py", "compliance.py", "supervise_gemini.py", "prompt_cache.py",
         "evaluation_config.py", "loop_config.py", "synthetic_diagnostics.py", "transfer.py", "transfer_sandbox.py", "transfer_gem5_board.py", "transfer_report.py")]
     protocol_paths += list((REPO / "tools/chia_loop/prompts").glob("*.md"))
     protocol_paths += list((REPO / "tools/eval").glob("*.py"))
@@ -600,7 +605,7 @@ def execute(args):
         root / "input_inventory.json", root / "runtime_manifest.json", root / "preflight_pass.json", root / "budget_carryover.json",
         root / "seed/atomic_controller.cpp", root / "seed/build.json",
         root / "evaluation_config.json", root / "transfer_inputs.json",
-        root / "loop_config.json", root / "loop_config_identity.json") if p.exists()]
+        root / "loop_config.json", root / "loop_config_identity.json", root / "prompt_cache.json") if p.exists()]
     input_paths += [p for p in (root / "transfer/runtime").rglob("*") if p.is_file()]
     input_paths += list((root / "training").glob("simpleo3/DDR5/*/*/manifest.json"))
     input_paths += list((root / "training/reports").glob("*.json"))

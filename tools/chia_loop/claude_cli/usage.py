@@ -12,7 +12,9 @@ import re
 import time
 
 from tools.chia_loop import recovery as R, real_core as P
+from tools.chia_loop import prompt_cache as K
 from tools.chia_loop.core import atomic_write_json
+from tools.chia_loop.framework.usage import InvalidUsage, normalize
 
 MODEL = "claude-fable-5-1"
 SCHEMA = 1
@@ -26,27 +28,16 @@ TARIFF = {"source": "https://platform.claude.com/docs/en/models/fable-5-1/overvi
 def normalized(raw):
     if raw is None:
         return None
-    if not isinstance(raw, dict):
-        raise RuntimeError("invalid provider usage")
-    def count(key, source=raw, required=False):
-        value = source.get(key)
-        if value is None and not required:
-            return None
-        if type(value) is not int or value < 0:
-            raise RuntimeError("invalid token count")
-        return value
-    inp, out = count("input_tokens", required=True), count("output_tokens", required=True)
-    read, write = count("cache_read_input_tokens"), count("cache_creation_input_tokens")
-    details = raw.get("cache_creation") or {}
-    short = count("ephemeral_5m_input_tokens", details)
-    long = count("ephemeral_1h_input_tokens", details)
-    if short is not None and long is not None and write != short + long:
-        raise RuntimeError("cache token counts disagree")
-    return {"uncached_input_tokens": inp, "output_tokens": out,
-            "cached_input_tokens": read, "cache_write_input_tokens": write,
-            "cache_write_5m_tokens": short, "cache_write_1h_tokens": long,
-            "input_tokens": None if read is None or write is None else inp + read + write,
-            "reasoning_output_tokens": None}
+    try:
+        tokens = normalize(raw, "anthropic_api")["tokens"]
+        if tokens["uncached_input_tokens"] is None or tokens["output_tokens"] is None:
+            raise InvalidUsage("input and output counters are required")
+    except InvalidUsage as error:
+        raise RuntimeError(str(error)) from error
+    return {key: tokens[key] for key in (
+        "uncached_input_tokens", "output_tokens", "cached_input_tokens", "cache_write_input_tokens",
+        "cache_write_5m_tokens", "cache_write_1h_tokens", "input_tokens", "reasoning_output_tokens",
+    )}
 
 
 def priced(tokens):
@@ -181,6 +172,7 @@ def report(root):
     return {"record_type": "individual_fable_usage_report", "run_id": root.name,
             "model": MODEL, "effort": config["effort"], "tariff": TARIFF,
             "invoice": False, "quota_measured": False, "totals": totals, "calls": ledger["calls"], "audit_issues": issues,
+            "prompt_cache": K.usage_summary(ledger["calls"], "claude"),
             "by_iteration": {str(i): {"calls": len(rows), "known_standard_usd": sum(r.get("known_standard_usd") or 0 for r in rows),
                              "unknown_usage_calls": sum(r["state"] != "usage_recorded" for r in rows)}
                              for i in sorted({r["iteration"] for r in ledger["calls"] if "iteration" in r})

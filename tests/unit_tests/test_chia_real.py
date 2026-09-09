@@ -84,7 +84,8 @@ def test_budget_carryover_cannot_replenish_authorization(tmp_path):
 def test_region_body_submission_preserves_scaffold_and_supports_parameters():
     seed = (REPO / P.MUTABLE).read_text()
     before, body = P.regions(seed)
-    code = body["CODE"].replace("void init_model() {}", 'double delay; void init_model() { delay = model_param("delay", 7, 1, 20); }')
+    code = body["CODE"].replace("void init_model() override {}", 'double delay; void init_model() override { delay = model_param("delay", 7, 1, 20); }')
+    assert code != body["CODE"], "fixture must actually exercise model-owned parameters"
     source = P.assemble_regions(seed, {"includes": "#include <algorithm>\n", "code": code})
     assert P.regions(source)[0] == before
     assert P.validate_source(seed, source)["static_boundary_pass"]
@@ -135,9 +136,14 @@ def test_completed_trace_archives_preserve_gzip_diagnostics(tmp_path):
 def test_source_regions_protect_lifecycle_and_deny_io():
     seed = (REPO / P.MUTABLE).read_text()
     changed = seed.replace("return m_clk + m_latency;", "return m_clk + 2 * m_latency;")
+    assert changed != seed
     assert P.validate_source(seed, changed)["static_boundary_pass"]
+    # The lifecycle now lives in the trusted base. Changing the inheritance is
+    # still outside the historical editable-region contract.
+    invalid = changed.replace(": public AtomicControllerBase", ": public IController")
+    assert invalid != changed
     with pytest.raises(ValueError, match="protected lifecycle"):
-        P.validate_source(seed, changed.replace("m_pending.pop();", ""))
+        P.validate_source(seed, invalid)
     with pytest.raises(ValueError, match="forbidden"):
         P.validate_source(seed, changed.replace("return m_clk + 2 * m_latency;", 'std::ifstream f("input"); return 1;'))
 

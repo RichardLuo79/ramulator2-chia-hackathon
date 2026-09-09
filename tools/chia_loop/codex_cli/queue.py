@@ -95,6 +95,7 @@ def execute(args):
             "model": T.MODEL, "effort": args.effort, "maximum_iterations": args.max_iterations,
             "usd_equivalent_guard": args.usd_cap, "cpu_budget": args.cpus, "auth_mode": "chatgpt",
             "guard_mode": "iterations" if getattr(args, "iteration_guard", False) else "usd",
+            "prompt_cache": getattr(args, "prompt_cache", B.K.DEFAULT),
             "generation_authorized": True, "authorization": "operator requested Astra pipeline after current Gemini jobs",
             "started_at": time.time(), "status": "waiting_for_predecessors",
             "after": [str(p) for p in after], "dependencies": dependencies(after),
@@ -138,6 +139,8 @@ def execute(args):
                 raise RuntimeError("prepared evaluation differs from queued profile")
             if B.L.load(root) != record["loop_profile"]["configuration"]:
                 raise RuntimeError("prepared loop configuration differs from queued profile")
+            if (B.K.load(root) or {}).get("mode") != record["prompt_cache"]:
+                raise RuntimeError("prepared cache layout differs from queued policy")
             B.verify(root)
             record.update(status="supervising", preparation_passed=True, launch_authorized_at=time.time(),
                           model_generation_started=None, live_status="see this run's supervisor_state.json and ledger.json")
@@ -172,6 +175,7 @@ def main():
     parser.add_argument("--evaluation-config", type=pathlib.Path, default=B.W.DEFAULT)
     parser.add_argument("--loop-config", type=pathlib.Path, default=B.L.DEFAULT)
     parser.add_argument("--codex-binary")
+    parser.add_argument("--prompt-cache", choices=B.K.MODES, default=B.K.DEFAULT)
     parser.add_argument("--carry-budget-from", type=pathlib.Path,
                         help="retain the same-effort predecessor's usage under the existing cap, without scientific history")
     parser.add_argument("--continue-training-from", type=pathlib.Path,

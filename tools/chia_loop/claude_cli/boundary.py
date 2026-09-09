@@ -14,6 +14,9 @@ import sys
 spec = importlib.util.spec_from_file_location("chia_native_boundary", pathlib.Path(__file__).parents[1] / "codex_cli/boundary.py")
 native = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(native)
+auth_spec = importlib.util.spec_from_file_location("chia_native_auth", pathlib.Path(__file__).with_name("auth.py"))
+auth = importlib.util.module_from_spec(auth_spec)
+auth_spec.loader.exec_module(auth)
 
 
 def main():
@@ -23,8 +26,14 @@ def main():
     resource.setrlimit(resource.RLIMIT_CPU, (180,) * 2)
     os.chdir(policy["cwd"])
     native.restrict([*policy["read"], f"/proc/{os.getpid()}/maps"], policy["write"], policy["port"])
+    environment = dict(policy["environment"])
+    if "CLAUDE_CODE_OAUTH_TOKEN" in environment:
+        raise RuntimeError("credentials must not be serialized in the process policy")
+    if policy.get("setup_token_file"):
+        # Native CLI authentication only: never argv, prompts, or a saved env.
+        environment["CLAUDE_CODE_OAUTH_TOKEN"] = auth.read_setup_token(policy["setup_token_file"])
     command = sys.argv[3:] if sys.argv[2] == "--" else sys.argv[2:]
-    os.execve(command[0], command, policy["environment"])
+    os.execve(command[0], command, environment)
 
 
 if __name__ == "__main__":

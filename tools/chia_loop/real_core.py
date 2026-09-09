@@ -11,6 +11,8 @@ import time
 
 from tools.chia_loop.core import atomic_write_json
 from tools.chia_loop.run_records import model_pricing
+from tools.chia_loop import prompt_cache as K
+from tools.chia_loop.pareto import objectives, dominates, pareto
 
 MUTABLE = "src/ramulator/controller/impl/atomic_controller.cpp"
 MODELS = {"pro": "gemini-3.1-pro-preview", "flash": "gemini-3.8-flash"}
@@ -78,9 +80,12 @@ class Ledger:
     Actual standard-rate estimates are reported separately, never used to raise
     the authorized per-run ceiling. No SDK hidden retries are allowed.
     """
-    def __init__(self, path: pathlib.Path, arm: str, *, run_id=None, cap_usd=None):
+    def __init__(self, path: pathlib.Path, arm: str, *, run_id=None, cap_usd=None, iteration_guard=False):
         self.path, self.arm = pathlib.Path(path), arm
         self.run_id = run_id
+        if type(iteration_guard) is not bool or (iteration_guard and (cap_usd is not None or not run_id)):
+            raise ValueError("iteration-only accounting requires a named run and no USD cap")
+        self.iteration_guard = iteration_guard
         if cap_usd is not None and (isinstance(cap_usd, bool) or not isinstance(cap_usd, (int, float))
                                    or not math.isfinite(cap_usd) or cap_usd <= 0):
             raise ValueError("budget cap must be finite and positive")
@@ -90,6 +95,10 @@ class Ledger:
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
     def _check_owner(self, data):
+        if self.iteration_guard != (data.get("guard_mode") == "iterations"):
+            raise ValueError("cannot change an initialized ledger guard mode")
+        if self.iteration_guard and data.get("cap_usd") is not None:
+            raise ValueError("iteration-only ledger cannot carry a dollar ceiling")
         if data.get("backend", data.get("arm")) != self.arm:
             raise ValueError("ledger belongs to a different model backend")
         if data.get("model", MODELS[self.arm]) != MODELS[self.arm]:
@@ -105,7 +114,8 @@ class Ledger:
             data = json.loads(self.path.read_text()) if self.path.exists() else {
                 "schema_version": 2, "record_type": "run_budget", "run_id": self.run_id,
                 "backend": self.arm, "model": MODELS[self.arm],
-                "cap_usd": self.cap_usd if self.cap_usd is not None else CAP_USD,
+                "cap_usd": None if self.iteration_guard else self.cap_usd if self.cap_usd is not None else CAP_USD,
+                **({"guard_mode": "iterations"} if self.iteration_guard else {}),
                 "pricing": model_pricing(PRICING, self.arm), "calls": []}
             self._check_owner(data)
             result = update(data)
@@ -116,7 +126,9 @@ class Ledger:
         """Keep earlier infrastructure-attempt charges inside the same authorization."""
         charge = carryover.get("cap_charge_usd", 0)
         estimate = carryover.get("estimated_standard_usd", 0)
-        if not 0 <= estimate <= charge <= (self.cap_usd if self.cap_usd is not None else CAP_USD):
+        ceiling = math.inf if self.iteration_guard else self.cap_usd if self.cap_usd is not None else CAP_USD
+        if (not math.isfinite(charge) or not math.isfinite(estimate)
+                or not 0 <= estimate <= charge <= ceiling):
             raise ValueError("invalid budget carryover")
         def update(data):
             if data["calls"] or data.get("carryover"):
@@ -148,7 +160,7 @@ class Ledger:
         reserve = (bound * rates["input"] + 2 * MAX_OUTPUT * rates["output"]) / 1e6
         def update(data):
             committed = data.get("carryover", {}).get("cap_charge_usd", 0) + sum(c["cap_charge_usd"] for c in data["calls"])
-            if committed + reserve > data["cap_usd"]:
+            if data["cap_usd"] is not None and committed + reserve > data["cap_usd"]:
                 raise BudgetExhausted(f"per-run ${data['cap_usd']:g} ceiling would be exceeded by next call")
             call_id = len(data["calls"])
             data["calls"].append({"id": call_id, "iteration": iteration, "turn": turn,
@@ -158,6 +170,10 @@ class Ledger:
                 "counted_input_tokens": input_tokens,
                 "reserved_usd": reserve, "cap_charge_usd": reserve,
                 "estimated_standard_usd": None})
+            # Both new layout arms use the same accounting convention. A
+            # legacy-layout ablation may still receive provider cache hits.
+            if K.load(self.path.parent) is not None:
+                data["calls"][-1]["cache_accounting"] = "reported_reads_discount_v1"
             return call_id
         return self._transaction(update)
 
@@ -193,6 +209,16 @@ class Ledger:
             long = prompt > 200_000
             row["estimated_standard_usd"] = (prompt * rate["long_input" if long else "input"]
                 + output * rate["long_output" if long else "output"]) / 1e6
+            if row.get("cache_accounting") == "reported_reads_discount_v1":
+                cached = usage.get("cached_content_token_count")
+                if cached is not None and (type(cached) is not int or not 0 <= cached <= prompt):
+                    raise RuntimeError("invalid cached input token count")
+                row["cached_input_tokens"] = cached
+                row["cache_cost_assumptions"] = [] if cached is not None else ["missing_cache_counter_priced_as_uncached_upper_estimate"]
+                row["estimated_standard_usd"] -= (cached or 0) * .9 * rate["long_input" if long else "input"] / 1e6
+                row["cache_price_source"] = "https://cloud.google.com/vertex-ai/generative-ai/docs/context-cache/context-cache-overview"
+            # The stopping guard intentionally remains conservative: a cache hit
+            # does not silently expand an existing campaign's authorization.
             guard = PRICING["conservative_cap_rates"][backend]
             row["cap_charge_usd"] = (prompt * guard["input"] + output * guard["output"]) / 1e6
             row["billed_output_including_thinking"] = output
@@ -345,21 +371,6 @@ def apply_unified(parent: str, patch: str) -> str:
     if result == parent:
         raise ValueError("proposal makes no source change")
     return result
-
-
-def objectives(summary):
-    aggregate = summary["aggregate"]
-    return (aggregate["cycle_macro_mae_pct"], aggregate["request_macro_mae_over_L"])
-
-
-def dominates(left, right):
-    return all(a <= b for a, b in zip(left, right)) and any(a < b for a, b in zip(left, right))
-
-
-def pareto(candidates):
-    return sorted(key for key, value in candidates.items() if not any(
-        dominates(objectives(other["metrics"]), objectives(value["metrics"]))
-        for other in candidates.values()))
 
 
 def render(template: str, fields: dict):

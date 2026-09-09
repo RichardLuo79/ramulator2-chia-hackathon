@@ -12,18 +12,24 @@ from tools.chia_loop.claude_cli.stream import terminal_response, action, readabl
 from tools.chia_loop.core import atomic_write_json
 
 
-def configure(root):
+def configure(root, credential_kind="native_login"):
     root.mkdir(exist_ok=True)
     atomic_write_json(root / "claude_config.json", {"run_id": root.name, "model": T.MODEL,
         "effort": "xhigh", "guard_mode": "iterations", "usd_cap": None, "maximum_iterations": 20,
-        "auth_mode": "claude_subscription", "cpu_budget": 3})
+        "auth_mode": "claude_subscription", "credential_kind": credential_kind, "cpu_budget": 3})
 
 
-def credentials(path):
-    atomic_write_json(path, {"claudeAiOauth": {"accessToken": "sk-ant-oat01-PRIVATE_AUTH_CANARY",
-        "refreshToken": "PRIVATE_REFRESH_CANARY", "expiresAt": (time.time() + 86400) * 1000,
-        "scopes": ["user:inference", "user:profile"], "subscriptionType": "max", "rateLimitTier": "default_claude_max_5x"}})
+def credentials(path, credential_kind="native_login"):
+    token = "sk-ant-oat01-" + "PRIVATE_SETUP_AUTH_CANARY_" * 3
+    if credential_kind == "setup_token":
+        path.write_text(token + "\n")
+    else:
+        token = "sk-ant-oat01-PRIVATE_AUTH_CANARY"
+        atomic_write_json(path, {"claudeAiOauth": {"accessToken": token,
+            "refreshToken": "PRIVATE_REFRESH_CANARY", "expiresAt": (time.time() + 86400) * 1000,
+            "scopes": ["user:inference", "user:profile"], "subscriptionType": "max", "rateLimitTier": "default_claude_max_5x"}})
     path.chmod(0o600)
+    return token
 
 
 def fake_sse(answer, stop="end_turn", thinking=True):
@@ -94,30 +100,59 @@ def test_configuration_no_inherited_environment(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("effort", T.EFFORTS)
-def test_real_cli_isolated_and_replayable(tmp_path, monkeypatch, effort):
+@pytest.mark.parametrize("credential_kind", auth.KINDS)
+@pytest.mark.parametrize("streaming", (False, True))
+def test_real_cli_isolated_and_replayable(tmp_path, monkeypatch, effort, credential_kind, streaming):
     binary = os.environ.get("CHIA_CLAUDE_PREFLIGHT_BINARY") or shutil.which("claude")
     assert binary, "real Claude binary required; no silent skip of isolation preflight"
     root = tmp_path / "run"
-    configure(root)
+    configure(root, credential_kind)
     config = json.loads((root / "claude_config.json").read_text())
     atomic_write_json(root / "claude_config.json", {**config, "effort": effort})
     credential = tmp_path / "auth.json"
-    credentials(credential)
+    expected_token = credentials(credential, credential_kind)
     before = credential.read_bytes()
     (tmp_path / "CLAUDE.md").write_text("PRIVATE_RULE_CANARY")
     monkeypatch.setenv("CLAUDE_CODE_EFFORT_LEVEL", "low")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "PRIVATE_API_CANARY")
+    monkeypatch.setenv("CLAUDE_CODE_OAUTH_TOKEN", "PRIVATE_INHERITED_OAUTH_CANARY")
+    original_run = T.subprocess.run
+    boundary_policies = []
+    def inspect_boundary(args, **options):
+        policy = json.loads(pathlib.Path(args[2]).read_text())
+        boundary_policies.append(policy)
+        assert expected_token not in json.dumps(policy)
+        assert "CLAUDE_CODE_OAUTH_TOKEN" not in policy["environment"]
+        assert expected_token not in json.dumps(args)
+        assert expected_token not in json.dumps(options.get("env", {}))
+        assert str(credential) in policy["read"]
+        assert str(credential.parent) not in policy["read"]
+        if credential_kind == "setup_token":
+            assert policy["setup_token_file"] == str(credential)
+            assert not (pathlib.Path(policy["cwd"]) / "home/.claude/.credentials.json").exists()
+        else:
+            assert "setup_token_file" not in policy
+        return original_run(args, **options)
+    monkeypatch.setattr(T.subprocess, "run", inspect_boundary)
     requests = []
     def upstream(request, headers, attempt):
         requests.append(request)
         assert "CANARY" not in json.dumps(request)
-        assert headers.get("Authorization") == "Bearer sk-ant-oat01-PRIVATE_AUTH_CANARY"
+        assert headers.get("Authorization") == "Bearer " + expected_token
         assert request["output_config"]["effort"] == effort
         assert not request.get("tools")
         return fake_sse({"status": "no_change", "limitations": "offline fixture"})
+    class StreamingFixture:
+        def stream(self, request, headers, attempt, *, on_chunk):
+            raw = upstream(request, headers, attempt)
+            for part in raw.splitlines(keepends=True):
+                on_chunk(part)
+            return raw
     kwargs = {"root": root, "operation": "proposal_001_001", "system": "A fixture contract. Return a JSON object.",
               "conversation": [{"role": "user", "content": "Return no_change JSON."}], "effort": effort,
-              "role": "proposal", "cap": None, "upstream": upstream, "binary": pathlib.Path(binary).resolve(), "auth_file": credential}
+              "role": "proposal", "cap": None, "upstream": StreamingFixture() if streaming else upstream,
+              "binary": pathlib.Path(binary).resolve(),
+              "auth_file": credential, "credential_kind": credential_kind}
     try:
         assert T.invoke(**kwargs)["status"] == "no_change"
     except Exception:
@@ -129,6 +164,7 @@ def test_real_cli_isolated_and_replayable(tmp_path, monkeypatch, effort):
         raise
     assert T.invoke(**kwargs)["status"] == "no_change"
     assert len(requests) == 1
+    assert len(boundary_policies) == 1
     events = [json.loads(line) for line in (root / "interactions/proposal_001_001/attempt_001/cli_events.jsonl").read_text().splitlines()]
     terminal = [e for e in events if e["type"] == "result"]
     assert len(terminal) == 1 and terminal[0]["is_error"] is False
@@ -136,7 +172,12 @@ def test_real_cli_isolated_and_replayable(tmp_path, monkeypatch, effort):
     assert json.loads(terminal[0]["result"])["status"] == "no_change"
     assert credential.read_bytes() == before
     assert not list(root.rglob(".credentials.json"))
-    assert "PRIVATE_AUTH_CANARY" not in "".join(p.read_text() for p in root.rglob("*") if p.is_file())
+    archived = "".join(p.read_text() for p in root.rglob("*") if p.is_file())
+    assert "PRIVATE_" not in archived and expected_token not in archived
+    identity = json.loads((root / "interactions/proposal_001_001/identity.json").read_text())
+    assert identity["credential_kind"] == credential_kind
+    with pytest.raises(RuntimeError, match="owner/input changed"):
+        T.invoke(**{**kwargs, "credential_kind": next(k for k in auth.KINDS if k != credential_kind)})
     assert U.Ledger(root).totals()["attempts"] == 1
     assert not U.report(root)["audit_issues"]
     # Compression must not make a completed call billable again or hide an
@@ -146,3 +187,108 @@ def test_real_cli_isolated_and_replayable(tmp_path, monkeypatch, effort):
     artifacts.verify(root / "packed.json")
     assert T.invoke(**kwargs)["status"] == "no_change" and len(requests) == 1
     assert not U.report(root)["audit_issues"]
+
+
+def test_setup_token_metadata_and_binding_never_copy_credentials(tmp_path):
+    credential = tmp_path / "private-token"
+    expected = credentials(credential, "setup_token")
+    # File age cannot establish an opaque token's expiry or subscription tier.
+    os.utime(credential, (1, 1))
+    status = auth.check(credential, now=time.time() + 10**9, credential_kind="setup_token")
+    assert status["expires_at"] is None and status["subscription_type"] is None
+    assert status["generation_calls"] == 0 and expected not in json.dumps(status)
+    work = tmp_path / "work"
+    work.mkdir()
+    assert auth.bind(work, credential, credential_kind="setup_token") == credential.resolve()
+    assert not list(work.rglob("*"))
+
+
+@pytest.mark.parametrize("credential_kind", auth.KINDS)
+@pytest.mark.parametrize("effort", ["xhigh", "max"])
+def test_real_cli_cache_layout_preserves_history_and_replays_without_payment(tmp_path, monkeypatch, credential_kind, effort):
+    from tools.chia_loop import prompt_cache as K, artifacts
+    binary = os.environ.get("CHIA_CLAUDE_PREFLIGHT_BINARY") or shutil.which("claude")
+    assert binary, "cache preflight requires the actual native CLI"
+    root = tmp_path / "run"
+    configure(root, credential_kind)
+    config = T.R.read_json(root / "claude_config.json")
+    atomic_write_json(root / "claude_config.json", {**config, "effort": effort})
+    K.install(root)
+    credential = tmp_path / "private-token"
+    private = credentials(credential, credential_kind)
+    monkeypatch.setenv("CLAUDE_CODE_OAUTH_TOKEN", "PRIVATE_WRONG_LOGIN")
+    (tmp_path / "CLAUDE.md").write_text("PRIVATE_BRANCH_CANARY")
+    calls = []
+    def upstream(request, headers, directory):
+        assert private not in json.dumps(request) and "CANARY" not in json.dumps(request)
+        assert any(k.lower() == "authorization" and private in v for k, v in headers.items())
+        calls.append(request)
+        return fake_sse({"status": "no_change"})
+    conversation = [{"role": "user", "content": "stable fixture " * 4000}]
+    args = dict(root=root, system="Test contract, no tools.", conversation=conversation,
+                effort=effort, role="proposal", cap=None, upstream=upstream, binary=pathlib.Path(binary).resolve(),
+                auth_file=credential, credential_kind=credential_kind)
+    assert T.invoke(operation="proposal_001_001", **args)["status"] == "no_change"
+    extended = conversation + [{"role": "assistant", "content": "inspect"}, {"role": "user", "content": "own new data"}]
+    assert T.invoke(operation="proposal_001_002", **{**args, "conversation": extended})["status"] == "no_change"
+    first, second = calls
+    assert first["system"] == second["system"]  # Includes unchanged native attribution.
+    left = [b["text"] for b in first["messages"][0]["content"]]
+    right = [b["text"] for b in second["messages"][0]["content"]]
+    assert right[:len(left) - 1] == left[:-1]
+    assert "".join(left[1:]) == json.dumps(conversation, sort_keys=True)
+    assert "".join(right[1:]) == json.dumps(extended, sort_keys=True)
+    assert sum("cache_control" in b for b in second["system"] + [b for m in second["messages"] for b in m["content"]]) <= 4
+    first_anchor = len(left) - 2
+    assert "cache_control" in first["messages"][0]["content"][first_anchor]
+    assert "cache_control" in second["messages"][0]["content"][first_anchor]
+    artifacts.compress(root, root / "packed.json", min_bytes=1)
+    assert T.invoke(operation="proposal_001_002", **{**args, "conversation": extended})["status"] == "no_change"
+    assert len(calls) == 2 and U.Ledger(root).totals()["attempts"] == 2
+    assert not U.report(root)["audit_issues"]
+
+
+@pytest.mark.parametrize("invalid", ["permissions", "empty", "api_key", "two_tokens", "oversize", "unicode", "fifo", "in_repository"])
+def test_setup_token_rejects_unsafe_files_without_disclosing_contents(tmp_path, monkeypatch, invalid):
+    credential = tmp_path / "private-token"
+    token = credentials(credential, "setup_token")
+    if invalid == "permissions": credential.chmod(0o644)
+    elif invalid == "empty": credential.write_text("")
+    elif invalid == "api_key": credential.write_text("sk-ant-api03-" + "PRIVATE_" * 10)
+    elif invalid == "two_tokens": credential.write_text(token + "\n" + token)
+    elif invalid == "oversize": credential.write_text(token * 100)
+    elif invalid == "unicode": credential.write_bytes(b"\xffPRIVATE_CANARY")
+    elif invalid == "fifo":
+        credential.unlink()
+        os.mkfifo(credential, 0o600)
+    elif invalid == "in_repository": monkeypatch.setattr(auth, "REPO", tmp_path)
+    with pytest.raises(RuntimeError) as exc:
+        auth.check(credential, credential_kind="setup_token")
+    assert token not in str(exc.value) and "PRIVATE_" not in str(exc.value)
+
+
+def test_setup_token_401_does_not_fall_back_or_retry_inside_cli(tmp_path, monkeypatch):
+    import httpx
+    binary = os.environ.get("CHIA_CLAUDE_PREFLIGHT_BINARY") or shutil.which("claude")
+    assert binary
+    root = tmp_path / "run"
+    configure(root, "setup_token")
+    credential = tmp_path / "private-token"
+    expected = credentials(credential, "setup_token")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "PRIVATE_API_FALLBACK_CANARY")
+    requests = []
+    def rejected(request, headers, attempt):
+        assert headers.get("Authorization") == "Bearer " + expected
+        assert headers.get("x-api-key") is None
+        requests.append(request)
+        response = httpx.Response(401, request=httpx.Request("POST", "https://provider.invalid/v1/messages"))
+        response.raise_for_status()
+    with pytest.raises(T.R.OperationalPause) as exc:
+        T.invoke(root, "proposal_001_001", "fixture", [], effort="xhigh", role="proposal", cap=None,
+                 upstream=rejected, binary=pathlib.Path(binary).resolve(), auth_file=credential, credential_kind="setup_token")
+    assert exc.value.retryable is False and len(requests) == 1
+    receipt = json.loads((root / "interactions/proposal_001_001/attempt_001/receipt.json").read_text())
+    assert receipt["http_status"] == 401
+    assert U.Ledger(root).totals()["attempts"] == 1
+    assert U.Ledger(root).totals()["unknown_usage_calls"] == 1
+    assert "PRIVATE_" not in "".join(p.read_text() for p in root.rglob("*") if p.is_file())

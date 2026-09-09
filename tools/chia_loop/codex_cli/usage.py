@@ -12,7 +12,9 @@ import re
 import time
 
 from tools.chia_loop import recovery as R
+from tools.chia_loop import prompt_cache as K
 from tools.chia_loop.core import atomic_write_json
+from tools.chia_loop.framework.usage import InvalidUsage, normalize
 
 SCHEMA = 2
 TARIFF = {"source": "https://developers.openai.com/api/docs/models/gpt-6-astra",
@@ -27,30 +29,15 @@ TOKEN_FIELDS = ("input_tokens", "cached_input_tokens", "cache_write_input_tokens
 def normalized(raw):
     if raw is None:
         return None
-    if not isinstance(raw, dict):
-        raise RuntimeError("invalid provider usage object")
-    def count(value, required=False):
-        if value is None and not required:
-            return None
-        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-            raise RuntimeError("invalid provider token count")
-        return value
-    inp, out = count(raw.get("input_tokens"), True), count(raw.get("output_tokens"), True)
-    details_in, details_out = raw.get("input_tokens_details"), raw.get("output_tokens_details")
-    details_in = {} if details_in is None else details_in
-    details_out = {} if details_out is None else details_out
-    if not isinstance(details_in, dict) or not isinstance(details_out, dict):
-        raise RuntimeError("invalid provider usage details")
-    cached = count(details_in.get("cached_tokens"))
-    written = count(details_in.get("cache_write_tokens"))
-    reasoning = count(details_out.get("reasoning_tokens"))
-    total = count(raw.get("total_tokens"))
-    if (cached or 0) + (written or 0) > inp or (reasoning or 0) > out or total not in (None, inp + out):
-        raise RuntimeError("inconsistent provider token counts")
-    return {"input_tokens": inp, "output_tokens": out, "cached_input_tokens": cached,
-            "cache_write_input_tokens": written, "reasoning_output_tokens": reasoning,
-            "non_reasoning_output_tokens": None if reasoning is None else out - reasoning,
-            "total_tokens": inp + out, "total_tokens_derived": total is None}
+    try:
+        tokens = normalize(raw, "openai_response")["tokens"]
+        if tokens["input_tokens"] is None or tokens["output_tokens"] is None:
+            raise InvalidUsage("input and output counters are required")
+    except InvalidUsage as error:
+        raise RuntimeError(str(error)) from error
+    return {key: tokens[key] for key in TOKEN_FIELDS} | {
+        "total_tokens_derived": raw.get("total_tokens") is None,
+    }
 
 
 def priced(tokens):
@@ -183,6 +170,7 @@ def report(root):
             "totals": current, "carryover": carryover,
             "authorization_totals": combine_totals(current, carryover["totals"] if carryover else summarize([])),
             "by_role": by_role, "by_iteration": by_iteration, "calls": rows,
+            "prompt_cache": K.usage_summary(ledger["calls"], "codex"),
             "audit_issues": issues, "optimization_feedback": False,
             "notes": ["Reasoning is a subset of output tokens; do not add it again.",
                       "Known sums exclude unreported fields/calls; unknown is not zero.",

@@ -35,13 +35,16 @@ def execute(args):
     binary = pathlib.Path(args.claude_binary or shutil.which("claude") or "").resolve(strict=True)
     args.claude_binary = str(binary)
     args.auth_file = args.auth_file.resolve(strict=True)
-    T.auth.check(args.auth_file)
+    args.credential_kind = getattr(args, "credential_kind", "native_login")
+    T.auth.check(args.auth_file, credential_kind=args.credential_kind)
     root.parent.mkdir(parents=True, exist_ok=True)
     path = root.with_name(root.name + ".queue.json")
     with R.exclusive_lock(root.with_name(root.name + ".queue.lock")):
         if path.exists():
             raise RuntimeError("an existing queue receipt cannot be overwritten")
         state = {"run_id": root.name, "model": T.MODEL, "effort": args.effort,
+                 "credential_kind": args.credential_kind,
+                 "prompt_cache": getattr(args, "prompt_cache", B.K.DEFAULT),
                  "maximum_iterations": args.max_iterations, "usd_cap": None, "guard_mode": "iterations",
                  "cpu_budget": args.cpus, "generation_authorized": args.authorize_paid,
                  "status": "preparing", "started_at": time.time(), "pinned_implementation": fingerprint(binary)}
@@ -59,6 +62,8 @@ def execute(args):
                     or T.P.sha(loop.read_bytes()) != state["loop_profile"]["sha256"]):
                 raise RuntimeError("queued profile changed; no generation launch")
             B.verify(root)
+            if (B.K.load(root) or {}).get("mode") != state["prompt_cache"]:
+                raise RuntimeError("prepared cache layout differs from queued policy")
             state.update(status="prepared", preparation_passed=True)
             atomic_write_json(path, state)
             if args.authorize_paid:
@@ -81,9 +86,11 @@ def main():
     parser.add_argument("--root", required=True, type=pathlib.Path)
     parser.add_argument("--effort", required=True, choices=T.EFFORTS)
     parser.add_argument("--auth-file", required=True, type=pathlib.Path)
+    parser.add_argument("--credential-kind", choices=T.auth.KINDS, default="native_login")
     parser.add_argument("--max-iterations", type=int, default=20)
     parser.add_argument("--cpus", type=int, default=3)
     parser.add_argument("--claude-binary")
+    parser.add_argument("--prompt-cache", choices=B.K.MODES, default=B.K.DEFAULT)
     parser.add_argument("--evaluation-config", type=pathlib.Path, default=B.REPO / "tools/chia_loop/configs/ddr5_frontend_transfer_v1.json")
     parser.add_argument("--loop-config", type=pathlib.Path, default=B.L.DEFAULT)
     mode = parser.add_mutually_exclusive_group(required=True)
