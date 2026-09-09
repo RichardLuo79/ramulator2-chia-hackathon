@@ -28,9 +28,11 @@ class SimpleO3Core {
     std::vector<Inst> m_trace;
     size_t m_trace_length = 0;
     size_t m_curr_trace_idx = 0;
+    size_t m_instruction_count = 0;
+    bool m_allow_wrap;
 
    public:
-    Trace(std::string file_path_str);
+    Trace(std::string file_path_str, bool allow_wrap);
     const Inst& get_next_inst();
   };
 
@@ -136,7 +138,7 @@ class SimpleO3Core {
 
  public:
   SimpleO3Core(const Clk_t& clk, int id, int ipc, int depth, size_t num_expected_insts, std::string trace_path,
-               ITranslation* translation, SimpleO3LLC* llc);
+               ITranslation* translation, SimpleO3LLC* llc, bool allow_trace_wrap = true);
 
   /**
    * @brief   Ticks the core.
@@ -147,6 +149,8 @@ class SimpleO3Core {
   bool issue_roi_quiescent() const {
     return m_roi_issue_complete && !m_issue_current_writeback_after_roi;
   }
+
+  const size_t& trace_instruction_count() const { return m_trace.m_instruction_count; }
 
   // Tick-elision support. A stalled core's tick is a pure blocked-cycle
   // count: retirement, issue, and trace advance are all unreachable. A core

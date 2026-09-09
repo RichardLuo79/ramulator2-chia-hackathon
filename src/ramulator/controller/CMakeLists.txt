@@ -52,7 +52,6 @@ target_sources(
   plugin/impl/live_trace_streamer.cpp
 
   impl/generic_ddr_controller.cpp
-  impl/atomic_controller.cpp
   impl/fixed_lat_controller.cpp
   impl/md1_controller.cpp
   impl/wmg1_controller.cpp
@@ -69,6 +68,30 @@ target_sources(
   impl/prac_controller.cpp
   impl/blockhammer_controller.cpp
 )
+
+if(RAMULATOR_CHIA_MODEL_API)
+  target_sources(ramulator-controller PRIVATE
+    impl/atomic_model_controller.cpp atomic_model/loader.cpp)
+  target_link_libraries(ramulator PRIVATE ${CMAKE_DL_LIBS})
+  add_library(ramulator-atomic MODULE ${PROJECT_SOURCE_DIR}/tools/chia_loop/model/seed.cpp)
+elseif(RAMULATOR_CHIA_TOOLS)
+  # Keep Atomic registration out of the trusted library. The runner loads this
+  # module only after closing frontend inputs and enforcing its access policy.
+  add_library(ramulator-atomic MODULE impl/atomic_controller.cpp)
+  target_link_libraries(ramulator-atomic PRIVATE ramulator fmt::fmt yaml-cpp::yaml-cpp)
+else()
+  target_sources(ramulator-controller PRIVATE impl/atomic_controller.cpp)
+endif()
+
+if(RAMULATOR_CHIA_TOOLS)
+  set_target_properties(ramulator-atomic PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "candidate"
+    LIBRARY_OUTPUT_DIRECTORY "${RAMULATOR_OUTPUT_DIRECTORY}"
+    BUILD_WITH_INSTALL_RPATH TRUE
+    INSTALL_RPATH "$ORIGIN"
+  )
+endif()
 
 target_link_libraries(
   ramulator

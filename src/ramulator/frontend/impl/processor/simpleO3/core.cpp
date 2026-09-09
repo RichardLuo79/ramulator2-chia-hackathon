@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 #include <fstream>
 #include <iostream>
+#include <limits>
 
 #include "ramulator/base/utils.h"
 #include "ramulator/frontend/impl/processor/simpleO3/llc.h"
@@ -12,7 +13,7 @@ namespace Ramulator {
 
 namespace fs = std::filesystem;
 
-SimpleO3Core::Trace::Trace(std::string file_path_str) {
+SimpleO3Core::Trace::Trace(std::string file_path_str, bool allow_wrap) : m_allow_wrap(allow_wrap) {
   fs::path trace_path(file_path_str);
   if (!fs::exists(trace_path)) {
     throw std::runtime_error(fmt::format("Trace {} does not exist!", file_path_str));
@@ -92,8 +93,17 @@ SimpleO3Core::Trace::Trace(std::string file_path_str) {
       throw std::runtime_error(
           fmt::format("Trace {}:{} contributes no instruction to the fixed ROI", file_path_str, line_number));
     }
+    // Stores are attached writebacks, not additional issued instructions.
+    const size_t instructions = static_cast<size_t>(bubble_count) + (load_addr != -1 ? 1 : 0);
+    if (m_instruction_count > std::numeric_limits<size_t>::max() - instructions) {
+      throw std::runtime_error(fmt::format("Trace {} instruction count overflows", file_path_str));
+    }
+    m_instruction_count += instructions;
   }
 
+  if (trace_file.bad()) {
+    throw std::runtime_error(fmt::format("Trace {} could not be read completely", file_path_str));
+  }
   trace_file.close();
   m_trace_length = m_trace.size();
   if (m_trace_length == 0) {
@@ -102,8 +112,14 @@ SimpleO3Core::Trace::Trace(std::string file_path_str) {
 }
 
 const SimpleO3Core::Trace::Inst& SimpleO3Core::Trace::get_next_inst() {
+  if (m_curr_trace_idx == m_trace_length) {
+    if (!m_allow_wrap) {
+      throw std::runtime_error("SimpleO3 attempted to wrap a no-wrap input trace");
+    }
+    m_curr_trace_idx = 0;
+  }
   const Inst& inst = m_trace[m_curr_trace_idx];
-  m_curr_trace_idx = (m_curr_trace_idx + 1) % m_trace_length;
+  ++m_curr_trace_idx;
   return inst;
 }
 
@@ -164,14 +180,20 @@ bool SimpleO3Core::InstWindow::set_ready(std::int64_t frontend_id) {
 }
 
 SimpleO3Core::SimpleO3Core(const Clk_t& clk, int id, int ipc, int depth, size_t num_expected_insts,
-                           std::string trace_path, ITranslation* translation, SimpleO3LLC* llc)
+                           std::string trace_path, ITranslation* translation, SimpleO3LLC* llc,
+                           bool allow_trace_wrap)
     : m_clk(clk),
       m_id(id),
       m_window(ipc, depth),
-      m_trace(trace_path),
+      m_trace(trace_path, allow_trace_wrap),
       m_num_expected_insts(num_expected_insts),
       m_translation(translation),
       m_llc(llc) {
+  if (!allow_trace_wrap && num_expected_insts > m_trace.m_instruction_count) {
+    throw std::runtime_error(fmt::format(
+        "Trace {} supplies {} instructions; fixed ROI needs {} with trace wrapping disabled",
+        trace_path, m_trace.m_instruction_count, num_expected_insts));
+  }
   // Fetch the instructions and addresses for tick 0.
   fetch_next_trace_inst();
 }

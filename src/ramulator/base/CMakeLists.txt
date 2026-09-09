@@ -13,6 +13,8 @@ logger.h    logger.cpp
   config.h    config.cpp
   stats.h
   request.h   request.cpp
+  simulation.h simulation.cpp
+  batch_simulation.h batch_simulation.cpp
 )
 
 target_link_libraries(

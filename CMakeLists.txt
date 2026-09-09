@@ -53,6 +53,12 @@ include_directories(${fmt_SOURCE_DIR}/include)
 message("Done configuring fmt.")
 
 option(RAMULATOR_PYTHON_BINDINGS "Build Python nanobind bindings" ON)
+option(RAMULATOR_CHIA_TOOLS "Build an isolated runner and separate Atomic candidate module" OFF)
+option(RAMULATOR_CHIA_MODEL_API "Use the restricted model API instead of an editable controller" OFF)
+if(RAMULATOR_CHIA_MODEL_API AND NOT RAMULATOR_CHIA_TOOLS)
+  message(FATAL_ERROR "RAMULATOR_CHIA_MODEL_API requires RAMULATOR_CHIA_TOOLS")
+endif()
+set(RAMULATOR_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}" CACHE PATH "Ramulator library output directory")
 if(RAMULATOR_PYTHON_BINDINGS)
   find_package(Python 3.10 REQUIRED COMPONENTS Interpreter Development.Module)
 
@@ -72,7 +78,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_library(ramulator SHARED)
 set_target_properties(ramulator PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY  ${PROJECT_SOURCE_DIR}
+  LIBRARY_OUTPUT_DIRECTORY  ${RAMULATOR_OUTPUT_DIRECTORY}
 )
 # PUBLIC so consumers of the ramulator target get the include path transitively
 target_include_directories(ramulator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -83,6 +89,13 @@ target_link_libraries(
 )
 
 add_subdirectory(src/ramulator)
+
+if(RAMULATOR_CHIA_TOOLS)
+  if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(FATAL_ERROR "The native CHIA candidate boundary currently requires Linux")
+  endif()
+  add_subdirectory(tools/chia_loop)
+endif()
 
 if(RAMULATOR_PYTHON_BINDINGS)
   # Run codegen before building — generates C++ headers from DRAM DSL

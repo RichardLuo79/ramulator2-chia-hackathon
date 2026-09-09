@@ -1,6 +1,5 @@
 // Trusted runner: initialize the frontend before loading an untrusted Atomic DSO.
-// The interleave body is extracted verbatim from the pinned Python binding by
-// prepare_runtime(), not reimplemented or optimized here.
+// Python and native entry points share the same interleave implementation.
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
@@ -16,9 +15,14 @@
 #include <unistd.h>
 #include <linux/landlock.h>
 #include "ramulator/base/config.h"
+#include "ramulator/base/batch_simulation.h"
 #include "ramulator/base/factory.h"
+#include "ramulator/base/simulation.h"
 #include "ramulator/frontend/i_frontend.h"
 #include "ramulator/memory_system/i_memory_system.h"
+#ifdef RAMULATOR_CHIA_MODEL_API
+#include "ramulator/controller/atomic_model/loader.h"
+#endif
 
 extern "C" {
 void* seccomp_init(unsigned int);
@@ -63,28 +67,43 @@ static void isolate(const char* candidate, const char* output_dir) {
   seccomp_release(ctx);
 }
 
-static void run(IFrontEnd* m_frontend, IMemorySystem* m_memory_system) {
-  // CHIA_INTERLEAVE_BODY
-}
-
 int main(int argc, char** argv) {
   try {
     if (argc != 5) throw std::runtime_error("usage: isolated_sim config candidate-or-dash output_dir stats");
     auto config = Config::parse_config_file(argv[1]);
+    std::vector<BatchRequest> batch;
+    const bool replay = static_cast<bool>(config["batch_trace"]);
+    if (replay) {
+      std::ifstream input(config["batch_trace"].as<std::string>());
+      batch = read_batch(input);
+    }
     std::ofstream stats(argv[4]);
     if (!stats) throw std::runtime_error("cannot open stats output");
     auto start = std::chrono::steady_clock::now();
     std::unique_ptr<IFrontEnd> frontend(Factory::create_frontend(config));
     if (std::string(argv[2]) != "-") {
       isolate(argv[2], argv[3]);
-      if (!dlopen(argv[2], RTLD_NOW | RTLD_GLOBAL))
-        throw std::runtime_error(dlerror());
+      void* library = dlopen(argv[2], RTLD_NOW | RTLD_GLOBAL);
+      if (!library) throw std::runtime_error(dlerror());
+#ifdef RAMULATOR_CHIA_MODEL_API
+      AtomicModel::install_factory(library);
+#endif
     }
     std::unique_ptr<IMemorySystem> memory(Factory::create_memory_system(config));
     frontend->connect_memory_system(memory.get());
     memory->connect_frontend(frontend.get());
     auto sim_start = std::chrono::steady_clock::now();
-    run(frontend.get(), memory.get());
+    if (replay) {
+      BatchState state;
+      auto result = run_batch(*memory, batch, state, true);
+      std::ofstream observations(std::string(argv[3]) + "/replay.csv");
+      write_batch(observations, batch, result, 0);
+      stats << "batch:\n  cycles: " << result.elapsed
+            << "\n  reads_completed: " << result.completed_reads
+            << "\n  writes_completed: " << result.completed_writes << '\n';
+    } else {
+      run_simulation(*frontend, *memory);
+    }
     const auto sim_end = std::chrono::steady_clock::now();
     frontend->update_stats_recursive();
     memory->update_stats_recursive();

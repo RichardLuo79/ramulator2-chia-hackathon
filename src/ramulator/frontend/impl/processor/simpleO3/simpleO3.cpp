@@ -26,7 +26,7 @@ namespace Ramulator {
 //   3 20734016
 //   8 20841280 20841280
 //
-// The trace replays cyclically.
+// Legacy runs replay cyclically; fixed-window evaluations disable trace wrapping.
 class SimpleO3 final : public IFrontEnd, public Implementation {
   RAMULATOR_REGISTER_IMPLEMENTATION(IFrontEnd, SimpleO3, "SimpleO3")
 
@@ -38,6 +38,7 @@ class SimpleO3 final : public IFrontEnd, public Implementation {
   std::unique_ptr<SimpleO3LLC> m_llc;
 
   int m_num_expected_insts;
+  bool m_allow_trace_wrap;
   std::vector<std::string> m_traces;
   int m_ipc;
   int m_depth;
@@ -53,6 +54,7 @@ class SimpleO3 final : public IFrontEnd, public Implementation {
   void init() override {
     RAMULATOR_PARSE_PARAM(m_clock_ratio, unsigned int, "clock_ratio").required();
     RAMULATOR_PARSE_PARAM(m_num_expected_insts, int, "num_expected_insts").required();
+    RAMULATOR_PARSE_PARAM(m_allow_trace_wrap, bool, "allow_trace_wrap").default_val(true);
     RAMULATOR_PARSE_PARAM(m_traces, std::vector<std::string>, "traces").required();
     RAMULATOR_PARSE_PARAM(m_ipc, int, "ipc").default_val(4);
     RAMULATOR_PARSE_PARAM(m_depth, int, "inst_window_depth").default_val(128);
@@ -101,7 +103,7 @@ class SimpleO3 final : public IFrontEnd, public Implementation {
 
     for (int id = 0; id < m_num_cores; id++) {
       auto core = std::make_unique<SimpleO3Core>(m_clk, id, m_ipc, m_depth, m_num_expected_insts, m_traces[id],
-                                                 m_translation, m_llc.get());
+                                                 m_translation, m_llc.get(), m_allow_trace_wrap);
       core->m_callback = [this](Request& req) { return this->receive(req); };
       if (!m_crit_trace_path.empty()) {
         core->open_crit_trace(fmt::format("{}.core{}", m_crit_trace_path, id));
@@ -110,6 +112,7 @@ class SimpleO3 final : public IFrontEnd, public Implementation {
     }
 
     m_stats.add("num_expected_insts", m_num_expected_insts);
+    m_stats.add("allow_trace_wrap", m_allow_trace_wrap);
     m_stats.add("llc_eviction", m_llc->s_llc_eviction);
     m_stats.add("llc_read_access", m_llc->s_llc_read_access);
     m_stats.add("llc_write_access", m_llc->s_llc_write_access);
@@ -127,6 +130,7 @@ class SimpleO3 final : public IFrontEnd, public Implementation {
     m_stats.add("internal_writebacks_live", m_llc->s_internal_writebacks_live);
 
     for (int core_id = 0; core_id < m_cores.size(); core_id++) {
+      m_stats.add(fmt::format("trace_instructions_core_{}", core_id), m_cores[core_id]->trace_instruction_count());
       m_stats.add(fmt::format("insts_issued_core_{}", core_id), m_cores[core_id]->s_insts_issued);
       m_stats.add(fmt::format("cycles_recorded_core_{}", core_id), m_cores[core_id]->s_cycles_recorded);
       m_stats.add(fmt::format("memory_access_cycles_recorded_core_{}", core_id), m_cores[core_id]->s_mem_access_cycles);
