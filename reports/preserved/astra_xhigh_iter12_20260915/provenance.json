@@ -1,0 +1,44 @@
+{
+  "candidate": {
+    "candidate": {
+      "candidate_id": "da0e0a865ac0220ea192486f9bc7019d36a4df1bca20c59f55b93d7771b61cae",
+      "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+      "files": {
+        "model.cpp": {
+          "bytes": 17004,
+          "sha256": "f21ab420f204a14fe72fc64f913c3ba2d7eedd3e55499dd07bbb2d678ef3d210"
+        },
+        "parameters.json": {
+          "bytes": 2,
+          "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        }
+      },
+      "parameters": {},
+      "schema_version": 1,
+      "source_sha256": "4157d6826a8299e308f220c8ef62f0b22635f1bdd2e975ad336080ee45e5468f"
+    },
+    "completed_iterations": 14,
+    "config_sha256": "b61914616759c94594aecde3034a743633ae912aef94917e149378f4f17d3039",
+    "iteration_record_sha256": "b326ea162e002fe4e292155ca6bb768606a8515d38f3bfb447d0da43653d9b0e",
+    "original_campaign": "/home/dev/chia-dpc4-paid-20260910/astra_xhigh",
+    "promoted_iteration": 12,
+    "training": {
+      "cycle_macro_mae_pct": 1.0192972000580873,
+      "request_macro_absolute_signed_drift_over_L": 0.04143931944648237,
+      "request_macro_mae_over_L": 0.17730839227298661
+    },
+    "validation": {
+      "core_error_pct": 2.9880942737367433,
+      "request_mae_over_L": 0.18188734646259713
+    }
+  },
+  "selected_iteration": 12,
+  "status": "frozen; historical multicore protocol superseded, not new-study evidence",
+  "single_core_protocol": "first-touch placement; 2M warmup + 20M measured instructions",
+  "multicore_protocol": "fixed placement; warmup barrier; finished cores parked",
+  "raw_evidence_local": "/home/dev/champsim-placement-20260914.WE0C4X/placement-study.tar.gz",
+  "raw_evidence_cloud": "gem5-fs-data-milan-20260912:/champsim-placement-20260914",
+  "source_only": true,
+  "no_llm_calls": true
+}

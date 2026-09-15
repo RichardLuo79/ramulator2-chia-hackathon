@@ -1,0 +1,50 @@
+{
+  "build-pins.json": {
+    "bytes": 736,
+    "sha256": "240510446fead424d613cadf894e84480d5dc4739ea4e0a59d4530f1df1de968"
+  },
+  "historical-multicore-protocol.json": {
+    "bytes": 143647,
+    "sha256": "eedc405755dcf8c72d5809265ddad605d61166def18e3c65dadb91384bd12134"
+  },
+  "historical-single-core-protocol.json": {
+    "bytes": 14182,
+    "sha256": "be403fa6523b4cd39ddfa187fa1f0931591ec82da4b5255a4493c1f23e1a7005"
+  },
+  "input-preservation-verified.json": {
+    "bytes": 1973,
+    "sha256": "6bcbc642c1885499da9cd68b4e0c2e6f77804e27a3d4f2e3b4ef32588be94df2"
+  },
+  "model/model.cpp": {
+    "bytes": 17004,
+    "sha256": "f21ab420f204a14fe72fc64f913c3ba2d7eedd3e55499dd07bbb2d678ef3d210"
+  },
+  "model/parameters.json": {
+    "bytes": 2,
+    "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+  },
+  "model/snapshot.json": {
+    "bytes": 514,
+    "sha256": "da0e0a865ac0220ea192486f9bc7019d36a4df1bca20c59f55b93d7771b61cae"
+  },
+  "multicore.csv": {
+    "bytes": 17035,
+    "sha256": "149e9f783e3c396d99dafb95b7d1a470da0f82a7e91d63c46fb52a86aec91109"
+  },
+  "provenance.json": {
+    "bytes": 1951,
+    "sha256": "21675a2b1c315255bcf22dc73d538a0b3adc2bd5b68e79800469fa6cbbfa6efb"
+  },
+  "retained-raw-artifact.json": {
+    "bytes": 376,
+    "sha256": "dcb736118e0ce89528a5d4618e884c402622cfef22f599bbb387ff90bcc673f0"
+  },
+  "retained-records-verified.json": {
+    "bytes": 67629,
+    "sha256": "98047b4e34139189a6733d2fc1530ee0fe404dea7a56f2fbdd5a06f91f43ebe5"
+  },
+  "single-core.csv": {
+    "bytes": 5486,
+    "sha256": "7e9d45a51ac2dd9b87509a9519594f1c8a8f7ebcf19b9877fb32fe0d01250989"
+  }
+}
