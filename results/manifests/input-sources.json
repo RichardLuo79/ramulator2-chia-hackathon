@@ -1,0 +1,432 @@
+{
+  "base_url": "https://traces.rbera.com/dpc4/",
+  "compression": {
+    "filename": "",
+    "format": "gzip",
+    "level": 1,
+    "mtime": 0
+  },
+  "integrity": "Full decoded prefix SHA256 and local gzip CRC; not full upstream-object CRC. ETags identify upstream objects, not necessarily MD5 checksums.",
+  "record_bytes": 64,
+  "schema_version": 1,
+  "source": "https://github.com/CMU-SAFARI/DPC4#workload-traces",
+  "traces": {
+    "traces/arizona.gz": {
+      "decoded_sha256": "1afcdb270b8dedadb2f080491a04c710eba43c352b1c635284744772167f5300",
+      "etag": "d6a804daf7f27d62fa0c8e188a5b33c9-22",
+      "path": "gtrace_v2/arizona/arizona_0000.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 2117845928,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/bark.gz": {
+      "decoded_sha256": "941c1c88e3ad0814c4e6c6969be02858b35b0e3aaf55d6225809a6dc1b4ac7cf",
+      "etag": "4b49164b89e6b993ad84b04a0b330a94-16",
+      "path": "ai-ml/bark.cpp-bark-small.coarse_token_gen.1.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 1565236669,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/biogpt.gz": {
+      "decoded_sha256": "f4477bfc60e6161f5ad9588dc91644dfd58951b15eb14dcd779ee06117b4201b",
+      "etag": "0ff79e99a37c22855e3fd021a9122937-17",
+      "path": "ai-ml/biogpt.cpp-ggml-model-tocilizumab.1.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 1642577240,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/bravo.gz": {
+      "decoded_sha256": "5abbd9cb2a91cf64ffe066996b620ae17e27a54ce57847136c2275f838eaa5b8",
+      "etag": "afef23ba813c8a38dcd4696ff3e37075-49",
+      "path": "gtrace_v2/bravo/bravo.a_0000.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4878636811,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/bwaves.gz": {
+      "decoded_sha256": "1a6a40e4e113b44c8208f34521ea19ce17d404664e66cdbda85fe273a848d02d",
+      "etag": "122deccaa020cbeef7764c6262c0114a",
+      "path": "SPEC17/603.bwaves_s-3699B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 34878376,
+      "upstream_range_bytes": 34878376
+    },
+    "traces/cactu.gz": {
+      "decoded_sha256": "5dfdee5fccc9e52e07d68d8c82d2142fe264aeaab6d62bb7c5f14d975e934e96",
+      "etag": "89d59e788d53f966204e8d5f9a2a3629-3",
+      "path": "SPEC17/607.cactuBSSN_s-2421B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 257158316,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/cam4.gz": {
+      "decoded_sha256": "338be36950e418ec6036ad2596de61e6dc6ad8482fd52dc4e134fb5849e0d9dd",
+      "etag": "0e985225fe0c582b96edda955f86715a-2",
+      "path": "SPEC17/627.cam4_s-573B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 151870320,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/charlie.gz": {
+      "decoded_sha256": "069ffb5506b2afa2aae2b7e0a4f34e9ea393b8da24ec9e5982577b6ede80294a",
+      "etag": "4dc2425d25f36930b3ca4b47614487c7-23",
+      "path": "gtrace_v2/charlie/charlie_0000.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 2202633445,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/delta.gz": {
+      "decoded_sha256": "4628b144d0ab67d3a919ebb2a11f3a1fcafaf4bc47503a1100639693953d0639",
+      "etag": "d066baf67d144280005754a0a9f088a1-23",
+      "path": "gtrace_v2/delta/delta_0000.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 2299427065,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/fotonik.gz": {
+      "decoded_sha256": "cb69c83b01071927f392dafb4dcfeb68dc26b21e300d339fc387ba5365bf7ebc",
+      "etag": "a714c94b5cb3213ca0cb775bc311d196-4",
+      "path": "SPEC17/649.fotonik3d_s-1176B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 328712224,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/gap_bc.gz": {
+      "decoded_sha256": "a690feff6516f2bccb535703ae510375ce8902517e40612fd32b4bcebed7e729",
+      "etag": "6cc67520d60600570b5efebeae873b04-6",
+      "path": "Graph/GAP/bc-0.trace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 588387863,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/gap_bfs.gz": {
+      "decoded_sha256": "4ac90ee0b8721011135ebda8440f4f201909e58543392b2d4df36a4101513a28",
+      "etag": "768700d7ae7b12a622cba863b829c899-6",
+      "path": "Graph/GAP/bfs-3.trace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 548100347,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/gap_pr.gz": {
+      "decoded_sha256": "8b09ca285042f07cb78217d27f2173d2d530676723ede2a9ca36bd65b26509db",
+      "etag": "743f80566eb891c58f712d5148b4a1dc-8",
+      "path": "Graph/GAP/pr-3.trace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 737193349,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/gap_sssp.gz": {
+      "decoded_sha256": "dc167e8f5a485496b1c5e6da62eb0ed2261f1ed56f331938795a8ef2b3a78156",
+      "etag": "99bbfded7864611f4c2044bf3e684232-6",
+      "path": "Graph/GAP/sssp-3.trace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 558722833,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/gcc.gz": {
+      "decoded_sha256": "70700d06783df5f4e1c7e508ba023c44ca6fd7a695e5f8dd910591259f4d104e",
+      "etag": "fda25e4beeabbb853cefe867eca92944-4",
+      "path": "SPEC17/602.gcc_s-734B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 368694692,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/gms_kstar.gz": {
+      "decoded_sha256": "a4faa08f06f90ffba65fa83f6f6a5a699902903cb1fe43efa26d0ddb1efd8900",
+      "etag": "eb3a6aa9ab57afdf37578f4f8408ed58-33",
+      "path": "Graph/GMS/gms.k_clique_star_list.soc-pokec-relationships.slice-696.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 3239643621,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/gms_maxclique.gz": {
+      "decoded_sha256": "541dbd4b1c118df13b4ae0c1555ceec6459d19457e917554c0a632c66af1933d",
+      "etag": "7ab35f23f98dc3df58d94081a995b9bd-51",
+      "path": "Graph/GMS/gms.maximal_clique_enum_bron_kerbosch.soc-pokec-relationships.slice-1099.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 5026260431,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/gms_subgraph.gz": {
+      "decoded_sha256": "24f8455307c5c9a678d8192b655ec92d90b511b5045f3efd16e42e2b32c151d5",
+      "etag": "0e4b63005a0e0f6e4b62e4b0404430d3-62",
+      "path": "Graph/GMS/gms.subgraphiso_vf2_sequential.soc-pokec-relationships.slice-1.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 6137010216,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/gms_triangle.gz": {
+      "decoded_sha256": "dc517411fb28a087196de7253fcd3a5e558c674b1828723f6a43f860ebaea024",
+      "etag": "530b8ff189a0bc77ecc548dd25e05a4b-23",
+      "path": "Graph/GMS/gms.triangle_count.soc-pokec-relationships.slice-117.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 2228794525,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/lbm.gz": {
+      "decoded_sha256": "e0a6c7e69a120b3e1250711ee71afb1266328a3cd22152d951997e462fae0560",
+      "etag": "f3dd2967546c38d8b012c9ad75509ac7-8",
+      "path": "SPEC17/619.lbm_s-4268B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 773592004,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/ligra_cf.gz": {
+      "decoded_sha256": "c237a51c1069722dff7e13d549eab3fcfe725d3af0258d0deb0422cb9abc850c",
+      "etag": "a230814967247cb034164dee99310a54",
+      "path": "Graph/Ligra/ligra_CF.com-lj.ungraph.gcc_6.3.0_O3.drop_154750M.length_250M.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 57456152,
+      "upstream_range_bytes": 57456152
+    },
+    "traces/ligra_components.gz": {
+      "decoded_sha256": "7426402bc3d89147b12719ce62b38a43154c7767c37ce36739f66fed6a32f1b1",
+      "etag": "c9973ec79ab47eca9b1ef41bc3d3b538-2",
+      "path": "Graph/Ligra/ligra_Components.com-lj.ungraph.gcc_6.3.0_O3.drop_15750M.length_250M.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 101179100,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/ligra_radii.gz": {
+      "decoded_sha256": "ae0e07e76159862052f3ce6b82ec9ec073807d9473a1ee6ec062306de8581865",
+      "etag": "e27e0a40dc13454be1ebf74c39ddec6c-2",
+      "path": "Graph/Ligra/ligra_Radii.com-lj.ungraph.gcc_6.3.0_O3.drop_24500M.length_250M.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 152453704,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/llama7b.gz": {
+      "decoded_sha256": "54b163927b858393299c91902a4bf17301b8a8f2e6c2c1f9ae104f7d8cb5e03c",
+      "etag": "6042aac3116cbb1eff1a8b43f14a909f-10",
+      "path": "ai-ml/llama2.c-llama2_7b.1.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 992956809,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/mcf.gz": {
+      "decoded_sha256": "b0268f2edfee9a3321ae827e6016a14cad8c69d56488c429f39f723f1c1dfbaa",
+      "etag": "32633b1bf5c466ca2d9bd825db5e802c-11",
+      "path": "SPEC17/605.mcf_s-665B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 1024276764,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/merced.gz": {
+      "decoded_sha256": "b1650d17ef562946a0b285b35d40181b66cd782e6c92bfabe384d87b327009da",
+      "etag": "9ce63e5f2f2c5268d14d216f0d813e1c-27",
+      "path": "gtrace_v2/merced/merced_0000.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 2637115952,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/omnetpp.gz": {
+      "decoded_sha256": "d29104a94f060479135d2e7fbad88f9109ecd0bc52eb8d35e8cf9d47beb163f2",
+      "etag": "f9d0957dc124d9f9978d40aff6b6ae7b-9",
+      "path": "SPEC17/620.omnetpp_s-874B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 802283392,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/pop2.gz": {
+      "decoded_sha256": "d439fbbbd98f212c030736d32f1359026fe285f64578fd3deaf1b57070fa1c17",
+      "etag": "42694513f5a9d6da324e19128a3ad35e-4",
+      "path": "SPEC17/628.pop2_s-17B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 313990504,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/rwkv.gz": {
+      "decoded_sha256": "1d593c5e8aea8b4b1a0d17bfd8fb7726d2d371c831effea4cb65a0861438ce4b",
+      "etag": "6162f6705a628b0785a10d49942b98b2-34",
+      "path": "ai-ml/rwkv_trace_2.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 3361549280,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/sd14.gz": {
+      "decoded_sha256": "f54b5e6ee3478eb96362ba07efff9384169324542bed3bb0354be6d6e94f87ce",
+      "etag": "c0c4e34468506e170a91b3a46ee9d64c-16",
+      "path": "ai-ml/stable-diffusion.cpp-sd-v1-4.ckpt.1.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 1570263762,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/sierra_a_3_0001.gz": {
+      "decoded_sha256": "2a3dcc06c86ec2b217147414e6322fae8286e604ebc0cf9b53eabf8fcd18aefe",
+      "etag": "0c7d92bcc4b60d71209554550404513d-53",
+      "path": "gtrace_v2/sierra.a.3/sierra.a.3_0001.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 5249118928,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/sierra_a_3_0006.gz": {
+      "decoded_sha256": "0e74098f44896a423bc633d09127161b37fd45053e76c735119ed86b3dac4177",
+      "etag": "9a004bbd3d9344f0110eb32250c88629-50",
+      "path": "gtrace_v2/sierra.a.3/sierra.a.3_0006.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4993834821,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/sierra_a_4_0005.gz": {
+      "decoded_sha256": "02cc3ad97345a1c62aca814ab5344a3cb43ffb6b7193ebac4e6430c1c6872cf3",
+      "etag": "700da5fcfd13fab7f38a19d24a751a01-52",
+      "path": "gtrace_v2/sierra.a.4/sierra.a.4_0005.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 5151025090,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/sierra_a_4_0013.gz": {
+      "decoded_sha256": "e7b04ef6fd4dc6a3eb05a661f10e501e40f90c4bbe5202f375a9a82d6ed09347",
+      "etag": "3a397501492a53d8966005ded60a21b0-50",
+      "path": "gtrace_v2/sierra.a.4/sierra.a.4_0013.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4967818100,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/sierra_a_6_0001.gz": {
+      "decoded_sha256": "059f9094c574170aa40761dbd34231e916837d1283ed1520ccc84c6255b45913",
+      "etag": "2607fb1964ee315b6a08c37e4f0bca8c-59",
+      "path": "gtrace_v2/sierra.a.6/sierra.a.6_0001.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 5819019809,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/sierra_a_6_0006.gz": {
+      "decoded_sha256": "f38d238525e6ca16cc4679e20b5775d89ef6c9656ab18c32fc2e7c31518528e7",
+      "etag": "654ec0fc78b6c74f471db7b3a4d458fe-59",
+      "path": "gtrace_v2/sierra.a.6/sierra.a.6_0006.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 5831158650,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/sierra_a_6_0011.gz": {
+      "decoded_sha256": "010357c5b9725a5e583c3157dc52e37845789664b7fcbf0c26d92e0c92ff6866",
+      "etag": "6ded495ac85ef0369d9363f0d6722433-57",
+      "path": "gtrace_v2/sierra.a.6/sierra.a.6_0011.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 5689688701,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/tahoe_0006.gz": {
+      "decoded_sha256": "905c74d82c97728fb197aaa9d7f1937500859786e17edb5ed2fe47927eb778d1",
+      "etag": "3e0463891c4973ced7e6cd800c3e0203-43",
+      "path": "gtrace_v2/tahoe/tahoe_0006.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4251357242,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/tahoe_0010.gz": {
+      "decoded_sha256": "9d59b8105909f3f2174301364185cb3ee54e61982a5af9f733f3854c37487022",
+      "etag": "faec17f7993fce3e18a0df8e0891490f-42",
+      "path": "gtrace_v2/tahoe/tahoe_0010.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4137346466,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/tahoe_0011.gz": {
+      "decoded_sha256": "4b80aa2fcac3c39481324f7b10ef330b6957c4de5ea4538e216aeb772f79e4b8",
+      "etag": "84b527afc63dafe3fcc94e1048d5603c-42",
+      "path": "gtrace_v2/tahoe/tahoe_0011.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4133255017,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/tahoe_0013.gz": {
+      "decoded_sha256": "d83b2008345d58f56f88994053987195ba918be337b22487bbc618ba1dd71c2b",
+      "etag": "13fba922c5cbed954fafdeaf7e0b6d7e-41",
+      "path": "gtrace_v2/tahoe/tahoe_0013.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4075331337,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/tahoe_0014.gz": {
+      "decoded_sha256": "e36c47b127794f4cdbf0b5b9cabe744b3ea54552252443313d85ae41a5184e40",
+      "etag": "5533436b39b59381a771064c3f0ef695-40",
+      "path": "gtrace_v2/tahoe/tahoe_0014.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 3970905292,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/tahoe_0016.gz": {
+      "decoded_sha256": "1c2fb8e9f6cabda80abab3de27c0674b1f386ffe02096eacfbbf1be49df1a90c",
+      "etag": "575b5f100475d41e1ec6a225c490cc77-41",
+      "path": "gtrace_v2/tahoe/tahoe_0016.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4052315127,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/tahoe_0023.gz": {
+      "decoded_sha256": "375e3cf1b552c0429bee806ba2a28be5d9c81f4ef85743ca3f95808e17732c90",
+      "etag": "47b7189dd39006ce316346c8b1a05efe-43",
+      "path": "gtrace_v2/tahoe/tahoe_0023.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4269517324,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/tahoe_0035.gz": {
+      "decoded_sha256": "312e8e314abb052a6516d19e9cba4977155538f02b303433922e2efbd6e235c9",
+      "etag": "027b427f884505a7ea8789301d0ac6da-40",
+      "path": "gtrace_v2/tahoe/tahoe_0035.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 3966833306,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/tango.gz": {
+      "decoded_sha256": "dcf7076fc1c3a660f2876dca673ed4135746f2912b7ebbfc8744bd1f22f0af2e",
+      "etag": "cb244d53da8ff1181206ad5922e70725-35",
+      "path": "gtrace_v2/tango/tango_0000.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 3493390485,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/vit_large.gz": {
+      "decoded_sha256": "0459988f3c3647b2680b5f01548bb635806b84a50209b348561871aaae6f5b8d",
+      "etag": "fc6a05c20f5ecbe8959703bac2369fe8-20",
+      "path": "ai-ml/vit.cpp-large-ggml-model-f16.gguf.armadillo.1.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 1959312353,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/whiskey.gz": {
+      "decoded_sha256": "8beefab369c38efc6860570d340f94ad53034dec90abcc1840138c5e0a000792",
+      "etag": "4083fa57676be62c80fc5d05e98ac034-45",
+      "path": "gtrace_v2/whiskey/whiskey_0000.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 4403445139,
+      "upstream_range_bytes": 134217728
+    },
+    "traces/whisper.gz": {
+      "decoded_sha256": "19e873c781e10ae9508221f9928e48b62e0580ae59d961bc256ded96b15c6bab",
+      "etag": "59d484aff38d37fb3b7367a44ba287a5-21",
+      "path": "ai-ml/whisper_trace_1.champsimtrace.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 2045138768,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/xalancbmk.gz": {
+      "decoded_sha256": "041e036b19687503d564840b30c539ddc2fe061f1304a001705c1b2d9d0b8ea7",
+      "etag": "41d2ad89ce38a06104dba25cabcdf82d-2",
+      "path": "SPEC17/623.xalancbmk_s-700B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 160985836,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/xz.gz": {
+      "decoded_sha256": "72d8061af3d7238d2c1b72e909635c41544c0a2f1a25eccbaccdb9e8aadb6069",
+      "etag": "69e0a29e6d44a354a716ebc823f89e8d-5",
+      "path": "SPEC17/657.xz_s-3167B.champsimtrace.xz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 465412108,
+      "upstream_range_bytes": 67108864
+    },
+    "traces/yankee.gz": {
+      "decoded_sha256": "89865f69657ab4d7a3e0981ebd0fe2287d53ff867206970634fb2b158a5107d7",
+      "etag": "f8e16a0609717007a9305d1d1adf83fd-26",
+      "path": "gtrace_v2/yankee/yankee_0000.champsim.gz",
+      "prefix_instructions": 23000000,
+      "size_bytes": 2545188722,
+      "upstream_range_bytes": 134217728
+    }
+  },
+  "upstream_manifest": "https://traces.rbera.com/dpc4/manifest.txt"
+}

@@ -1,0 +1,24 @@
+{
+  "changes": [
+    {
+      "path": "results/foundation/campaigns.json",
+      "before_sha256": "780d0b3395ae2da445f737967389cb7ba37fef7b168abce759f3acbec7cbc8f0",
+      "after_sha256": "2c9fb6ac073bffa1df3856eb8101b83e5cb2e076bfdbc9fcc3175b71c2e946c3",
+      "numeric_values_unchanged": true
+    },
+    {
+      "path": "results/extensions/transfer.json",
+      "before_sha256": "20155a1306b1d27ce98ceb30c37718fd4b8bb52ee3156aa622db8875f926316d",
+      "after_sha256": "90ef94aa64f22ba87e0cbe968708820cef81a3cc31261125730f4ec6368b8b57",
+      "numeric_values_unchanged": true
+    },
+    {
+      "path": "results/diagnostics/dram-speed.json",
+      "before_sha256": "2d09efd5d4da31f4858ef8813c696e011689403422d6eb813d583e20a7e516e4",
+      "after_sha256": "b7720299714378d0583406940bde4f74edf08a7bda365896f53c6795025949ae",
+      "numeric_values_unchanged": true
+    }
+  ],
+  "host_alias_count": 17,
+  "reason": "stable anonymous execution-host labels preserve host-separated runtime grouping"
+}

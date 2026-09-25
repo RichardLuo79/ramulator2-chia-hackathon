@@ -1,0 +1,10 @@
+arm,traffic_points,planned_points,min_repeats,max_repeats,shared_points,geomean_speedup
+oracle,30,30,5,5,30,1.0
+astra_single_core,30,30,5,5,30,31.63405021686087
+deepseek_single_core,30,30,5,5,30,21.73151628520131
+astra_multicore,30,30,5,5,30,31.240781963508976
+deepseek_multicore,30,30,5,5,30,20.66998129250786
+fixedlat,30,30,5,5,30,36.898942474486965
+md1,30,30,5,5,30,54.22144665899337
+wmg1,30,30,5,5,30,32.46813977000525
+mess,30,30,5,5,30,42.566806149007256

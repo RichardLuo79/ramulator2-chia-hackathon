@@ -1,0 +1,49 @@
+# Example cluster config for ChampSim. Copy to champsim-cluster.yaml and fill in your values.
+cluster_name: default
+
+available_node_types:
+    champsim:
+        resources: {"champsim": 1.0}
+        num_workers: 1
+        docker:
+            image: "champsim-test:latest"
+            container_name: "chia-champsim"
+            pull_before_run: False
+            run_options:
+                - --ulimit nofile=65536:65536
+                - --shm-size=10.24gb
+        compatible_ips: [worker-hostname]
+
+provider:
+    type: local
+    head_ip: head-hostname
+    worker_ips: [worker-hostname]
+
+auth:
+    ssh_user: your-username
+    ssh_private_key: ~/.ssh/id_ed25519
+
+file_mounts: {}
+
+rsync_exclude:
+    - "**/.git"
+    - "**/.git/**"
+
+rsync_filter:
+    - ".gitignore"
+
+initialization_commands: []
+
+setup_commands: []
+
+head_env_commands: ["source ~/.bashrc && conda activate chia_env"]
+
+head_setup_commands: []
+
+head_start_ray_commands:
+    - ray stop
+    - ulimit -c unlimited && ray start --head --port=6379 --include-dashboard=True
+
+worker_start_ray_commands:
+    - ray stop
+    - ray start --address=$RAY_HEAD_IP:6379

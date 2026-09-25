@@ -1,0 +1,148 @@
+--- a/linear-algebra/kernels/atax/atax.c
++++ b/linear-algebra/kernels/atax/atax.c
+@@ -1,3 +1,4 @@
++#include <gem5/m5ops.h>
+ /**
+  * This version is stamped on May 10, 2016
+  *
+@@ -102,7 +103,7 @@
+   init_array (m, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(x));
+ 
+   /* Start timer. */
+-  polybench_start_instruments;
++  m5_work_begin(0, 0);
+ 
+   /* Run kernel. */
+   kernel_atax (m, n,
+@@ -112,7 +113,7 @@
+ 	       POLYBENCH_ARRAY(tmp));
+ 
+   /* Stop and print timer. */
+-  polybench_stop_instruments;
++  m5_work_end(0, 0);
+   polybench_print_instruments;
+ 
+   /* Prevent dead-code elimination. All live-out data must be printed
+--- a/linear-algebra/kernels/bicg/bicg.c
++++ b/linear-algebra/kernels/bicg/bicg.c
+@@ -1,3 +1,4 @@
++#include <gem5/m5ops.h>
+ /**
+  * This version is stamped on May 10, 2016
+  *
+@@ -116,7 +117,7 @@
+ 	      POLYBENCH_ARRAY(p));
+ 
+   /* Start timer. */
+-  polybench_start_instruments;
++  m5_work_begin(0, 0);
+ 
+   /* Run kernel. */
+   kernel_bicg (m, n,
+@@ -127,7 +128,7 @@
+ 	       POLYBENCH_ARRAY(r));
+ 
+   /* Stop and print timer. */
+-  polybench_stop_instruments;
++  m5_work_end(0, 0);
+   polybench_print_instruments;
+ 
+   /* Prevent dead-code elimination. All live-out data must be printed
+--- a/linear-algebra/blas/gemver/gemver.c
++++ b/linear-algebra/blas/gemver/gemver.c
+@@ -1,3 +1,4 @@
++#include <gem5/m5ops.h>
+ /**
+  * This version is stamped on May 10, 2016
+  *
+@@ -149,7 +150,7 @@
+ 	      POLYBENCH_ARRAY(z));
+ 
+   /* Start timer. */
+-  polybench_start_instruments;
++  m5_work_begin(0, 0);
+ 
+   /* Run kernel. */
+   kernel_gemver (n, alpha, beta,
+@@ -164,7 +165,7 @@
+ 		 POLYBENCH_ARRAY(z));
+ 
+   /* Stop and print timer. */
+-  polybench_stop_instruments;
++  m5_work_end(0, 0);
+   polybench_print_instruments;
+ 
+   /* Prevent dead-code elimination. All live-out data must be printed
+--- a/linear-algebra/blas/gesummv/gesummv.c
++++ b/linear-algebra/blas/gesummv/gesummv.c
+@@ -1,3 +1,4 @@
++#include <gem5/m5ops.h>
+ /**
+  * This version is stamped on May 10, 2016
+  *
+@@ -118,7 +119,7 @@
+ 	      POLYBENCH_ARRAY(x));
+ 
+   /* Start timer. */
+-  polybench_start_instruments;
++  m5_work_begin(0, 0);
+ 
+   /* Run kernel. */
+   kernel_gesummv (n, alpha, beta,
+@@ -129,7 +130,7 @@
+ 		  POLYBENCH_ARRAY(y));
+ 
+   /* Stop and print timer. */
+-  polybench_stop_instruments;
++  m5_work_end(0, 0);
+   polybench_print_instruments;
+ 
+   /* Prevent dead-code elimination. All live-out data must be printed
+--- a/linear-algebra/kernels/mvt/mvt.c
++++ b/linear-algebra/kernels/mvt/mvt.c
+@@ -1,3 +1,4 @@
++#include <gem5/m5ops.h>
+ /**
+  * This version is stamped on May 10, 2016
+  *
+@@ -118,7 +119,7 @@
+ 	      POLYBENCH_ARRAY(A));
+ 
+   /* Start timer. */
+-  polybench_start_instruments;
++  m5_work_begin(0, 0);
+ 
+   /* Run kernel. */
+   kernel_mvt (n,
+@@ -129,7 +130,7 @@
+ 	      POLYBENCH_ARRAY(A));
+ 
+   /* Stop and print timer. */
+-  polybench_stop_instruments;
++  m5_work_end(0, 0);
+   polybench_print_instruments;
+ 
+   /* Prevent dead-code elimination. All live-out data must be printed
+--- a/linear-algebra/solvers/trisolv/trisolv.c
++++ b/linear-algebra/solvers/trisolv/trisolv.c
+@@ -1,3 +1,4 @@
++#include <gem5/m5ops.h>
+ /**
+  * This version is stamped on May 10, 2016
+  *
+@@ -98,13 +99,13 @@
+   init_array (n, POLYBENCH_ARRAY(L), POLYBENCH_ARRAY(x), POLYBENCH_ARRAY(b));
+ 
+   /* Start timer. */
+-  polybench_start_instruments;
++  m5_work_begin(0, 0);
+ 
+   /* Run kernel. */
+   kernel_trisolv (n, POLYBENCH_ARRAY(L), POLYBENCH_ARRAY(x), POLYBENCH_ARRAY(b));
+ 
+   /* Stop and print timer. */
+-  polybench_stop_instruments;
++  m5_work_end(0, 0);
+   polybench_print_instruments;
+ 
+   /* Prevent dead-code elimination. All live-out data must be printed

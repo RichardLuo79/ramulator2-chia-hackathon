@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "imports": [
+    {
+      "path": "results/foundation/campaigns.json",
+      "original_sha256": "d2eab8acde9d76d2d3fe4c6b2352877ead0451f94550aaffef7e1ec9b783fafc",
+      "public_sha256": "780d0b3395ae2da445f737967389cb7ba37fef7b168abce759f3acbec7cbc8f0",
+      "numerical_values_unchanged": true,
+      "redacted": true
+    },
+    {
+      "path": "results/diagnostics/dram-speed.json",
+      "original_sha256": "f98fd7127104641f7de788c448af61fe5d25976efc4c130162a844d9154975b9",
+      "public_sha256": "2d09efd5d4da31f4858ef8813c696e011689403422d6eb813d583e20a7e516e4",
+      "numerical_values_unchanged": true,
+      "redacted": true
+    },
+    {
+      "path": "results/extensions/transfer.json",
+      "original_sha256": "c3408e9d42c305b9985cd234bab899b4966fc5ac0829c022e24c1ccb20e0a956",
+      "public_sha256": "20155a1306b1d27ce98ceb30c37718fd4b8bb52ee3156aa622db8875f926316d",
+      "numerical_values_unchanged": true,
+      "redacted": true
+    },
+    {
+      "path": "results/provenance/campaigns/astra.json",
+      "original_sha256": "ef981aebcc1b09f4e654dea6b4295d2ec8f3329803eec1afa9a115dfc8892ad1",
+      "public_sha256": "0c8db251e1fc655e3f01f8bff35c82081c35de829e3fe50a78fffb473144fec4",
+      "numerical_values_unchanged": true,
+      "redacted": false
+    },
+    {
+      "path": "results/provenance/campaigns/deepseek.json",
+      "original_sha256": "99fb66f0db133612b8a6b7ec1fb322e4edc3468e5838c2b2b86f1012684f8ae2",
+      "public_sha256": "34c9d00609ec03df63d7a79a7076a47dca80ecbbeff44c7b2722a17bc89294ba",
+      "numerical_values_unchanged": true,
+      "redacted": false
+    },
+    {
+      "path": "chia-loop/configs/astra.json",
+      "original_sha256": "2b9e017fd49ccbb850a7e013f064aba5a655acfc4e31c589d17fb44d64040f42",
+      "changes": "campaign name and explicit data/build paths only; provider project if present"
+    },
+    {
+      "path": "chia-loop/configs/deepseek.json",
+      "original_sha256": "13836b43bf8a8fee2db865baf78f6f11628e0e74c415a8d1a43c2e0bf8769bf3",
+      "changes": "campaign name and explicit data/build paths only; provider project if present"
+    },
+    {
+      "path": "chia-loop/configs/opus.json",
+      "original_sha256": "d69cdff7a206c8803891b8f45a94427589e9c395987f6ff6f9516e7b967dbff3",
+      "changes": "campaign name and explicit data/build paths only; provider project if present"
+    }
+  ],
+  "redactions": {
+    "[private-project]": 6991,
+    "[private-path]": 87
+  },
+  "opus_database_sha256": "8713d8b80df603197bbe3534cda55dde934d6d28fdaf0c47560e0ca26173e05c",
+  "original_opus_index_sha256": "c1a861a0c441d075f024d371ad9c05f04e8baaaf4bc826ae1842555801819a72",
+  "gemini": "pending: no results imported; append a later verified snapshot"
+}

@@ -1,0 +1,122 @@
+diff --git a/inc/tracereader.h b/inc/tracereader.h
+index 4fe37ca..1c33397 100644
+--- a/inc/tracereader.h
++++ b/inc/tracereader.h
+@@ -31,7 +31,8 @@ namespace champsim
+ {
+ class tracereader
+ {
+-  static uint64_t instr_unique_id; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
++  uint64_t instruction_ordinal = 0;
++  uint8_t stream_cpu = 0;
+   struct reader_concept {
+     virtual ~reader_concept() = default;
+     virtual ooo_model_instr operator()() = 0;
+@@ -60,14 +61,16 @@ class tracereader
+ 
+ public:
+   template <typename T, std::enable_if_t<!std::is_same_v<tracereader, T>, bool> = true>
+-  tracereader(T&& val) : pimpl_(std::make_unique<reader_model<T>>(std::forward<T>(val)))
++  tracereader(T&& val, uint8_t cpu = 0) : stream_cpu(cpu), pimpl_(std::make_unique<reader_model<T>>(std::forward<T>(val)))
+   {
+   }
+ 
+   auto operator()()
+   {
+     auto retval = (*pimpl_)();
+-    retval.instr_id = instr_unique_id++;
++    // Unique across cores and stable under different inter-core fetch timing.
++    // This preserves per-core program order and the one-core numbering.
++    retval.instr_id = instruction_ordinal++ * NUM_CPUS + stream_cpu;
+     return retval;
+   }
+ 
+diff --git a/src/champsim.cc b/src/champsim.cc
+index 385e33c..33cc374 100644
+--- a/src/champsim.cc
++++ b/src/champsim.cc
+@@ -38,7 +38,8 @@ std::chrono::seconds elapsed_time() { return std::chrono::duration_cast<std::chr
+ 
+ namespace champsim
+ {
+-long do_cycle(environment& env, std::vector<tracereader>& traces, std::vector<std::size_t> trace_index, champsim::chrono::clock& global_clock)
++long do_cycle(environment& env, std::vector<tracereader>& traces, std::vector<std::size_t> trace_index,
++              champsim::chrono::clock& global_clock, const std::vector<bool>& phase_complete)
+ {
+   auto operables = env.operable_view();
+   std::sort(std::begin(operables), std::end(operables),
+@@ -47,11 +48,20 @@ long do_cycle(environment& env, std::vector<tracereader>& traces, std::vector<st
+   // Operate
+   long progress{0};
+   for (champsim::operable& op : operables) {
++    // Finite jobs: stop core execution at its own instruction target. Caches
++    // and memory continue servicing outstanding traffic while other jobs run.
++    if (auto* cpu = dynamic_cast<O3_CPU*>(&op); cpu != nullptr && phase_complete[cpu->cpu]) {
++      // Keep a parked warmup core aligned with global time before ROI resumes.
++      cpu->current_time = global_clock.now();
++      continue;
++    }
+     progress += op.operate_on(global_clock);
+   }
+ 
+   // Read from trace
+   for (O3_CPU& cpu : env.cpu_view()) {
++    if (phase_complete[cpu.cpu])
++      continue;
+     auto& trace = traces.at(trace_index.at(cpu.cpu));
+     for (auto pkt_count = cpu.IN_QUEUE_SIZE - static_cast<long>(std::size(cpu.input_queue)); !trace.eof() && pkt_count > 0; --pkt_count) {
+       cpu.input_queue.push_back(trace());
+@@ -89,7 +99,7 @@ phase_stats do_phase(const phase_info& phase, environment& env, std::vector<trac
+     auto next_phase_complete = phase_complete;
+     global_clock.tick(time_quantum);
+ 
+-    auto progress = do_cycle(env, traces, trace_index, global_clock);
++    auto progress = do_cycle(env, traces, trace_index, global_clock, phase_complete);
+ 
+     if (progress == 0) {
+       ++stalled_cycle;
+@@ -102,6 +112,8 @@ phase_stats do_phase(const phase_info& phase, environment& env, std::vector<trac
+     if (livelock_timer >= livelock_period) {
+       // for each cpu
+       for (O3_CPU& cpu : env.cpu_view()) {
++        if (phase_complete[cpu.cpu])
++          continue;
+         // for each threshold
+         for (auto thres = std::begin(livelock_threshold); thres != std::end(livelock_threshold); thres++) {
+           double livelock_ipc = std::ceil(cpu.sim_instr() - livelock_instr[cpu.cpu]) / std::ceil(livelock_period);
+diff --git a/src/tracereader.cc b/src/tracereader.cc
+index dc7da0b..7f59753 100644
+--- a/src/tracereader.cc
++++ b/src/tracereader.cc
+@@ -24,8 +24,6 @@
+ 
+ namespace champsim
+ {
+-uint64_t tracereader::instr_unique_id = 0; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+-
+ ooo_model_instr apply_branch_target(ooo_model_instr branch, const ooo_model_instr& target)
+ {
+   branch.branch_target = (branch.is_branch && branch.branch_taken) ? target.ip : champsim::address{};
+@@ -36,18 +34,18 @@ template <template <class, class> typename R, typename T>
+ champsim::tracereader get_tracereader_for_type(std::string fname, uint8_t cpu)
+ {
+   if (bool is_gzip_compressed = (fname.substr(std::size(fname) - 2) == "gz"); is_gzip_compressed) {
+-    return champsim::tracereader{R<T, champsim::inf_istream<champsim::decomp_tags::gzip_tag_t<>>>(cpu, fname)};
++    return champsim::tracereader{R<T, champsim::inf_istream<champsim::decomp_tags::gzip_tag_t<>>>(cpu, fname), cpu};
+   }
+ 
+   if (bool is_lzma_compressed = (fname.substr(std::size(fname) - 2) == "xz"); is_lzma_compressed) {
+-    return champsim::tracereader{R<T, champsim::inf_istream<champsim::decomp_tags::lzma_tag_t<>>>(cpu, fname)};
++    return champsim::tracereader{R<T, champsim::inf_istream<champsim::decomp_tags::lzma_tag_t<>>>(cpu, fname), cpu};
+   }
+ 
+   if (bool is_bzip2_compressed = (fname.substr(std::size(fname) - 3) == "bz2"); is_bzip2_compressed) {
+-    return champsim::tracereader{R<T, champsim::inf_istream<champsim::decomp_tags::bzip2_tag_t>>(cpu, fname)};
++    return champsim::tracereader{R<T, champsim::inf_istream<champsim::decomp_tags::bzip2_tag_t>>(cpu, fname), cpu};
+   }
+ 
+-  return champsim::tracereader{R<T, std::ifstream>(cpu, fname)};
++  return champsim::tracereader{R<T, std::ifstream>(cpu, fname), cpu};
+ }
+ } // namespace champsim
+ 

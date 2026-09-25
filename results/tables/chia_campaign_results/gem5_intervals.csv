@@ -1,0 +1,16 @@
+case,mode,ending,oracle_instructions,min_model_instructions,max_model_instructions,minimum_recorded_reads,low_traffic
+polybench421_atax_large,SE,roi_end,41931771,41931771,41931771,476229,False
+polybench421_bicg_large,SE,roi_end,41908495,41908495,41908495,476549,False
+polybench421_gemver_large,SE,roi_end,88101036,88101036,88101036,1456061,False
+polybench421_gesummv_large,SE,roi_end,16609512,16609512,16609512,377487,False
+polybench421_mvt_large,SE,roi_end,58030014,58030013,58030014,965695,False
+polybench421_trisolv_large,SE,roi_end,14022009,14022009,14022009,229207,False
+gapbs-c1-bfs,FS,roi_end,66989163,66953582,66999329,1510928,False
+gapbs-c1-pr,FS,roi_end,1492383349,1492073319,1492392559,147407113,False
+gapbs-c1-sssp,FS,roi_end,584875021,584506208,584885345,27422523,False
+npb-c1-cg.B.x,FS,instruction_cap,2000000001,2000000000,2000000003,52048973,False
+npb-c1-is.B.x,FS,instruction_cap,2000000004,2000000001,2000000004,21469863,False
+npb-c1-mg.B.x,FS,instruction_cap,2000000003,2000000000,2000000003,56940960,False
+parsec-c1-blackscholes,FS,instruction_cap,2000000003,2000000000,2000000001,2647622,False
+parsec-c1-canneal,FS,roi_end,1774917366,1772308456,1774998909,35964325,False
+parsec-c1-streamcluster,FS,instruction_cap,2000000001,2000000000,2000000006,35432518,False

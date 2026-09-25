@@ -1,0 +1,872 @@
+{
+  "validation-c1-bwaves/oracle": {
+    "case": {
+      "allow_trace_wrap": "background_only",
+      "completion_policy": "background-replay",
+      "frontend": "champsim",
+      "instruction_identity": "per-stream-ordinal-times-core-count-plus-core-v1",
+      "no_retirement_windows": 2,
+      "num_cores": 1,
+      "placement": {
+        "bytes": 19002,
+        "policy": "canonical-data-and-page-table-frames-v1",
+        "sha256": "2f11ef5a62c492826faa554223a314395c1b2fc4fa03084bc1e11953577bd6d5"
+      },
+      "programs": [
+        {
+          "core": 0,
+          "input_bytes": 1472000000,
+          "input_sha256": "1a6a40e4e113b44c8208f34521ea19ce17d404664e66cdbda85fe273a848d02d",
+          "instruction_record_bytes": 64
+        }
+      ],
+      "request_window": "per-core-admission-ordinal-v1",
+      "retirement_sample_cpu_cycles": 10000000,
+      "roi_instructions": 20000000,
+      "stage": "validation",
+      "std": "DDR5",
+      "stopping": "background-replay-warmup-barrier-v1",
+      "warmup_instructions": 2000000,
+      "workload": "validation-c1-bwaves"
+    },
+    "per_core_cycles": [
+      10682297
+    ],
+    "frontend_stats": {
+      "admission_windows": [
+        {
+          "admitted_reads": 40889,
+          "begin": 0,
+          "core": 0,
+          "end": 48066,
+          "total_admitted_reads": 40889
+        }
+      ],
+      "background": [
+        {
+          "background_instructions": 0,
+          "core": 0,
+          "wraps": 0
+        }
+      ],
+      "cycles_or_ticks": 10682297,
+      "instructions": 20000001,
+      "per_core_cycles": [
+        10682297
+      ],
+      "per_core_instructions": [
+        20000001
+      ]
+    },
+    "controller_stats": {
+      "observed_read_records": 40888
+    },
+    "traces": {
+      "controller.csv.ch0": {
+        "codec": "gzip",
+        "executable": false,
+        "logical_bytes": 3535816,
+        "logical_sha256": "e587481d26cdfa20ce7996720bb005a111c0cfc3a514d167c325cbf927b6e019",
+        "name": "observations/controller.csv.ch0.gz",
+        "stored_bytes": 1125666,
+        "stored_sha256": "ed8d15754bb367bf879a18fbfdb749a225ae771f972770fbe7559a8442403b46"
+      }
+    },
+    "original_receipt_sha256": "b39db19aab33b77156ee6dae2ec708cef21c765304aae5b9e3dfa4eb46490882"
+  },
+  "training-c4-05/astra_single_core": {
+    "case": {
+      "allow_trace_wrap": "background_only",
+      "completion_policy": "background-replay",
+      "frontend": "champsim",
+      "instruction_identity": "per-stream-ordinal-times-core-count-plus-core-v1",
+      "no_retirement_windows": 2,
+      "num_cores": 4,
+      "placement": {
+        "bytes": 1019419,
+        "policy": "canonical-data-and-page-table-frames-v1",
+        "sha256": "316c8d18eda374dd2c6830b671fa79de23231be5d5d2a6cdb53b49e4dd76a42f"
+      },
+      "programs": [
+        {
+          "core": 0,
+          "input_bytes": 1472000000,
+          "input_sha256": "1afcdb270b8dedadb2f080491a04c710eba43c352b1c635284744772167f5300",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 1,
+          "input_bytes": 1472000000,
+          "input_sha256": "069ffb5506b2afa2aae2b7e0a4f34e9ea393b8da24ec9e5982577b6ede80294a",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 2,
+          "input_bytes": 1472000000,
+          "input_sha256": "a4faa08f06f90ffba65fa83f6f6a5a699902903cb1fe43efa26d0ddb1efd8900",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 3,
+          "input_bytes": 1472000000,
+          "input_sha256": "d29104a94f060479135d2e7fbad88f9109ecd0bc52eb8d35e8cf9d47beb163f2",
+          "instruction_record_bytes": 64
+        }
+      ],
+      "request_window": "per-core-admission-ordinal-v1",
+      "retirement_sample_cpu_cycles": 10000000,
+      "roi_instructions": 20000000,
+      "stage": "training",
+      "std": "DDR5",
+      "stopping": "background-replay-warmup-barrier-v1",
+      "warmup_instructions": 2000000,
+      "workload": "training-c4-05"
+    },
+    "per_core_cycles": [
+      21117949,
+      22535253,
+      15731798,
+      49430630
+    ],
+    "frontend_stats": {
+      "admission_windows": [
+        {
+          "admitted_reads": 82705,
+          "begin": 0,
+          "core": 0,
+          "end": 384139,
+          "total_admitted_reads": 186374
+        },
+        {
+          "admitted_reads": 107817,
+          "begin": 0,
+          "core": 1,
+          "end": 411398,
+          "total_admitted_reads": 248452
+        },
+        {
+          "admitted_reads": 10810,
+          "begin": 0,
+          "core": 2,
+          "end": 287395,
+          "total_admitted_reads": 27950
+        },
+        {
+          "admitted_reads": 186612,
+          "begin": 0,
+          "core": 3,
+          "end": 936516,
+          "total_admitted_reads": 186612
+        }
+      ],
+      "background": [
+        {
+          "background_instructions": 27236921,
+          "core": 0,
+          "wraps": 2
+        },
+        {
+          "background_instructions": 18960638,
+          "core": 1,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 42734532,
+          "core": 2,
+          "wraps": 2
+        },
+        {
+          "background_instructions": 0,
+          "core": 3,
+          "wraps": 0
+        }
+      ],
+      "cycles_or_ticks": 49430630,
+      "instructions": 20000000,
+      "per_core_cycles": [
+        21117949,
+        22535253,
+        15731798,
+        49430630
+      ],
+      "per_core_instructions": [
+        20000002,
+        20000002,
+        20000002,
+        20000000
+      ]
+    },
+    "controller_stats": {
+      "observed_read_records": 387944
+    },
+    "traces": {
+      "controller.csv.ch0": {
+        "codec": "gzip",
+        "executable": false,
+        "logical_bytes": 66836544,
+        "logical_sha256": "56b436542ff1647fa9782847b6db3a7751f2c3510b9e33053c7675c5de5b98d5",
+        "name": "observations/controller.csv.ch0.gz",
+        "stored_bytes": 23722394,
+        "stored_sha256": "e7b0810b940ccbb6d51d84c7df7472df95e60c7e3692d44fb610f30d81af5d33"
+      }
+    },
+    "original_receipt_sha256": "5f0ff374303ed90a9c10770140e13cdd53eb2ca45e6d8c407cc45fe59d245f45"
+  },
+  "test-c8-03/oracle": {
+    "case": {
+      "allow_trace_wrap": "background_only",
+      "completion_policy": "background-replay",
+      "frontend": "champsim",
+      "instruction_identity": "per-stream-ordinal-times-core-count-plus-core-v1",
+      "no_retirement_windows": 2,
+      "num_cores": 8,
+      "placement": {
+        "bytes": 4002587,
+        "policy": "canonical-data-and-page-table-frames-v1",
+        "sha256": "c8b1dd3d592699c0392ec2316d979708f33e6583569e52dff2b636f4c962c8b2"
+      },
+      "programs": [
+        {
+          "core": 0,
+          "input_bytes": 1472000000,
+          "input_sha256": "d83b2008345d58f56f88994053987195ba918be337b22487bbc618ba1dd71c2b",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 1,
+          "input_bytes": 1472000000,
+          "input_sha256": "905c74d82c97728fb197aaa9d7f1937500859786e17edb5ed2fe47927eb778d1",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 2,
+          "input_bytes": 1472000000,
+          "input_sha256": "e36c47b127794f4cdbf0b5b9cabe744b3ea54552252443313d85ae41a5184e40",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 3,
+          "input_bytes": 1472000000,
+          "input_sha256": "c237a51c1069722dff7e13d549eab3fcfe725d3af0258d0deb0422cb9abc850c",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 4,
+          "input_bytes": 1472000000,
+          "input_sha256": "941c1c88e3ad0814c4e6c6969be02858b35b0e3aaf55d6225809a6dc1b4ac7cf",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 5,
+          "input_bytes": 1472000000,
+          "input_sha256": "312e8e314abb052a6516d19e9cba4977155538f02b303433922e2efbd6e235c9",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 6,
+          "input_bytes": 1472000000,
+          "input_sha256": "ae0e07e76159862052f3ce6b82ec9ec073807d9473a1ee6ec062306de8581865",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 7,
+          "input_bytes": 1472000000,
+          "input_sha256": "4b80aa2fcac3c39481324f7b10ef330b6957c4de5ea4538e216aeb772f79e4b8",
+          "instruction_record_bytes": 64
+        }
+      ],
+      "request_window": "per-core-admission-ordinal-v1",
+      "retirement_sample_cpu_cycles": 10000000,
+      "roi_instructions": 20000000,
+      "stage": "test",
+      "std": "DDR5",
+      "stopping": "background-replay-warmup-barrier-v1",
+      "warmup_instructions": 2000000,
+      "workload": "test-c8-03"
+    },
+    "per_core_cycles": [
+      67539378,
+      58608006,
+      42293778,
+      58938588,
+      15269381,
+      56187226,
+      21075090,
+      44847993
+    ],
+    "frontend_stats": {
+      "admission_windows": [
+        {
+          "admitted_reads": 287932,
+          "begin": 0,
+          "core": 0,
+          "end": 3124341,
+          "total_admitted_reads": 287932
+        },
+        {
+          "admitted_reads": 246589,
+          "begin": 0,
+          "core": 1,
+          "end": 2705804,
+          "total_admitted_reads": 283335
+        },
+        {
+          "admitted_reads": 158169,
+          "begin": 0,
+          "core": 2,
+          "end": 1945373,
+          "total_admitted_reads": 274857
+        },
+        {
+          "admitted_reads": 330679,
+          "begin": 0,
+          "core": 3,
+          "end": 2721013,
+          "total_admitted_reads": 378242
+        },
+        {
+          "admitted_reads": 123466,
+          "begin": 0,
+          "core": 4,
+          "end": 728730,
+          "total_admitted_reads": 512094
+        },
+        {
+          "admitted_reads": 271160,
+          "begin": 0,
+          "core": 5,
+          "end": 2591221,
+          "total_admitted_reads": 322177
+        },
+        {
+          "admitted_reads": 60680,
+          "begin": 0,
+          "core": 6,
+          "end": 995546,
+          "total_admitted_reads": 187788
+        },
+        {
+          "admitted_reads": 181524,
+          "begin": 0,
+          "core": 7,
+          "end": 2060025,
+          "total_admitted_reads": 268794
+        }
+      ],
+      "background": [
+        {
+          "background_instructions": 0,
+          "core": 0,
+          "wraps": 0
+        },
+        {
+          "background_instructions": 3116484,
+          "core": 1,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 7793313,
+          "core": 2,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 2740453,
+          "core": 3,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 68790428,
+          "core": 4,
+          "wraps": 3
+        },
+        {
+          "background_instructions": 2441767,
+          "core": 5,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 43515159,
+          "core": 6,
+          "wraps": 2
+        },
+        {
+          "background_instructions": 10082311,
+          "core": 7,
+          "wraps": 1
+        }
+      ],
+      "cycles_or_ticks": 67539378,
+      "instructions": 20000000,
+      "per_core_cycles": [
+        67539378,
+        58608006,
+        42293778,
+        58938588,
+        15269381,
+        56187226,
+        21075090,
+        44847993
+      ],
+      "per_core_instructions": [
+        20000000,
+        20000000,
+        20000001,
+        20000001,
+        20000004,
+        20000001,
+        20000000,
+        20000003
+      ]
+    },
+    "controller_stats": {
+      "observed_read_records": 1660199
+    },
+    "traces": {
+      "controller.csv.ch0": {
+        "codec": "gzip",
+        "executable": false,
+        "logical_bytes": 231302771,
+        "logical_sha256": "9a5244cd1685496b333b49ea9684ecf0ca1cb0e6ba8428ab4eea521a86043203",
+        "name": "observations/controller.csv.ch0.gz",
+        "stored_bytes": 81853751,
+        "stored_sha256": "05722511c895cd9de2b021b7f71ca5e3ee3b34030da2dde99646c0125844332e"
+      }
+    },
+    "original_receipt_sha256": "977a451e418da111117615add26ce4c23907a8dd6e2c71a3d038cc81ca7f761a"
+  },
+  "training-c4-05/oracle": {
+    "case": {
+      "allow_trace_wrap": "background_only",
+      "completion_policy": "background-replay",
+      "frontend": "champsim",
+      "instruction_identity": "per-stream-ordinal-times-core-count-plus-core-v1",
+      "no_retirement_windows": 2,
+      "num_cores": 4,
+      "placement": {
+        "bytes": 1019419,
+        "policy": "canonical-data-and-page-table-frames-v1",
+        "sha256": "316c8d18eda374dd2c6830b671fa79de23231be5d5d2a6cdb53b49e4dd76a42f"
+      },
+      "programs": [
+        {
+          "core": 0,
+          "input_bytes": 1472000000,
+          "input_sha256": "1afcdb270b8dedadb2f080491a04c710eba43c352b1c635284744772167f5300",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 1,
+          "input_bytes": 1472000000,
+          "input_sha256": "069ffb5506b2afa2aae2b7e0a4f34e9ea393b8da24ec9e5982577b6ede80294a",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 2,
+          "input_bytes": 1472000000,
+          "input_sha256": "a4faa08f06f90ffba65fa83f6f6a5a699902903cb1fe43efa26d0ddb1efd8900",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 3,
+          "input_bytes": 1472000000,
+          "input_sha256": "d29104a94f060479135d2e7fbad88f9109ecd0bc52eb8d35e8cf9d47beb163f2",
+          "instruction_record_bytes": 64
+        }
+      ],
+      "request_window": "per-core-admission-ordinal-v1",
+      "retirement_sample_cpu_cycles": 10000000,
+      "roi_instructions": 20000000,
+      "stage": "training",
+      "std": "DDR5",
+      "stopping": "background-replay-warmup-barrier-v1",
+      "warmup_instructions": 2000000,
+      "workload": "training-c4-05"
+    },
+    "per_core_cycles": [
+      21054084,
+      22272001,
+      15710868,
+      49255190
+    ],
+    "frontend_stats": {
+      "admission_windows": [
+        {
+          "admitted_reads": 82703,
+          "begin": 0,
+          "core": 0,
+          "end": 385745,
+          "total_admitted_reads": 186262
+        },
+        {
+          "admitted_reads": 107769,
+          "begin": 0,
+          "core": 1,
+          "end": 409815,
+          "total_admitted_reads": 249740
+        },
+        {
+          "admitted_reads": 10810,
+          "begin": 0,
+          "core": 2,
+          "end": 288888,
+          "total_admitted_reads": 27910
+        },
+        {
+          "admitted_reads": 186706,
+          "begin": 0,
+          "core": 3,
+          "end": 939248,
+          "total_admitted_reads": 186706
+        }
+      ],
+      "background": [
+        {
+          "background_instructions": 27191371,
+          "core": 0,
+          "wraps": 2
+        },
+        {
+          "background_instructions": 19335011,
+          "core": 1,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 42670857,
+          "core": 2,
+          "wraps": 2
+        },
+        {
+          "background_instructions": 0,
+          "core": 3,
+          "wraps": 0
+        }
+      ],
+      "cycles_or_ticks": 49255190,
+      "instructions": 20000000,
+      "per_core_cycles": [
+        21054084,
+        22272001,
+        15710868,
+        49255190
+      ],
+      "per_core_instructions": [
+        20000002,
+        20000002,
+        20000002,
+        20000000
+      ]
+    },
+    "controller_stats": {
+      "observed_read_records": 387988
+    },
+    "traces": {
+      "controller.csv.ch0": {
+        "codec": "gzip",
+        "executable": false,
+        "logical_bytes": 67022343,
+        "logical_sha256": "6f686195926547a2f8c03ea0a5e776dda1b91183654cad3019ce4f4fc5dd9a85",
+        "name": "observations/controller.csv.ch0.gz",
+        "stored_bytes": 23810505,
+        "stored_sha256": "94e31c32ddd77dfb8d033357b631202725d5d0406221f017bb3af443b51aaeaa"
+      }
+    },
+    "original_receipt_sha256": "8bcc614f6128af5c117544a5b7901de3329af87fdc65ca241539926bfd6709b9"
+  },
+  "test-c8-03/astra_single_core": {
+    "case": {
+      "allow_trace_wrap": "background_only",
+      "completion_policy": "background-replay",
+      "frontend": "champsim",
+      "instruction_identity": "per-stream-ordinal-times-core-count-plus-core-v1",
+      "no_retirement_windows": 2,
+      "num_cores": 8,
+      "placement": {
+        "bytes": 4002587,
+        "policy": "canonical-data-and-page-table-frames-v1",
+        "sha256": "c8b1dd3d592699c0392ec2316d979708f33e6583569e52dff2b636f4c962c8b2"
+      },
+      "programs": [
+        {
+          "core": 0,
+          "input_bytes": 1472000000,
+          "input_sha256": "d83b2008345d58f56f88994053987195ba918be337b22487bbc618ba1dd71c2b",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 1,
+          "input_bytes": 1472000000,
+          "input_sha256": "905c74d82c97728fb197aaa9d7f1937500859786e17edb5ed2fe47927eb778d1",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 2,
+          "input_bytes": 1472000000,
+          "input_sha256": "e36c47b127794f4cdbf0b5b9cabe744b3ea54552252443313d85ae41a5184e40",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 3,
+          "input_bytes": 1472000000,
+          "input_sha256": "c237a51c1069722dff7e13d549eab3fcfe725d3af0258d0deb0422cb9abc850c",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 4,
+          "input_bytes": 1472000000,
+          "input_sha256": "941c1c88e3ad0814c4e6c6969be02858b35b0e3aaf55d6225809a6dc1b4ac7cf",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 5,
+          "input_bytes": 1472000000,
+          "input_sha256": "312e8e314abb052a6516d19e9cba4977155538f02b303433922e2efbd6e235c9",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 6,
+          "input_bytes": 1472000000,
+          "input_sha256": "ae0e07e76159862052f3ce6b82ec9ec073807d9473a1ee6ec062306de8581865",
+          "instruction_record_bytes": 64
+        },
+        {
+          "core": 7,
+          "input_bytes": 1472000000,
+          "input_sha256": "4b80aa2fcac3c39481324f7b10ef330b6957c4de5ea4538e216aeb772f79e4b8",
+          "instruction_record_bytes": 64
+        }
+      ],
+      "request_window": "per-core-admission-ordinal-v1",
+      "retirement_sample_cpu_cycles": 10000000,
+      "roi_instructions": 20000000,
+      "stage": "test",
+      "std": "DDR5",
+      "stopping": "background-replay-warmup-barrier-v1",
+      "warmup_instructions": 2000000,
+      "workload": "test-c8-03"
+    },
+    "per_core_cycles": [
+      65035773,
+      57025026,
+      42077383,
+      57848093,
+      15621722,
+      54428520,
+      22841552,
+      44474118
+    ],
+    "frontend_stats": {
+      "admission_windows": [
+        {
+          "admitted_reads": 284913,
+          "begin": 0,
+          "core": 0,
+          "end": 3043327,
+          "total_admitted_reads": 284913
+        },
+        {
+          "admitted_reads": 245471,
+          "begin": 0,
+          "core": 1,
+          "end": 2656081,
+          "total_admitted_reads": 280107
+        },
+        {
+          "admitted_reads": 158374,
+          "begin": 0,
+          "core": 2,
+          "end": 1932497,
+          "total_admitted_reads": 269809
+        },
+        {
+          "admitted_reads": 330366,
+          "begin": 0,
+          "core": 3,
+          "end": 2695586,
+          "total_admitted_reads": 371720
+        },
+        {
+          "admitted_reads": 123745,
+          "begin": 0,
+          "core": 4,
+          "end": 743961,
+          "total_admitted_reads": 486907
+        },
+        {
+          "admitted_reads": 269488,
+          "begin": 0,
+          "core": 5,
+          "end": 2528909,
+          "total_admitted_reads": 319499
+        },
+        {
+          "admitted_reads": 60685,
+          "begin": 0,
+          "core": 6,
+          "end": 1072689,
+          "total_admitted_reads": 167371
+        },
+        {
+          "admitted_reads": 181280,
+          "begin": 0,
+          "core": 7,
+          "end": 2043281,
+          "total_admitted_reads": 263797
+        }
+      ],
+      "background": [
+        {
+          "background_instructions": 0,
+          "core": 0,
+          "wraps": 0
+        },
+        {
+          "background_instructions": 3032761,
+          "core": 1,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 7536023,
+          "core": 2,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 2488000,
+          "core": 3,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 62963944,
+          "core": 4,
+          "wraps": 3
+        },
+        {
+          "background_instructions": 2427791,
+          "core": 5,
+          "wraps": 1
+        },
+        {
+          "background_instructions": 36166829,
+          "core": 6,
+          "wraps": 2
+        },
+        {
+          "background_instructions": 9960561,
+          "core": 7,
+          "wraps": 1
+        }
+      ],
+      "cycles_or_ticks": 65035773,
+      "instructions": 20000000,
+      "per_core_cycles": [
+        65035773,
+        57025026,
+        42077383,
+        57848093,
+        15621722,
+        54428520,
+        22841552,
+        44474118
+      ],
+      "per_core_instructions": [
+        20000000,
+        20000000,
+        20000001,
+        20000001,
+        20000004,
+        20000002,
+        20000000,
+        20000003
+      ]
+    },
+    "controller_stats": {
+      "observed_read_records": 1654322
+    },
+    "traces": {
+      "controller.csv.ch0": {
+        "codec": "gzip",
+        "executable": false,
+        "logical_bytes": 225121936,
+        "logical_sha256": "3d9634294bef2e893013a5e0530cbeae8439cf0ae0f58978f2b58c32a3c0aade",
+        "name": "observations/controller.csv.ch0.gz",
+        "stored_bytes": 79201933,
+        "stored_sha256": "2f26f374115aed5524f13683f6620af41f3358ead739f6b2f7367f6d6ee73683"
+      }
+    },
+    "original_receipt_sha256": "ca3aa4c2f62ebed0ef5098ca2595302b8830335fc70e2ccfd8ebe18512667830"
+  },
+  "validation-c1-bwaves/astra_single_core": {
+    "case": {
+      "allow_trace_wrap": "background_only",
+      "completion_policy": "background-replay",
+      "frontend": "champsim",
+      "instruction_identity": "per-stream-ordinal-times-core-count-plus-core-v1",
+      "no_retirement_windows": 2,
+      "num_cores": 1,
+      "placement": {
+        "bytes": 19002,
+        "policy": "canonical-data-and-page-table-frames-v1",
+        "sha256": "2f11ef5a62c492826faa554223a314395c1b2fc4fa03084bc1e11953577bd6d5"
+      },
+      "programs": [
+        {
+          "core": 0,
+          "input_bytes": 1472000000,
+          "input_sha256": "1a6a40e4e113b44c8208f34521ea19ce17d404664e66cdbda85fe273a848d02d",
+          "instruction_record_bytes": 64
+        }
+      ],
+      "request_window": "per-core-admission-ordinal-v1",
+      "retirement_sample_cpu_cycles": 10000000,
+      "roi_instructions": 20000000,
+      "stage": "validation",
+      "std": "DDR5",
+      "stopping": "background-replay-warmup-barrier-v1",
+      "warmup_instructions": 2000000,
+      "workload": "validation-c1-bwaves"
+    },
+    "per_core_cycles": [
+      10711148
+    ],
+    "frontend_stats": {
+      "admission_windows": [
+        {
+          "admitted_reads": 40889,
+          "begin": 0,
+          "core": 0,
+          "end": 48066,
+          "total_admitted_reads": 40889
+        }
+      ],
+      "background": [
+        {
+          "background_instructions": 0,
+          "core": 0,
+          "wraps": 0
+        }
+      ],
+      "cycles_or_ticks": 10711148,
+      "instructions": 20000001,
+      "per_core_cycles": [
+        10711148
+      ],
+      "per_core_instructions": [
+        20000001
+      ]
+    },
+    "controller_stats": {
+      "observed_read_records": 40889
+    },
+    "traces": {
+      "controller.csv.ch0": {
+        "codec": "gzip",
+        "executable": false,
+        "logical_bytes": 3537242,
+        "logical_sha256": "91d58d15394ff76cd6a5fa2a1e37cc97c6a782e25044544e42b254168c3a1f49",
+        "name": "observations/controller.csv.ch0.gz",
+        "stored_bytes": 1120209,
+        "stored_sha256": "531bba013b4857f6ca0cf0e8aaa252b0cb413e5c0e3546586f45728fffd301bd"
+      }
+    },
+    "original_receipt_sha256": "eb8c278d9543e6e0e21c75e95430ca3a9527ff6cd8a022ae59d0ef7351b6770b"
+  }
+}

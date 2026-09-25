@@ -1,0 +1,101 @@
+case,core_order
+test-c1-bark,bark
+test-c1-biogpt,biogpt
+test-c1-cam4,cam4
+test-c1-gap_bc,gap_bc
+test-c1-gcc,gcc
+test-c1-ligra_cf,ligra_cf
+test-c1-ligra_radii,ligra_radii
+test-c1-pop2,pop2
+test-c1-sierra_a_3_0001,sierra_a_3_0001
+test-c1-sierra_a_3_0006,sierra_a_3_0006
+test-c1-sierra_a_4_0005,sierra_a_4_0005
+test-c1-sierra_a_4_0013,sierra_a_4_0013
+test-c1-sierra_a_6_0001,sierra_a_6_0001
+test-c1-sierra_a_6_0006,sierra_a_6_0006
+test-c1-sierra_a_6_0011,sierra_a_6_0011
+test-c1-tahoe_0006,tahoe_0006
+test-c1-tahoe_0010,tahoe_0010
+test-c1-tahoe_0011,tahoe_0011
+test-c1-tahoe_0013,tahoe_0013
+test-c1-tahoe_0014,tahoe_0014
+test-c1-tahoe_0016,tahoe_0016
+test-c1-tahoe_0023,tahoe_0023
+test-c1-tahoe_0035,tahoe_0035
+test-c1-xalancbmk,xalancbmk
+test-c4_google_03,"sierra_a_4_0013, sierra_a_3_0006, sierra_a_6_0001, sierra_a_6_0011"
+test-c4_google_04,"tahoe_0023, tahoe_0013, tahoe_0011, tahoe_0006"
+test-c4_mixed_05,"gcc, sierra_a_4_0005, tahoe_0016, biogpt"
+test-c4_mixed_06,"tahoe_0035, sierra_a_6_0006, ligra_radii, cam4"
+test-c4_mixed_07,"tahoe_0014, gap_bc, sierra_a_3_0001, bark"
+test-c4_mixed_08,"sierra_a_4_0013, tahoe_0010, ligra_cf, xalancbmk"
+test-c4_non_google_01,"ligra_radii, gap_bc, biogpt, cam4"
+test-c4_non_google_02,"pop2, bark, xalancbmk, ligra_cf"
+test-c8-01,"cam4, tahoe_0010, sierra_a_3_0006, sierra_a_4_0005, tahoe_0016, biogpt, sierra_a_6_0011, sierra_a_3_0001"
+test-c8-02,"gcc, gap_bc, tahoe_0023, sierra_a_4_0013, pop2, xalancbmk, sierra_a_6_0006, sierra_a_6_0001"
+test-c8-03,"tahoe_0013, tahoe_0006, tahoe_0014, ligra_cf, bark, tahoe_0035, ligra_radii, tahoe_0011"
+test-c8-04,"sierra_a_3_0001, cam4, sierra_a_4_0013, tahoe_0014, xalancbmk, tahoe_0011, tahoe_0010, pop2"
+test-c8-05,"sierra_a_6_0001, tahoe_0035, tahoe_0016, sierra_a_4_0005, gcc, tahoe_0006, sierra_a_3_0006, ligra_radii"
+test-c8-06,"bark, gap_bc, sierra_a_3_0001, tahoe_0023, tahoe_0013, sierra_a_6_0011, sierra_a_4_0005, sierra_a_6_0006"
+test-c8-07,"biogpt, ligra_cf, gap_bc, sierra_a_6_0001, sierra_a_6_0011, sierra_a_4_0013, tahoe_0035, tahoe_0010"
+test-c8-08,"ligra_radii, biogpt, pop2, sierra_a_6_0006, sierra_a_3_0006, bark, cam4, ligra_cf"
+training-c1-arizona,arizona
+training-c1-bravo,bravo
+training-c1-cactu,cactu
+training-c1-charlie,charlie
+training-c1-gap_bfs,gap_bfs
+training-c1-gap_sssp,gap_sssp
+training-c1-gms_kstar,gms_kstar
+training-c1-gms_maxclique,gms_maxclique
+training-c1-lbm,lbm
+training-c1-llama7b,llama7b
+training-c1-mcf,mcf
+training-c1-omnetpp,omnetpp
+training-c1-whiskey,whiskey
+training-c1-whisper,whisper
+training-c4-01,"arizona, gap_bfs, whisper, gms_maxclique"
+training-c4-02,"cactu, whiskey, llama7b, charlie"
+training-c4-03,"mcf, gap_sssp, omnetpp, bravo"
+training-c4-04,"lbm, gms_kstar, gms_maxclique, mcf"
+training-c4-05,"arizona, charlie, gms_kstar, omnetpp"
+training-c4-06,"gap_bfs, llama7b, gap_sssp, lbm"
+training-c4-07,"whiskey, bravo, whisper, cactu"
+training-c4-08,"omnetpp, cactu, gap_bfs, gms_kstar"
+training-c8-01,"mcf, omnetpp, whisper, gms_maxclique, whiskey, charlie, llama7b, gap_sssp"
+training-c8-02,"cactu, arizona, gms_kstar, lbm, bravo, gap_bfs, charlie, gap_sssp"
+training-c8-03,"cactu, omnetpp, lbm, gms_maxclique, mcf, gap_bfs, gms_kstar, whisper"
+training-c8-04,"arizona, llama7b, whiskey, bravo, cactu, gms_maxclique, gap_bfs, whisper"
+training-c8-05,"gap_sssp, mcf, bravo, gms_kstar, llama7b, arizona, omnetpp, lbm"
+training-c8-06,"charlie, whiskey, lbm, mcf, arizona, gms_maxclique, bravo, gap_bfs"
+training-c8-07,"whisper, gms_kstar, charlie, llama7b, cactu, whiskey, omnetpp, gap_sssp"
+training-c8-08,"gap_sssp, gms_maxclique, bravo, omnetpp, gap_bfs, whisper, lbm, whiskey"
+validation-c1-bwaves,bwaves
+validation-c1-delta,delta
+validation-c1-fotonik,fotonik
+validation-c1-gap_pr,gap_pr
+validation-c1-gms_subgraph,gms_subgraph
+validation-c1-gms_triangle,gms_triangle
+validation-c1-ligra_components,ligra_components
+validation-c1-merced,merced
+validation-c1-rwkv,rwkv
+validation-c1-sd14,sd14
+validation-c1-tango,tango
+validation-c1-vit_large,vit_large
+validation-c1-xz,xz
+validation-c1-yankee,yankee
+validation-c4-01,"bwaves, tango, fotonik, delta"
+validation-c4-02,"gms_subgraph, gms_triangle, sd14, xz"
+validation-c4-03,"ligra_components, rwkv, gap_pr, merced"
+validation-c4-04,"vit_large, yankee, xz, gap_pr"
+validation-c4-05,"gms_triangle, vit_large, rwkv, fotonik"
+validation-c4-06,"gms_subgraph, delta, ligra_components, yankee"
+validation-c4-07,"tango, merced, sd14, bwaves"
+validation-c4-08,"rwkv, bwaves, xz, gms_subgraph"
+validation-c8-01,"rwkv, xz, gms_subgraph, yankee, tango, delta, sd14, ligra_components"
+validation-c8-02,"gap_pr, bwaves, vit_large, fotonik, merced, gms_triangle, xz, delta"
+validation-c8-03,"vit_large, ligra_components, bwaves, rwkv, gap_pr, yankee, tango, fotonik"
+validation-c8-04,"gms_triangle, gms_subgraph, merced, sd14, gap_pr, ligra_components, fotonik, yankee"
+validation-c8-05,"delta, gms_subgraph, vit_large, bwaves, sd14, merced, rwkv, tango"
+validation-c8-06,"gms_triangle, xz, rwkv, tango, merced, gap_pr, yankee, vit_large"
+validation-c8-07,"delta, ligra_components, gms_triangle, bwaves, gms_subgraph, xz, fotonik, sd14"
+validation-c8-08,"gap_pr, sd14, delta, vit_large, yankee, xz, ligra_components, bwaves"

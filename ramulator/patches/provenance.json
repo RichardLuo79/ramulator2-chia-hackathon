@@ -1,0 +1,7 @@
+{
+  "upstream": "https://github.com/CMU-SAFARI/ramulator2",
+  "commit": "72427a1bba3771564c4fb0e494ba02242fd1eaa7",
+  "files_changed": 106,
+  "patch_sha256": "228b56cbcc7f68b47eaeec86a98b460043b66f12c67d16f2a64e7d68b4403ea2",
+  "scope": "selected native/Python/integration files; third-party and ChampSim patches are separate"
+}

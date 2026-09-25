@@ -1,0 +1,5 @@
+Campaign,Invocations,Coverage and gaps,Billing interpretation
+Astra,32,825 request records recovered; two interrupted tails have unknown additional usage.,subscription; API-equivalent only
+DeepSeek,32,"1,245 reported / 1,248 attempted requests; three lack usage; two reviews mechanically skipped.","direct API; frozen peak-rate equivalent, not time-adjusted invoice"
+Gemini,31,"All 2,017 recorded requests have input/output; 81 lack a cache partition.","Vertex credits; API-equivalent, not credit-adjusted"
+Opus 5.5,30,All 30 main-agent CLI invocations; not cumulative modelUsage or inferred subagent usage.,subscription; API-equivalent only

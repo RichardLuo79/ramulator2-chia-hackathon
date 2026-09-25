@@ -1,0 +1,8 @@
+{
+  "pp_pairs": {"num_requests": 20000, "mlp": 2, "row_run": 2, "bank_spread": 8, "wb_mode": 4, "think_time": 20,
+               "sweep": {"pp_lead": [10, 40, 100, 200, 266, 400]}},
+  "pp_singles_dep": {"num_requests": 20000, "mlp": 1, "row_run": 1, "bank_spread": 8, "wb_mode": 4, "dep_frac": 1.0,
+               "sweep": {"pp_lead": [10, 40, 100, 200, 300]}},
+  "pp_pairs_dep": {"num_requests": 20000, "mlp": 2, "row_run": 2, "bank_spread": 8, "wb_mode": 4, "dep_frac": 0.5, "think_time": 20,
+               "sweep": {"pp_lead": [40, 266]}}
+}

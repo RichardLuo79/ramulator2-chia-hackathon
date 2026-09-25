@@ -1,0 +1,9 @@
+model,batch,traffic_points,geometric_mean_speedup
+Queued FixedLat,batch_a,30,36.89894247448695
+M/D/1,batch_a,30,54.221446658993344
+WMG1,batch_a,30,32.46813977000525
+MeSS,batch_a,30,42.56680614900729
+GPT-6 Astra,batch_a,30,31.634050216860846
+DeepSeek V4.1 Flash,batch_a,30,21.731516285201298
+Gemini 3.8 Flash,batch_b,30,23.601955584112037
+Opus 5.5,batch_b,30,6.437460163859206

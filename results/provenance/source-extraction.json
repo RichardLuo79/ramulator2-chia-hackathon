@@ -1,0 +1,3182 @@
+{
+  "note": "Original hashes precede documented package/path-only changes. Release hashes are separate.",
+  "runtime_profile_differences": [
+    "src/ramulator/base/batch_simulation.cpp",
+    "src/ramulator/base/batch_simulation.h",
+    "src/ramulator/frontend/impl/memory_trace/latency_throughput_trace.cpp",
+    "src/ramulator/frontend/lat_tp_addresses.h",
+    "tests/utils/batch_simulation_test.cpp",
+    "tools/chia_loop/CMakeLists.txt",
+    "tools/chia_loop/dram_speed_inputs.cpp",
+    "tools/chia_loop/isolated_sim.cpp"
+  ],
+  "schema_version": 1,
+  "sources": [
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "fca341cadfba01e29b8819a30f620250a85fac102607031d560d8261d51440d1",
+      "path": "ramulator/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "74a1f19701bb06cb80b4ec31e6de6472f5fd767e5949c1c4d51f70007d18b3f2",
+      "path": "ramulator/LICENSE"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2f571c8a846242630c03a81d97c0d892e22be0c0e954847cd184ae80028508ff",
+      "path": "ramulator/ext/fmt/.clang-format"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7020b55a6d78b3c6f1ca4ebd79e8ca78a4189ba74304172a6a7a2c2cb6d7e12b",
+      "path": "ramulator/ext/fmt/.gitignore"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "17b1dace7784dce06b97942af57a1ed385a58c0a3d8008e4219b1a957bbbcd37",
+      "path": "ramulator/ext/fmt/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "be39c4f99e35a65dc2212867fc13a58478c0591e2e1e523cc07a9e77a0c681f3",
+      "path": "ramulator/ext/fmt/CONTRIBUTING.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c719372f390c04bbb8c0e74ad673ae59ee35a1b955bb37a87b4ef1bee774713f",
+      "path": "ramulator/ext/fmt/ChangeLog.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8",
+      "path": "ramulator/ext/fmt/LICENSE"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "4ec2ba1bb691625cbc1fb9f0fe84b6a5e2238712e2fd8ce8bf16e302c9a013aa",
+      "path": "ramulator/ext/fmt/README.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "418b645e9022277a5858841c07a3c65237053d45311a8c099573ac517b43d1c2",
+      "path": "ramulator/ext/fmt/include/fmt/args.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a38d6c02f64e2af3684369ad4df6ab88be203a0d4bdfbf51fde542f83546eac9",
+      "path": "ramulator/ext/fmt/include/fmt/chrono.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "014c9dacc521f9c3768468f46a71545d10da1f3c4a8b826b8596b8a03588a77a",
+      "path": "ramulator/ext/fmt/include/fmt/color.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "69aa4297b42f273bbfacf5c9eebe4b6a26b552d06fb74cd151c47260c37b6850",
+      "path": "ramulator/ext/fmt/include/fmt/compile.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "143d591df63db5b20786eb8ca756012e0b7e2c6dab7f002488e2c701e897a91f",
+      "path": "ramulator/ext/fmt/include/fmt/core.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c390df52884480b131dffd17842af3dde8eae6cd7f1aafda30b63efa369d6e61",
+      "path": "ramulator/ext/fmt/include/fmt/format-inl.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "63bd5a34d139bfca1727bfbaf941afbb5751c871adaaa91b77dce58a70723073",
+      "path": "ramulator/ext/fmt/include/fmt/format.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "89b7a98365b90127e11d5e84c2fa58443088164ec9c99ce262ed303a7c197eed",
+      "path": "ramulator/ext/fmt/include/fmt/os.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f839f36281b36ac9e514e4c6d944f6f6699a2101bb36e9d4809aade4bd25ff61",
+      "path": "ramulator/ext/fmt/include/fmt/ostream.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d121c2b5b48f68de396ca3ac5fa32b7c7dd77dd8d8e9684e8604a88756e680e5",
+      "path": "ramulator/ext/fmt/include/fmt/printf.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "87a9911af535273e9f9bed00d6da3083b71eec3491c9a54013258a882342b6f3",
+      "path": "ramulator/ext/fmt/include/fmt/ranges.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "06467b405f40291f40f26c6e46c15d756254581c397413a77c02b2b7d62dcb41",
+      "path": "ramulator/ext/fmt/include/fmt/std.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e7b39f998679214676059671b9085d2ab2549634ac0e49f8ff94028a1a3e69dc",
+      "path": "ramulator/ext/fmt/include/fmt/xchar.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a7a20b0413289cd030377848f66483a39f18f87ab77f1e8b0a5af49ddcab5ee7",
+      "path": "ramulator/ext/fmt/src/fmt.cc"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b57f3cba7860115d82218d1539eba8126ccbda16be83f0231dc1fd996f1a22b2",
+      "path": "ramulator/ext/fmt/src/format.cc"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3c8b7de9a8088092ced498e7e42fca722879a6fcf18317a5efea334468350448",
+      "path": "ramulator/ext/fmt/src/os.cc"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3bed3cd78eda81bab8836b2ba69da50e88a1781760fb4219a35236bb34b58e6f",
+      "path": "ramulator/ext/fmt/support/Android.mk"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "efe10ca9770cd6e40029ec80966c019e3618764c7da5a864fd6d2e26386e52de",
+      "path": "ramulator/ext/fmt/support/AndroidManifest.xml"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "dc918929ddf6994bd0da45bfd619ecfdbd5e77482005dfb2049e1278541e06ac",
+      "path": "ramulator/ext/fmt/support/C++.sublime-syntax"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "99df194e16daa0f113f65261da812d08d4c69c2c08335744870c3d20880b3908",
+      "path": "ramulator/ext/fmt/support/README"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "4f409a586748af4c34122115d88f5488ab2dd5719c875a18285b39d0aa52f265",
+      "path": "ramulator/ext/fmt/support/Vagrantfile"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f5da1e44bbd559283a4a4f8f1188fdfaef7ea2e8ec22fdfec81c4a72dc61736a",
+      "path": "ramulator/ext/fmt/support/bazel/.bazelversion"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "829c5d1f1d20a2d79b2f7188cf205a2265fedfbcaa2a5a2245ac422f376ca046",
+      "path": "ramulator/ext/fmt/support/bazel/BUILD.bazel"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b6ec5b5cd424ea70bdadf50488bddae1e8336e4acba0f0fcee33c4a1107ad772",
+      "path": "ramulator/ext/fmt/support/bazel/README.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "419a00d235dc68ff5915a88c9a8e10c967cc1f27cd674bc58cac70a070bb8200",
+      "path": "ramulator/ext/fmt/support/bazel/WORKSPACE.bazel"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c8a1fb52538b81a297630161ca8a50932880378b9dabcc32fbc2e4aa9ec7e03a",
+      "path": "ramulator/ext/fmt/support/build-docs.py"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "761326806692d751cfb7ff2f4f7d4d7c0aa10de6856bba6ceb22dda2582c4c19",
+      "path": "ramulator/ext/fmt/support/build.gradle"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "44fa708653778bc92c337fcc976e662f12e4a8efa943b5d0717c714897e34425",
+      "path": "ramulator/ext/fmt/support/cmake/FindSetEnv.cmake"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "8b7434dd86fdcb38e7ea037da0d3e069a015a439bfc5738f950c2b3cd9d04c9f",
+      "path": "ramulator/ext/fmt/support/cmake/JoinPaths.cmake"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a7e7ed7e1d21b05b7ba76d8ed6b2d286ef7771fe03dd1d946ece665a35c413fd",
+      "path": "ramulator/ext/fmt/support/cmake/fmt-config.cmake.in"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "734b9afb583495c8297b6f4736f2dc780d5075ece0f5fd2aa40e872524437051",
+      "path": "ramulator/ext/fmt/support/cmake/fmt.pc.in"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "8277d722c399ece7616a8c43d23f13a61a5789df6759f5689e7a4aa85aa4b30e",
+      "path": "ramulator/ext/fmt/support/compute-powers.py"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ee8a677f71fa3ab35fb456c141d8853a366fe91d5fe73c2f84e7b4d3014f6980",
+      "path": "ramulator/ext/fmt/support/docopt.py"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ca47898e54fbd2cbfdc1163a8b2fe6b21ec7be95d36ad9f627ad94083ae8faf4",
+      "path": "ramulator/ext/fmt/support/manage.py"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c60d5af1143573bfb0995b36c3de7b56b2d8f8a910fbd7fea58b64bccf95f669",
+      "path": "ramulator/ext/fmt/support/printable.py"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5501e7ba6dae96e277a8cfa4bf68269b5d615951f04e5c0ab4afd5ed4764fbfb",
+      "path": "ramulator/ext/fmt/support/rtd/conf.py"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d466aed9423ba45a6a65709687475b6fef7db5c9c35ff8b26d7e98f49bc2de16",
+      "path": "ramulator/ext/fmt/support/rtd/index.rst"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3dfacd74f51054a229898085f710090d1e8000e88c2c66552200b8d8be52df71",
+      "path": "ramulator/ext/fmt/support/rtd/theme/layout.html"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e96582b1973ede0a49ff99fbda6a39eef816135655ade6877590b3b08e088578",
+      "path": "ramulator/ext/fmt/support/rtd/theme/theme.conf"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a728bd19c8c16729cf0d9137d2fc716521d2dbb09d688bb89a1ea0f9243e584c",
+      "path": "ramulator/ext/mess/LICENSE"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7a03667e442a0c554deda16b299248b9d06d3dc119e93fd4c1735106e83ab3b9",
+      "path": "ramulator/ext/mess/UPSTREAM.json"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0219c82a1d9563e9ec09b192acc0fe90c6e4c6207b151192d4b65f7f5bbe423c",
+      "path": "ramulator/ext/mess/mess_mem_ctrl.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ab8e713723987781e30d9941cde3787b002e3c26f6c76c6bf5da3390efd0a802",
+      "path": "ramulator/ext/mess/mess_mem_ctrl.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "af397398dc69db935f58f32672b1021f66a148bf62f956b2d691cabf6d206f4d",
+      "path": "ramulator/ext/mess/ramulator.patch"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "88d92c19479a5b28582fa0652f3fcdc6e3b69def5fb0509c6e0d1c3964df5904",
+      "path": "ramulator/ext/sniper_wmg1/LICENSE"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5f2ad2681b67e5f3ad75cb14048aecccdc3c6b7de84143dd279aded373ff02ac",
+      "path": "ramulator/ext/sniper_wmg1/UPSTREAM.json"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "952690adf794d754671f572afccb402ec9b56a24fb2e1becc6d61af3725d5603",
+      "path": "ramulator/ext/sniper_wmg1/queue_model_windowed_mg1.cc"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7fc0e2dfb4aa2b6aaa8959417d23ddaec72a2f9e66fe1c751342752d5ce15a37",
+      "path": "ramulator/ext/sniper_wmg1/queue_model_windowed_mg1.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3aaa5825cacb8c8ec71b086632d2d7705dd07ebb542f57f6db4e8fbdd8bd0067",
+      "path": "ramulator/ext/sniper_wmg1/ramulator.patch"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6aadf3b5deeae0166b9cc20915e61e935ca2a17da5dacff4377ea8228f08ddeb",
+      "path": "ramulator/ext/yaml-cpp/.bazelignore"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6d5856ee6f037b7f6c49b7cdb5045b21c1eda3fe1990cd869fc16dedf9b30931",
+      "path": "ramulator/ext/yaml-cpp/.clang-format"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "086db02df0804ce25ba13b2373625ba07f3a1be94c9bc3fdaf011a3113473fa4",
+      "path": "ramulator/ext/yaml-cpp/.codedocs"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "870f15f0ef3a9b17a194062396eb071e6e9b55e10d9413c221a6fa352ed2ad2d",
+      "path": "ramulator/ext/yaml-cpp/.gitignore"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3f0e25a8f41d7170ae78dead27f742c5661da787b44d0ef54e16659ccabe4963",
+      "path": "ramulator/ext/yaml-cpp/BUILD.bazel"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1b1b0b9d346f68976873e8e4f3fdd71dd6ae0ff62d47b7fd83a18a69410f8a29",
+      "path": "ramulator/ext/yaml-cpp/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ad78af40f5fa76b090cae2d5c361b19e07c7d9083deb785d00c9c9fe3e56a2f8",
+      "path": "ramulator/ext/yaml-cpp/CONTRIBUTING.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "aa6fcc27be034e41e21dd832f9175bfe694a48491d9e14ff0fa278e19ad14f1b",
+      "path": "ramulator/ext/yaml-cpp/LICENSE"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d8b57b18b95efcf92dbaf8f0f3c8014c9910d94b8918023be6e917c6a3932482",
+      "path": "ramulator/ext/yaml-cpp/MODULE.bazel"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "42fd1f583d54958b92d3f7ba1779eed309b0cfcb1c79af65d8913eae0c82c8a2",
+      "path": "ramulator/ext/yaml-cpp/MODULE.bazel.lock"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2935880b1e3d6b36950cd3aabdf60722e24e98882824d151a85d8d05c5508562",
+      "path": "ramulator/ext/yaml-cpp/README.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1d6b5f05bb8b324cfb5bc3409bc52a027735a31a39497181c202f0bac2cf46d0",
+      "path": "ramulator/ext/yaml-cpp/SECURITY.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "db0bf5ec965ed312269f25057c56d7b5ca64e74da6c40e8153c01dbbffd3cefe",
+      "path": "ramulator/ext/yaml-cpp/cmake_uninstall.cmake.in"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ded02f04893f094ea4fad9e7994bc86fb444b4bd3fac3ef0f171fb9f5a6f2076",
+      "path": "ramulator/ext/yaml-cpp/docs/Breaking-Changes.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "736935c75edb506158412e55e6c686846181fad268185ceb66949025cba6937c",
+      "path": "ramulator/ext/yaml-cpp/docs/How-To-Emit-YAML.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "4f5bbd532d7c4c94087a51d414a064cc56f277000c83001df154b5787702c094",
+      "path": "ramulator/ext/yaml-cpp/docs/How-To-Parse-A-Document-(Old-API).md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "bd6b334c87d8530677735b696fb27b9abc37b48ce32e69156d82837ef1acdae7",
+      "path": "ramulator/ext/yaml-cpp/docs/Strings.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a1bb5edebf7ac7ed7a53f82d0d4c66718b350443c70a15fb550df594c7c5e170",
+      "path": "ramulator/ext/yaml-cpp/docs/Tutorial.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "89500f4d9d2bb727f973ace596b9ea2e58553acd80c41d95c3c2658f45095560",
+      "path": "ramulator/ext/yaml-cpp/docs/_config.yml"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "10fc17aaf9da35ac0b753e0828816d28c0f9c69ef68313a3c8702816ca233cc1",
+      "path": "ramulator/ext/yaml-cpp/docs/index.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e1674864314ce7a1d78c71d37b60ec6c130fc352ed178bd9b8467928774b1be8",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/anchor.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1be5b37a45f0e1eb0c2dbd6aa3093363171d5149e89e0830c5a56e0eea0eac4a",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/binary.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "42ad62a385771109ff84ef3faefd44b753b5f265f0909946202ea3139b3ab071",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/contrib/anchordict.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "17d4206096c9b4f8ccaeddd485f53241c66da8b8e8ce8b2cc0e7b8f424635a8a",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/contrib/graphbuilder.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1471521778b70c549e057a38c56b11a42a4aa4d666e3fbb5f80e9ac90b9f610c",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/depthguard.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5abb040020b43f9c2a05fe4e92c0144b8135c6581107d56837d35f80c79169b2",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/dll.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5e625da946a68b8e321e067030f5163e8bff3ec7904ea66e95b304dd6a112779",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/emitfromevents.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d8db8c0b68ec306ad150335ee384e92f93c9531672bfa40d2cb8cdb2ab24eef2",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/emitter.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "58d709085b46f31eef29fd8074d1c6d1657d3ebd4fb393b1c06a73cef69e6e48",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/emitterdef.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a40e08ab89d74171ec259e0dea7470ff29eacf9e5de90dd8b89042d0e47eb1d4",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/emittermanip.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d1c9b881ca7ad54a8994de649ae8da84b8b82c6cc0a7b95ae590b41ed7420519",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/emitterstyle.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0a91628a17a18d58b71154c595cb7d31c3cd6208cccae670b245fd730f0f8d66",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/eventhandler.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f18a0d5350117f058ce86e82360b168f12831c59b60666fdc4db3d6bb074fe89",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/exceptions.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "943f84847cb517d08d550ca8ad2e26cd88d6d9af1ed53abc741b8036359105e8",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/fptostring.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "069033be17c7a5875817102f3f77538431afdb7d1834a4673bad6a7267f0cab5",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/mark.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ef912b9268798d7c420c1797c1f482cf367e8195c9fb78a4b9ef1aff149ee2bf",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/convert.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7ead18bfc864986262a4e9000aec9b4acdceaa9162e7741723ccba18e4e4177e",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/detail/impl.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3b7933bf6d08580644453273769b5d620a38837b4eaab6654944591adfde294a",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/detail/iterator.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ce9bf893f38351d5e3e95f5b55a67765c721ba0e4c9f01e38ecba89d64722a6b",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/detail/iterator_fwd.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f1090a218c2784d3a78dfee51aa43300a2ebaab6dbfa2234b3a456428c220416",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/detail/memory.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b9e55e166b8d3168b88ebdc06506c4c2dc3a5f0bc046435ee4b04795dba34275",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/detail/node.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "53419f8984bce1e2d1d5aa15cba420e04918f8c665489dd5b4071793654f30f8",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/detail/node_data.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a24d52b5a85d90fae0504ad444327bb7075b7a4a9200c490711a6a624cb66a59",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/detail/node_iterator.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "26fbb939e32d5f4237ab1712eedb3d695820de004cee2a0b2bb2d394b8dbd70b",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/detail/node_ref.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "39f35d344ba0502e05449a935c5c9fa3a0179d72b9aa2b75ee964ddd1c4a26af",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/emit.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2e18792aa5186aefaa7d042b43e199864bdb0d5a890b511d6ec61218b58ccbfc",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/impl.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c09465516b6d854f476f08392aa730d08df63688b80f04cf49e1562eab3e0cfe",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/iterator.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a320b6461c1731e6e2b0f31ae22c71087fc39ff9109bffe5c50707df8f0dbfaa",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/node.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "eafa4476872ab20c176cf9f93341e57e7e24190a2c3864242c211bc536b97de2",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/parse.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d56a5edbfeeaa03d374afd970a39e3603ee72be98564382e0ab2aef29367d4b7",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/ptr.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2c50788c420533512e2de1782ec9ae40462073dca69885458a4b64ba11dad0ee",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/node/type.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "67280724ff2528ac4cc9863db5770216a6bd467a35a2e8b067f43b92d7c278d7",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/noexcept.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "56abe9189fdff525e045308a3bdc6bbfdcb7be890e0d905438c9df18802de94f",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/null.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "43bd5094bdf5fb1bd64a3081e372336b2ea410effd86fd910fd5d96b91f586c6",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/ostream_wrapper.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a954930f86e865fcea885e1b65d35feb25f6d5fceb27cccb406425c354cda1af",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/parser.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0757d307e863f57cee50b3bfc8d657b5fb49e9431918b4e38a433827a57ef68d",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/stlemitter.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6dd18d6947e7b595b5649ac90915347043789f16070423abc58755d35b9d4d50",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/traits.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "739f93fadb222a39a99e463c028d65d36c74d326f7349431853d1749605060a0",
+      "path": "ramulator/ext/yaml-cpp/include/yaml-cpp/yaml.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "fb3eaf17b1130633a596e802613e424e0a6c77bc95761b8ce9a98f02208cd2eb",
+      "path": "ramulator/ext/yaml-cpp/install.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0054d7e81c2df19a1c0aca69878acbbf848071fa9b27c077114d210729a009a3",
+      "path": "ramulator/ext/yaml-cpp/src/binary.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c3e0c036f2e771b2f7e92fcb0ea73dd8273d61066ed1cd18f7ffcd38295e204a",
+      "path": "ramulator/ext/yaml-cpp/src/collectionstack.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "32ae7986fcebe2b8d68833e8a8401cf5c1b406ce7f4e439ba347c2927128e9ec",
+      "path": "ramulator/ext/yaml-cpp/src/contrib/dragonbox.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7ae64ca7777fdd564702bbbac24dfd2b5f35924bb86f53e8830b4e6cf8ab16d8",
+      "path": "ramulator/ext/yaml-cpp/src/contrib/graphbuilder.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "af052df5c3715962b3a5121e35ffae6bda488d8acdea3475fbf287ac21fafa5f",
+      "path": "ramulator/ext/yaml-cpp/src/contrib/graphbuilderadapter.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b822056848bd69da08ae807d091fb40515325e1828ebfd19a54d99dc8aa3e4ab",
+      "path": "ramulator/ext/yaml-cpp/src/contrib/graphbuilderadapter.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6ac9ea8ed90dc0537e140b417cbcd186aa2b541ab58812b1292d6c88a0f4a9e2",
+      "path": "ramulator/ext/yaml-cpp/src/contrib/yaml-cpp.natvis"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1151d88aa10e6ea62b346a653c5378b4cadc0971070498a38d759514a95e3f66",
+      "path": "ramulator/ext/yaml-cpp/src/contrib/yaml-cpp.natvis.md"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5f5a78dd9d3af335305a6cf4ec5ac5449f1957e974bef4ef6d4bfe12c5052c1c",
+      "path": "ramulator/ext/yaml-cpp/src/convert.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "bc2a38fe6345fdc26ef49ed22a62992c88098c2656e0dd89fa6a5b400d10b07e",
+      "path": "ramulator/ext/yaml-cpp/src/depthguard.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "607b82f9d8b01b06e8cb4922eeb3793418b2173f348790b48adb37527661398b",
+      "path": "ramulator/ext/yaml-cpp/src/directives.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "64454e7f7fb849a083b35dbfca2a6d5e3dd65f09cff18b1f1fa1c69ac757a1ce",
+      "path": "ramulator/ext/yaml-cpp/src/directives.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "9eda6c78fe667e00d8ab3bddedd818d2cdfade6c0bef4b6e530fb4975520d4d9",
+      "path": "ramulator/ext/yaml-cpp/src/emit.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d4f5e16936f86a469c50869d50fd021a01e348cd9abb8f5fcd768e481a24cdef",
+      "path": "ramulator/ext/yaml-cpp/src/emitfromevents.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "878eb4e109c5ea26cbed8014e884ac4bdcd3facdf1260018e26e5f51bfcd8e38",
+      "path": "ramulator/ext/yaml-cpp/src/emitter.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ed74eab62af8da09a24009d7dcd24585d8187bc8255bac2c492051954d30caa1",
+      "path": "ramulator/ext/yaml-cpp/src/emitterstate.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a9bf90d4888fa59d978298bf088bccbaf00e5b30bc0617453faf74e866c8a96a",
+      "path": "ramulator/ext/yaml-cpp/src/emitterstate.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d690f3c40fb0de5032002fa540f734335bbc4f969e5722f589842c86f5da0f51",
+      "path": "ramulator/ext/yaml-cpp/src/emitterutils.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6a67e11e3919ca70eafb7db61a79b14199b4d10ca2b9934e079a3d785df6391e",
+      "path": "ramulator/ext/yaml-cpp/src/emitterutils.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "525402dc6450163cca1ce613a3d719fd05bfe9f04653a8b4850888421f0b167b",
+      "path": "ramulator/ext/yaml-cpp/src/exceptions.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b85b2c3a2c00634f7d3ba8803b13e37394eb48d80656e2aaa003e1099d4e853e",
+      "path": "ramulator/ext/yaml-cpp/src/exp.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c3ee620cc13d02c6b1559af0551866d164ac7b82bfba0ac924386f9e47b4f403",
+      "path": "ramulator/ext/yaml-cpp/src/exp.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "cf45a0f3101184cf7616c8a57b927fa423246046eba26387b6d9bd0dbf9e6480",
+      "path": "ramulator/ext/yaml-cpp/src/fptostring.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c963f5c280b2ca22c2220eec667a67fe0225160ce63a691a698cccfb119896f5",
+      "path": "ramulator/ext/yaml-cpp/src/indentation.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "480a5df9460bfa7f1e0e777e6beb1443626ae9b8e735bed1d32bf1962339f710",
+      "path": "ramulator/ext/yaml-cpp/src/memory.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a4692db767050cabdd0ff79e4c5cd116cf11adace2d673dd102e67e68f5fd082",
+      "path": "ramulator/ext/yaml-cpp/src/node.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0008be93bc715d79094fb5e6ad0937b49a7b5b77b4f652e9026f35a6d35f84bc",
+      "path": "ramulator/ext/yaml-cpp/src/node_data.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "24690ce2899dd3088952dcbb8c32169a9662c7ab728c2e0feb8e5026a61e0ed3",
+      "path": "ramulator/ext/yaml-cpp/src/nodebuilder.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "eb18f93af9833eb1cda1d14e36b7ce1ecd5e2d2e3cc235df7477825475187181",
+      "path": "ramulator/ext/yaml-cpp/src/nodebuilder.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "487513c91abed800a3a629ba4c12417551ba81cbe57528371adc3bc6dd6628bf",
+      "path": "ramulator/ext/yaml-cpp/src/nodeevents.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6741f8a61bb1c30ed833ca0347bd520ad8dcde5d11f5f7f9b95df900e966c126",
+      "path": "ramulator/ext/yaml-cpp/src/nodeevents.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "9292ddc72a123f38be00abd7d914b5d2d550cedcbff123ff38d60ecd90ca299e",
+      "path": "ramulator/ext/yaml-cpp/src/null.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d91813c0e8ccaaa9d9b18b30ff7a46ca0b85201152f172a87d0dc9565d12265a",
+      "path": "ramulator/ext/yaml-cpp/src/ostream_wrapper.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "8d3c305048193bdf55ef42d414f778d0f13b485be70d668a587c57d78409698d",
+      "path": "ramulator/ext/yaml-cpp/src/parse.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "9e21a99437bfa2906176fc48b0572fdbd1c8bb55584c936d406722c4967f6f2e",
+      "path": "ramulator/ext/yaml-cpp/src/parser.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e6a2fe024363eef1f3ca5060757222b472998046e7d955daf8d434b3ce63d9e2",
+      "path": "ramulator/ext/yaml-cpp/src/ptr_vector.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d01856e2d05041080a46c8be7659ddce9f7b02aaad597610c466901ac2a7673c",
+      "path": "ramulator/ext/yaml-cpp/src/regex_yaml.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "26f8f1a1739bde3d01629f9dc38b33db00f8057f17cdf26ebe3dfed3dcff90f8",
+      "path": "ramulator/ext/yaml-cpp/src/regex_yaml.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "9a421625a4547a7b3cecc2f08556d60ac20796b728f779dbb348212ddbedb26e",
+      "path": "ramulator/ext/yaml-cpp/src/regeximpl.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "07fea8b203b5dcff4585dedab881dfd2aad2c32fca9217286c17b54f5bfdda5c",
+      "path": "ramulator/ext/yaml-cpp/src/scanner.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c75383d6a950b46a9fdffa772a2cc3b9f4dcae2684b983f5176836f31bfb2e58",
+      "path": "ramulator/ext/yaml-cpp/src/scanner.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1291d1a3f3cf3c04b1883ae50850b2a9d2e023144e023d1079d459437657ce8f",
+      "path": "ramulator/ext/yaml-cpp/src/scanscalar.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d19e4ed5fe7f24b75791185167bb69510076a5da087487acc9f4a0db9853b0fe",
+      "path": "ramulator/ext/yaml-cpp/src/scanscalar.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "40d8fd0eee4196e66db8d6e38ba7071589761f68c47a43c30a551c9cfbcc83ca",
+      "path": "ramulator/ext/yaml-cpp/src/scantag.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6960b01908f737c0e1b16eb8ba9da01e06d8140e4b1913e1fb647bbbc1266872",
+      "path": "ramulator/ext/yaml-cpp/src/scantag.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0072b28a0140fd26ad395bafedc51de8f8b3e5f0156568e24a3eb84324b9eb2e",
+      "path": "ramulator/ext/yaml-cpp/src/scantoken.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c1291c5a7e46242876edc9c76f6975e6c4cabcff45bb89d88f50a1c6f9ff893b",
+      "path": "ramulator/ext/yaml-cpp/src/setting.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7ea8e9ad62a1cb33a7f2eab57bbc5f7ed90b0f795b170fd90736d0d36750699e",
+      "path": "ramulator/ext/yaml-cpp/src/simplekey.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d958cc6404952353ca008c5f5021c906864e6ef6c1f47b1e10dbfc18b64d9307",
+      "path": "ramulator/ext/yaml-cpp/src/singledocparser.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "859345e1aac5595ef5939df76347f29a90290adbe8e139a0c2833a3426012e07",
+      "path": "ramulator/ext/yaml-cpp/src/singledocparser.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c80117bd3700dcb681dd54a307de7cb4b4597bb66cb43cb2d6c9f166064b7591",
+      "path": "ramulator/ext/yaml-cpp/src/stream.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "32bbe5b929fcbb15c9393ccf6f1e331a0c269ca7b8ea84f571a8a5853e5acd69",
+      "path": "ramulator/ext/yaml-cpp/src/stream.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "77f4ccea3594ae12ffd58baa8dd56dc2153fc655050dc83e2fcc475e066be2b2",
+      "path": "ramulator/ext/yaml-cpp/src/streamcharsource.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3fb078773082339ab19042d5e448e789c30522fc2f927fc6ca65f9ee154826eb",
+      "path": "ramulator/ext/yaml-cpp/src/stringsource.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "cbd7ae57db4dd60118bf08fd728d6d97cfb329df842472ab3735b29403655850",
+      "path": "ramulator/ext/yaml-cpp/src/tag.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1f779d8c9a8bb3d73c76ccd3e5823d22ecf77e8110c3e13e51b8a0ece9eef0c2",
+      "path": "ramulator/ext/yaml-cpp/src/tag.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "57a69302f95f9e59df6dd7770da67ab05e80ec859b63235424a8e6f60acb68f2",
+      "path": "ramulator/ext/yaml-cpp/src/token.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "62d3a646732e472cc6044b383a3d417af5e0f8ce145b083ff8901db39d4bd09b",
+      "path": "ramulator/ext/yaml-cpp/util/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "458c49ad1dfe891cdd817423056defa9dbf853cb4c185cb6731d9f8c37605585",
+      "path": "ramulator/ext/yaml-cpp/util/api.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ba737919fe26ea1664e26cb499bee197b0770a8501b6fe430974a6c98bb630f7",
+      "path": "ramulator/ext/yaml-cpp/util/parse.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "bebb06bb0de675a9480c153906708bbd533f12fb968b6a21da7e59685150952d",
+      "path": "ramulator/ext/yaml-cpp/util/read.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "13bac01dc4ca24cef4b445f3570f2ff98cd626bf6f1b95ac9aac22a68ef1a171",
+      "path": "ramulator/ext/yaml-cpp/util/sandbox.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f0917c1d58427cc99d1fa8da75ff1d838ab778d93ed0685a056246cbc49fd491",
+      "path": "ramulator/ext/yaml-cpp/yaml-cpp-config.cmake.in"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "129ad0dd364f999b156d70ff72dbddaf2e10629afc9edade943c00f324e2bf1b",
+      "path": "ramulator/ext/yaml-cpp/yaml-cpp.pc.in"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "524d49334f2d327a24ef217803907d5c31e30a5ba6c1f1bc06c5d0abc1721b09",
+      "path": "ramulator/src/ramulator/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c08d2757034dc400b2aa45db24cb7785a86f390fd46edfa31e7b26ac6cfc9966",
+      "path": "ramulator/src/ramulator/base/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "aa32d2e3a091231099cf7206c4860a50a635c1c5acae365a291c4a5f035f1b3f",
+      "path": "ramulator/src/ramulator/base/base.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "803522602dd87b02cb15873bbab96d69a80b265e41b57abe78388b1350e6e657",
+      "path": "ramulator/src/ramulator/base/batch_simulation.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "cc5e9a1e9273e666a9d801c241a6e76312b1b1be50e8b40c00aae97ada1f359f",
+      "path": "ramulator/src/ramulator/base/batch_simulation.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "801f152b836072815583366c8ee562a9fe7ec31d7c8f8ecc746bba93c9d14f8c",
+      "path": "ramulator/src/ramulator/base/config.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7a87b85a442525004b24bae26042e9ccefd8eaca63e16eaa84fb33978f35cace",
+      "path": "ramulator/src/ramulator/base/config.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "083f80ac53c125d19ed54ccb5f4e8c4b3901a4981dab7b7a8cf6eee4d3e9249e",
+      "path": "ramulator/src/ramulator/base/config_node.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b40c58d27c91162c7d181037263638bf0a0e4aec1ddf95e71e37e3d20b68ed17",
+      "path": "ramulator/src/ramulator/base/debug.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "8138ff10ab8fac1a1afdc38e741d38eaba4214ce8968f4599d4bfe386408e762",
+      "path": "ramulator/src/ramulator/base/factory.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d70258d3fc131a4364874c27258d7458d3ef5ed6054460085ae885fdb8214ea9",
+      "path": "ramulator/src/ramulator/base/factory.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "627da9519a3b8bf4030ec21bb4108ecc0d8eae6752c146650f78805ebe56df8b",
+      "path": "ramulator/src/ramulator/base/function_ref.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b812a708d0eae432d54f5935032a74c8fc2e30a429efa07f77ac62998c9e54e8",
+      "path": "ramulator/src/ramulator/base/logger.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "37225cbf51662a4ed2fbcf3ee47c78ddbaaaaa437c813020c51ac78deb5f73b5",
+      "path": "ramulator/src/ramulator/base/logger.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c46d37cc7f14b03ea017db6c32603a7cfcbea5a61595ca8b2afdc3f3d9152c42",
+      "path": "ramulator/src/ramulator/base/param.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e62d4f1b7da03dad8dfd432f1bb78ecfee912d7c6cc14e8bf05041cfb920e279",
+      "path": "ramulator/src/ramulator/base/request.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "bd42419d3ad633a3de29e0c4a0d1927db90022eeb7c62c2000f7984360d1bdc1",
+      "path": "ramulator/src/ramulator/base/request.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7178847db8980dc65320f7623e8eafae7116bec897cf1d5f515202c2e0b97308",
+      "path": "ramulator/src/ramulator/base/simulation.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5cc8428467eb042c7062d5010d6bb683a818d51f839e74971a14a9d53b3eaf24",
+      "path": "ramulator/src/ramulator/base/simulation.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1f5f0240cae7d46645c2454680d0d2213d75cfac47f157d63b6944086b7a3757",
+      "path": "ramulator/src/ramulator/base/stats.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "bfb003c3192ef65d6f083d199289624617cfc26d1d092d99fa198d32039882a3",
+      "path": "ramulator/src/ramulator/base/type.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "421cc29548e9e238940fbb9fe51be456084032c6478c4236675354f578b2457e",
+      "path": "ramulator/src/ramulator/base/utils.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5fcd9c2b2b94651bfa65aa3cf5d8624cdc319785dfb1936132453d19328e8a43",
+      "path": "ramulator/src/ramulator/base/utils.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "14ee0d0eceb173df67fe79ce5cc2615e2d1b06d5044c3a0587c409de29694a63",
+      "path": "ramulator/src/ramulator/bench/micro_bench.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0f4538407e4f142faf8cdbdf828e02720fd8ae9239661cdb734bca00343c5bb2",
+      "path": "ramulator/src/ramulator/controller/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "eef705d7ab4a6cb12fb1d7a4ffdaf182c2afa772cb7297002b17b43a8baac7e4",
+      "path": "ramulator/src/ramulator/controller/addr_mapper/addr_mapper_base.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2ac04bfc45d4f1483b7be25c94663a4b3c479584f1afe637b5e188736e0ee92f",
+      "path": "ramulator/src/ramulator/controller/addr_mapper/addr_mapper_base.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3016538f10adac668d6b53b52a8590fdeb3936eaa5e84469a5868cc980084f03",
+      "path": "ramulator/src/ramulator/controller/addr_mapper/i_addr_mapper.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "82395d6ac15a3df74d67d147c253eecb3e1dad9cef4901a668cf42381a08a306",
+      "path": "ramulator/src/ramulator/controller/addr_mapper/impl/ch_ra_ba_ro_co.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2ad6ea64f67096f7348fb4916c14802fa195894bfa6b493ba9f71337d7692bef",
+      "path": "ramulator/src/ramulator/controller/addr_mapper/impl/mop4clxor.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "28f6004d1b038bdd8e6f657b5e47fa2bc0c1399ee2e83f28628f5366fe372033",
+      "path": "ramulator/src/ramulator/controller/addr_mapper/impl/passthrough_addr_mapper.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e7045997013af1d0747ef6dade9a50d65ed0dc32e4199dcfe46e928c75bd847b",
+      "path": "ramulator/src/ramulator/controller/addr_mapper/impl/rit_addr_mapper.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7bc4817513fa0f4fec4895744b83b0905b3fe8f150c609e8d0d68414d8022326",
+      "path": "ramulator/src/ramulator/controller/addr_mapper/impl/rit_addr_mapper.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "da4674941d1e49a9003314f5b8c06f16eca2259ed9f97bbbe38aad27b19d6784",
+      "path": "ramulator/src/ramulator/controller/addr_mapper/impl/ro_ba_ra_co_ch.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1536bdfe38b37142e5ac10afbff502c2d49c12d99f2140490677e12199fce239",
+      "path": "ramulator/src/ramulator/controller/atomic_model/api.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c427996a17648de02690fa6e791f15ded0dbb801bf35cf834fb0aa60ca3eb13f",
+      "path": "ramulator/src/ramulator/controller/atomic_model/loader.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "4b27e90a951a3e654bbec7605cdc1fbc515078ccebf941d7bcc38a544eafb5e1",
+      "path": "ramulator/src/ramulator/controller/atomic_model/loader.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5fcd4aa59f9724c6e76ff673f852dc72c2eb4c38d9cb8f8ff37effcdb631ad7a",
+      "path": "ramulator/src/ramulator/controller/controller_base.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "8672c21a16bb4cf6dfa9ad5618c13d2b29922fa45aa27dbd95eb415186cb6fcb",
+      "path": "ramulator/src/ramulator/controller/controller_base.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "826e0234f105ef6716c7fd3cbe427610b37a54c7ed5eee6290cafabc067ae71c",
+      "path": "ramulator/src/ramulator/controller/i_controller.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e18b4046e86b82deeb20b3549be72985835d1005ec2ad5e98d221f7098f59a2b",
+      "path": "ramulator/src/ramulator/controller/impl/atomic_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ff1de9d2182bb1b40c031344a84bf4fdfdbe260bcb9dd0ccd802cd5fa5e4e7d5",
+      "path": "ramulator/src/ramulator/controller/impl/atomic_controller_base.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "453a0716d16f0c929e2cf183980ec90a3fc13aedaa1ff6c8c23dd0c49df2df35",
+      "path": "ramulator/src/ramulator/controller/impl/atomic_model_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "fa28d882eedb27bc89c07aec5f1150d2fe58cb2d37c1a67a01f74d5aa811b3bc",
+      "path": "ramulator/src/ramulator/controller/impl/blockhammer_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "07780c43c9ea75817a38b7c81d37e9e7f71e61fccdf1d8b2ed8880ccd6353eda",
+      "path": "ramulator/src/ramulator/controller/impl/fixed_lat_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2b38194325958c5e4020df149aad424e617d6e8bffa44f69dc1b9143ed7e5dae",
+      "path": "ramulator/src/ramulator/controller/impl/gddr7_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "03fffb90d986d2d5032f22fe05c39aa52175d45770c00f2d5357b4c11cb00b5a",
+      "path": "ramulator/src/ramulator/controller/impl/generic_ddr_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "29a0b6c3eeb9a57ce620bb88ae9c2e0d26834fe4ff10e22142f1088a3b9b653b",
+      "path": "ramulator/src/ramulator/controller/impl/hbm12_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "94b34ab60681afff5115fca422b198a6463f4a63c910f3fa08b9f8c2b8c0a213",
+      "path": "ramulator/src/ramulator/controller/impl/hbm34_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f9296094f9d38a1866cba1631a3f4f5d9c302653d39b92fec58cb4c99c791d5c",
+      "path": "ramulator/src/ramulator/controller/impl/hbm_controller_base.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5dd9d152d86569d7a16df315be297906b40f5ac8616d59523832fd070ff7b254",
+      "path": "ramulator/src/ramulator/controller/impl/hbm_controller_base.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7de3762ddb7c9760be01a03d7065642214a839fc0a20710bca2dd7c248ad27d9",
+      "path": "ramulator/src/ramulator/controller/impl/lpddr5_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c813668a2f5e3a4c418997da6214cea337bd22b457611f284557a4c95ab515e1",
+      "path": "ramulator/src/ramulator/controller/impl/lpddr6_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "cc44f83bea0549c5635f69301ca589dbc48b99c03cbad4c54e094f99b87e6093",
+      "path": "ramulator/src/ramulator/controller/impl/lpddr_controller_base.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "bb4403979c676e3c8cd5c7ad36b998edbbec09a2a5cffc40a2c39d12901dcbc1",
+      "path": "ramulator/src/ramulator/controller/impl/lpddr_controller_base.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0cf36adbf25162a636d219b2def9589507c27363852aeb3ba437144b86859a51",
+      "path": "ramulator/src/ramulator/controller/impl/md1_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "76e7d6bef27e2408037a4e37be0f5a567306e5fdddd1e49b3310c9cf8268f330",
+      "path": "ramulator/src/ramulator/controller/impl/mess_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "66e23f718d3715c2f54b40718e62e9aa5aedcff3eecf60c65b351326a207d8dc",
+      "path": "ramulator/src/ramulator/controller/impl/prac_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "01a2babbe2d30c4acb798d1b8bcb5493f88e51c0d8d304aa01593fd4dadb49bf",
+      "path": "ramulator/src/ramulator/controller/impl/wmg1_controller.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "341bf1e0534b5fd6b64ce9ee343245ece8b7fb1de757100c61678cfe58c061df",
+      "path": "ramulator/src/ramulator/controller/impl/zoo_probe.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "96e238f0bcf91f8e49a70dbb51910dbc50408ee8e5f465ca9d405c8600d3a9a2",
+      "path": "ramulator/src/ramulator/controller/plugin/controller_validation_hook.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "cabea41d9c4aac5f66190e71995d74a2c2cc00c65d256ed63477cea2e14acd82",
+      "path": "ramulator/src/ramulator/controller/plugin/i_controller_plugin.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "9c331b3e855c398d47443994bf0b6b9ffaa02f8ba8e1f855fa931301a78f6db7",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/aqua.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "cb767318228c26c65fd9e12b206cbdabef3b9395b31e7175718d2e4cdce8c6a3",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/bin_trace_recorder.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c16dba79d6ccf7cd81cb053a443c51016a8651cb2762c17e2eaa37d448dc3239",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/cmd_trace_recorder.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "96d3f6461a63f150c4db4fe08d226436127b982822c55931501e0a471b8abd8e",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/command_counter.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f41e29afd500a4665a343abd0979aeffddff6734486070c2e9c5bad8d18a6061",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/graphene.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d74723cf7dc8210bc650465a37d2fd38c586816235f5aadcb315c33717c7f432",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/hydra.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "01e65e46793d0c3fe8b28b398fb3240dc981354161c4a9d53dd004be0bfe079e",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/hynix_trr.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "fc699c666c1815d0e32ea08b9d595580ed164e4442b3491615d7dcdb645c7e34",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/ideal_trr.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2d2cb67dffbebb2db2ed37cf08746850db58f38d5485bbf099081ae307ff7e33",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/issued_command_validation_hook.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "58bc5f7c4cb46021f57bd524e03ad20e15135234135c3959db97efc855e80bc0",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/live_trace_streamer.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "39db0f81c86079f3f85727b41cd621fad8a616434c6a4939a89950f76e55f550",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/oracle_rh.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "386edc6e5abfa012e6c7c92440ddc4ac0e3b3e3f17d9c851860c54e24ce7c92f",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/para.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c04b876abb49793a83df7d4c4abd5af26603fbe5d6b9dfb8f5d444c588a2ba42",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/req_trace_recorder.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a837021c88c4d4f0894cc25a0b4a84f14d651c53d836bd5912993e2bce6cc6f4",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/rfm_manager.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "57671a1456b111146ef0f993318dc49334d0ee51f9728589f31ac30db6dbe1ee",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/rrs.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0db1f2caa61ae92803238963ceaf620d1c1602f3da1f9092faf4317315a369f2",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/samsung_trr.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "eedcdcc36c71a852db23804c589bc07473399710c034ba7aec10631626232fdb",
+      "path": "ramulator/src/ramulator/controller/plugin/impl/twice.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2a458a7eb985a032f1efe2bbab4f4a28e593b55104bd9b18b3324a92dd1629d4",
+      "path": "ramulator/src/ramulator/controller/refresh/i_refresh_manager.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3bdbdf8a1e8ae2d779428521bae3fc9be6b3cc35850c4a2727b9ae68a6f005e8",
+      "path": "ramulator/src/ramulator/controller/refresh/impl/all_bank.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "4578aef8fec974bc1afd39bbc164ea3a59f34fc87e389428b6df78a95fc1aa7a",
+      "path": "ramulator/src/ramulator/controller/refresh/impl/hbm_per_bank_refresh.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "76945448ab9b33492a88f611f468764c8943845db44bb536f55e85befd404f0b",
+      "path": "ramulator/src/ramulator/controller/refresh/impl/no_refresh.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d76fdefe344f04e7de6b0a5819902fbc308ddcbfb90b3f1e86167d006af843e5",
+      "path": "ramulator/src/ramulator/controller/refresh/impl/per_bank.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "85ab28b3cf4a594e3b28a76e41a23debf3f3a398149b7089c61474cca8c8972f",
+      "path": "ramulator/src/ramulator/controller/rowpolicy/i_row_policy.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2e77606218ea3989d2e983a364dcf5e084b3c1cd4c977bae43dc1343cdf1b994",
+      "path": "ramulator/src/ramulator/controller/rowpolicy/impl/closed_cap.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "4acd08a7249dc4ec8af7900990b4af335aa7f9e4573711bc48cd09e9e3b221c6",
+      "path": "ramulator/src/ramulator/controller/rowpolicy/impl/open.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7571af56b4a96a0912f243a47514fc7f11f2f79875108b336d8ade29bc7e5c31",
+      "path": "ramulator/src/ramulator/controller/scheduler/i_scheduler.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d822738aa625c45e6026b44401e185637352e710b0d54dbdf575f98a2541959d",
+      "path": "ramulator/src/ramulator/controller/scheduler/impl/frfcfs.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "058ec8f1b048f7a686e1903768de4f7264af6c26f0d4b3b99ed26cdee6d654a7",
+      "path": "ramulator/src/ramulator/controller/scheduler/impl/frfcfs_rowhit.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0ba6dcccf5ec43d89e56067a5a9711b44f1a3121ddf574a93028860b13377332",
+      "path": "ramulator/src/ramulator/dram/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "520685bc9fd37f65cb5b49b8cdd6a7d30e1520c9ebdc8af4b94dbdd59720f0a1",
+      "path": "ramulator/src/ramulator/dram/commands/ACT.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ebb618edf08018a5a40b59da0f075b8622f0eadd4e7cdd585dbc5cef735f6a35",
+      "path": "ramulator/src/ramulator/dram/commands/ACT1.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "60f3f1613b95a93036633f80dd292407dac7c0fdcc2922603225266cd9057bb7",
+      "path": "ramulator/src/ramulator/dram/commands/ACT2.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "cae0141d00bae86e7531caebce6badb4d603413cafda45e8704b7bac387d654b",
+      "path": "ramulator/src/ramulator/dram/commands/CAS.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "15a443ec236cdf8868f12811fec849eb08ce04a8f83b34bf4f05483fb5d8d10c",
+      "path": "ramulator/src/ramulator/dram/commands/CAS_RD.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a826f75f449f281430756f957ccbb7aa0ec90238885c93213c8aefb73e82e7c0",
+      "path": "ramulator/src/ramulator/dram/commands/CAS_WR.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "20ba1e26c068c1f379468f8d3195fd1940455a240cc90e23a9bf6d64cb072ea3",
+      "path": "ramulator/src/ramulator/dram/commands/PREab.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "78311297fc541e64baf47ab175026c49625b96a6755f52640eb4154f1948427d",
+      "path": "ramulator/src/ramulator/dram/commands/PREpb.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a4ff3fe565133ad0ece3fd430bc6e8e7bc537ef8d03f064b47e8c0dedb3c4243",
+      "path": "ramulator/src/ramulator/dram/commands/PREsb.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7ee585a80a3ac300c1b8cf74f7568d4d40cbc8b53d0ee26ae9c4bb5af39e1c53",
+      "path": "ramulator/src/ramulator/dram/commands/RCKSTOP.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0b49082f9137aa7fe087d7dfee8bebd9b5bf205cf3406b5185c8ee14a71d831c",
+      "path": "ramulator/src/ramulator/dram/commands/RCKSTRT.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "fd67a6e45b672aae02a25180e9163fff94e4cea4fcb71aad461a1240ae4c3dad",
+      "path": "ramulator/src/ramulator/dram/commands/RD.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d5897481c4bba8a6b15656f74e1b488748861d21d7f3bcc976ff900c5da61670",
+      "path": "ramulator/src/ramulator/dram/commands/RDA.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a7c314145913010ed31bf6f5437b940c2766f4cb160362c4c18e370e582d1e46",
+      "path": "ramulator/src/ramulator/dram/commands/RDA_L.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "767b8ea9806196527c4299e636a395827894634aa18ba37f64c5df78193dcb1c",
+      "path": "ramulator/src/ramulator/dram/commands/RDA_S.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "56c9d20916dfa36837c59b72177d71e3ed6cc39c1db61dd3c89cb97d4b7c087f",
+      "path": "ramulator/src/ramulator/dram/commands/RD_L.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "80a88115ad2c2e0b2984d685a445ab05c6204d366b7edea587b6cff02ac2f7b3",
+      "path": "ramulator/src/ramulator/dram/commands/RD_S.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6a3ee078d3cc512e6fc8a2aba44fbdc26368f8dac0e43c067dcea138fbfc8dfc",
+      "path": "ramulator/src/ramulator/dram/commands/REFab.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1e1bdfff2f1fbc92cad046e953b6c3e48eb38ca21ae21bfe402d82d242cfc003",
+      "path": "ramulator/src/ramulator/dram/commands/REFpb.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "8e450c3949fb6d8db82c36878f5d6498ae0eebdfa5a5ed26a21a0a7831445ca7",
+      "path": "ramulator/src/ramulator/dram/commands/REFsb.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0081e54bd0b5d509bf9306ef2b9041017a29af9b16327224ee2b024cb932b486",
+      "path": "ramulator/src/ramulator/dram/commands/RFMab.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a307b2cdaf6b41f0d8b753bb36bd89d8b22e27329d89e4ad76012b45fbe26e37",
+      "path": "ramulator/src/ramulator/dram/commands/RFMpb.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "bdc4f322429a8b83806bc7a0aa7b9808e34effa4791128a2a082642b6a7a3b2b",
+      "path": "ramulator/src/ramulator/dram/commands/RFMsb.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "668fae70a06de7d83cff7dcef3b9280bbee424a44c77024b1e0db8388c0d9ae6",
+      "path": "ramulator/src/ramulator/dram/commands/VRR.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3f6d6fd89395d52807f4b97e7506ab1b61a7a15e854f32f9be7f0e1c6e198ee1",
+      "path": "ramulator/src/ramulator/dram/commands/WR.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "34ae0a5122d20ed9f4cf93c6031981cd039f169a404015663aa1eb387a787fe4",
+      "path": "ramulator/src/ramulator/dram/commands/WRA.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f71b020ce69813d9f58ed838cea5da8bfacdba3e403dd9391c8da145cf61afb4",
+      "path": "ramulator/src/ramulator/dram/commands/WRA_L.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "ad483991cddb04d10b7ef232d18bf634f130c0850c6b2f9dd03f496adf7b2f03",
+      "path": "ramulator/src/ramulator/dram/commands/WRA_S.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0f56262dc5fc70bbcaefa43f10a10c467a93ef49aa57f2694e13e91e5c16d6cf",
+      "path": "ramulator/src/ramulator/dram/commands/WR_L.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "58ce1ebfbddaf470697208895f6b8eee5cce986d600d097e9e886e9e223c4b53",
+      "path": "ramulator/src/ramulator/dram/commands/WR_S.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "88d9049b4ab6d81d5798bc8fdc5f06508592f816147b3284f87d3ba617aa4cb4",
+      "path": "ramulator/src/ramulator/dram/commands/populate.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a39142d56118b772ff698bbb30cf7463493e1ca5b41011d31012e2f10e1c5909",
+      "path": "ramulator/src/ramulator/dram/device.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c63ef1b11bfeae4d2727e736ee126936c0a7d34874ff2ec4dfe7ea4cb0b0ffcd",
+      "path": "ramulator/src/ramulator/dram/device.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c6e3007e4f31e69ed9248ca9ee2257f32972631349de5b70da6c162de5239305",
+      "path": "ramulator/src/ramulator/dram/dram_spec.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "9abfa9aa4567e6417a7655059f08d16a9e1037aa8904dcc07bce7b84d24f4a8e",
+      "path": "ramulator/src/ramulator/dram/dram_spec.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "20c3bba50c1cc3a09fab978cb2936c2b49ef90d2742a2c1a320efa218ea7463b",
+      "path": "ramulator/src/ramulator/dram/func_types.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "34b7e64011659e515f667e74825aea60300c70489152dec757d490454d67e732",
+      "path": "ramulator/src/ramulator/dram/impl/DDR3.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "48da80790e6be036684855258e7506c4f561cebbc3314a4621147af6141db4ca",
+      "path": "ramulator/src/ramulator/dram/impl/DDR4.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "80d91725e0a7407bb68c8d5559c17f95e82a04a53433bfd60cc922e39824bf52",
+      "path": "ramulator/src/ramulator/dram/impl/DDR4_VRR.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c934ae3019119d5b65754b3da21741085b690248233c768728062fb300a4d1de",
+      "path": "ramulator/src/ramulator/dram/impl/DDR5.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "63fc9276f2a5c7ee9823926c0eb65c0a5c791f296631ec82b35ab9596e60652f",
+      "path": "ramulator/src/ramulator/dram/impl/DDR5_VRR.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "37acbf11a0151301269f5613a060a4e94bb4906f28e73c7e7e6c14e202e122d1",
+      "path": "ramulator/src/ramulator/dram/impl/GDDR6.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "778eab25b2ffe0004c0eb7369ae05ebde6424a5546e9fd44c4dfa0facd6e5e8e",
+      "path": "ramulator/src/ramulator/dram/impl/GDDR7.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "9052df7ceedf6dc7998932b2083297501a4e3a36cbf96919c60522aae41199ca",
+      "path": "ramulator/src/ramulator/dram/impl/HBM1.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "0e814b778ac9210680b220f3b215d9b55fc50e624a955b3f83f5b0cecb98d6f2",
+      "path": "ramulator/src/ramulator/dram/impl/HBM2.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c2e19d70be3b4ea4f618e34a2c7f19bb466b62f3c6c59b1b6e7c5be6bd9bd474",
+      "path": "ramulator/src/ramulator/dram/impl/HBM3.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5d12b651e90df87a5fb6853f8289407c98a7d2f654d24086b9d45644eea9cb74",
+      "path": "ramulator/src/ramulator/dram/impl/HBM4.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "3729e9ca157c36d6254cc37ba0e85a336d2a784261f37fa392adb4ec9a41b182",
+      "path": "ramulator/src/ramulator/dram/impl/LPDDR5.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "73b0d5e6d8dd0ea7fa1e9486d05270efbd30d2cc615602cbdcbee70b340ae59d",
+      "path": "ramulator/src/ramulator/dram/impl/LPDDR6.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "57260b20c305ac8bd24cdf238bd39e4c2b9938672a3d2dc7fcd09986aa5bb9f4",
+      "path": "ramulator/src/ramulator/dram/node.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5a9bb98b86b9acf7b3966c063b524e31bfe1a89ec0696da379c203e333649817",
+      "path": "ramulator/src/ramulator/dram/node.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b2dab5b1c17c487982aeb8cb4c38b16b14e2d59dbf99bff44a46275c1ba1f23e",
+      "path": "ramulator/src/ramulator/frontend/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b76cfd99ec2a1c6ae314e4b9760bfd03e3784571c1aabc52e45eab91262366e7",
+      "path": "ramulator/src/ramulator/frontend/i_frontend.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b1ad73a8d74218200984735bc7ed096e748e82df5d753579fc4ed910da47a640",
+      "path": "ramulator/src/ramulator/frontend/impl/external.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e9764d17fbe35596023afdaca77eaea405ce7d62bad69fbb517ff2c25f6fa00d",
+      "path": "ramulator/src/ramulator/frontend/impl/memory_trace/latency_throughput_trace.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c12ea11ea8de7dd2b9c627185c934196d49047b970d2b6557c6e0a586074afa3",
+      "path": "ramulator/src/ramulator/frontend/impl/memory_trace/loadstore_trace.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "49f16e0c718b818871e4830d5fa4a328157c790d8b1617c11afa468981c39d45",
+      "path": "ramulator/src/ramulator/frontend/impl/memory_trace/readwrite_trace.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e8473cde9b7df7e08bcada6a875828768f5fc19b9e2f196b454b4895f90abc5b",
+      "path": "ramulator/src/ramulator/frontend/impl/memory_trace/synthetic_pattern.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "b9e655e1bdff0531478d9b6cf24c218f38a4d7e566c56f05110fa520110de4fc",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/bhO3/bhO3.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "a7b174d5c6fa934eb3eb0b7e29ce8fbc99922fbe9741c8518294ba0664a6be03",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/bhO3/bhO3.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6cd8b27ee6f59fbed7fbfa6fb85a90b891ed0409dad77d3f238d29369369305f",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/bhO3/bhcore.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f3c0ba937d1635173348d0df7803d23d751b6e929e5e00df355ef0c9cbaa2df2",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/bhO3/bhcore.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1e23fb8ff1193def66902321b61f4712ce317fc7c259db9ca0938b82459954bc",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/bhO3/bhllc.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "7db2e188407fff01c0f2010275ebc9703a90023d30431cb78b9a7e346f4e7d4f",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/bhO3/bhllc.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f4c7bf6fdd7f7bd86608437884396b75a499cdb2b3c45822251871c924b06999",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/simpleO3/core.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "87998ee8ff58945bae1314e5f71cf9bca622068ca2b9a6ef00970db1bbf0e77f",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/simpleO3/core.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1d36781227c90a57134f11c1d0f26142378b470d2346883514e2b44a29bae31e",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/simpleO3/llc.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f711ff944a47599030ab9dfda67a66f57ca33b040c0744d56b93c2cf71f95bf6",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/simpleO3/llc.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "1dbadd349120e70dfb929972507d5d6a5bf6fbd7260291ef39975b966fbabd16",
+      "path": "ramulator/src/ramulator/frontend/impl/processor/simpleO3/simpleO3.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "4dac82404c1b51a324eb3b4591ca65ff8384ae9cb83e37533e5a8dfb8e13cbe3",
+      "path": "ramulator/src/ramulator/frontend/lat_tp_addresses.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "682b75dde0e52684c4d4405fc3aa5ccd44f89956840b7c737b052c5850bcfe08",
+      "path": "ramulator/src/ramulator/memory_system/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "9554136605083c5e59fe139ac4b19fe6b37b97ba5eecb89a4343e1464812df07",
+      "path": "ramulator/src/ramulator/memory_system/channel_mapper/i_channel_mapper.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "499ec113f6dc01aee7820d7824ba6740a46198f31f925c929b6bcf0a58991b7f",
+      "path": "ramulator/src/ramulator/memory_system/channel_mapper/impl/cache_line_interleave.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "4d59cb78e3c09f7a03b2b62653bfbb3679b17d4f0ab9ff5e44a3c08be8a8a084",
+      "path": "ramulator/src/ramulator/memory_system/channel_mapper/impl/gem5_port_interleave.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "6d68e398db8c05c6e8abd3e05e857646e39ffc2c3d2f133d168c50d8d72eb8e3",
+      "path": "ramulator/src/ramulator/memory_system/channel_mapper/impl/passthrough_channel_mapper.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "34abd77241ac18ba813427a75dfbf87e734a427b4bf957ae6024d482f7523792",
+      "path": "ramulator/src/ramulator/memory_system/i_memory_system.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "52b883385b107b199966c912798f255ad5ae6ebab9d06752bfa0cd770d049573",
+      "path": "ramulator/src/ramulator/memory_system/impl/generic_dram_system.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5a19b905a6a5ed1ff73b5b9aa414ffec812c19ec98539578f22ebe8a51d5041c",
+      "path": "ramulator/src/ramulator/python/binding_utils.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "40dc924fc012ca14ebba1a606fd3e1bbdf8fc3de54159ee591546e95a4d7dd52",
+      "path": "ramulator/src/ramulator/python/bindings.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "d33ac3d8959165899e669887de1fa78048b95643db8d821b201b7b53b5923c48",
+      "path": "ramulator/src/ramulator/translation/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "e58fc454b858ff614eee16d9d7f39d338caf671d5d22ea33c4481033667ed969",
+      "path": "ramulator/src/ramulator/translation/i_translation.h"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f1e496e65547e9ac4ffd9ee32c2407202ac9542df39b2b53907c0354ab56119e",
+      "path": "ramulator/src/ramulator/translation/impl/no_translation.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "5075ce9bf4ef12b6d4e5de2b54999dd0a40374932a441f0d93533b06781d2aac",
+      "path": "ramulator/src/ramulator/translation/impl/random_translation.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "27193944d6cd9022fadb322c888260464be409ab6faf897f7877e2eb0b05fb8a",
+      "path": "ramulator/tests/utils/atomic_admission_test.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "f864f35701c2acbeb7be6134bb94a26a2f9af7cf3f4db0dab4d745e337542d4c",
+      "path": "ramulator/tests/utils/atomic_model_api_test.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "30ac233a34e1da1996f0b7a5f155a182f623d45067c87260367e2c484fb99352",
+      "path": "ramulator/tests/utils/atomic_model_loader_fixture.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "9ce64c81dc7a40a75554d4d8a47b3e51c9d42e4bdfe57e34830aa495e4eeab72",
+      "path": "ramulator/tests/utils/atomic_model_loader_test.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "02f4711265036bce96b8843e7de620a511560d1499769234f197d4b6b8f15f44",
+      "path": "ramulator/tests/utils/batch_simulation_test.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "c1327e5647f489ec430a2d8025258e395114b4132e6fb79d4444f8b3eaec42e7",
+      "path": "ramulator/tests/utils/simulation_lifecycle_test.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "151bf69f12bc8c493491a714cea387411209b23fbbbafa2531611ab1df964522",
+      "path": "chia-loop/native/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "4e8cc32176e5300ef183339e0898d6ecb16f2fc92fb0948de336eca75628e8f1",
+      "path": "chia-loop/native/dram_speed_inputs.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "afc9f4e59e9412720228d2f2459d9d0fb764f3e96da35a8a1577727de89d9933",
+      "path": "chia-loop/native/isolated_sim.cpp"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "2b097677c2af4f2e5d617aee977418f6939f7183c2aaef179b28f0c82a755270",
+      "path": "chia-loop/native/model/CMakeLists.txt"
+    },
+    {
+      "origin": "qualified-dram-speed-runtime",
+      "original_sha256": "09bf27f60670578de220571f31e80794c50f7287c990335307a585b1221f601e",
+      "path": "chia-loop/native/model/seed.cpp"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "95404076650956c49794fd0ac72b61ca80e1c1ea45b274a870769a4c91bfc04d",
+      "path": "ramulator/pyproject.toml"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f2859d9998d25fdd93cd0f199fe74f8540ae36865f9380a89f1eb4b5378300f4",
+      "path": "ramulator/python/ramulator/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "ff95e60c71574271a022968d29a7355a969d5d6824d68be00c1e9bce7cfce8a6",
+      "path": "ramulator/python/ramulator/__main__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "08f42b308d7e003fc9afa068afb3a2416053eb6bd88e436ee1b1ad00c9f02d1e",
+      "path": "ramulator/python/ramulator/addr_mapper/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "a037a3bdbc3d1a25d2a55ac1e09894a42231a354ba14699f951366739a5cea5b",
+      "path": "ramulator/python/ramulator/addr_mapper/ch_ra_ba_ro_co.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "70bd2a3f04bb6d5db9421e77ae388371e02e7d43df1c8d820691d9ddc2a47986",
+      "path": "ramulator/python/ramulator/addr_mapper/mop4_clxor.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "b2423d189a4a72915599f31547ac3f38aad2d00b5953548b587b1f3a0abd8f88",
+      "path": "ramulator/python/ramulator/addr_mapper/pass_through_addr_mapper.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "cd193e28b2d6b7264c57603514072a42252edba07df022db767dd435c30b446a",
+      "path": "ramulator/python/ramulator/addr_mapper/rit_addr_mapper.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "82911d5e84eca77ace280ba6818048b0feaa6fbe55de5a23daa785b243395bea",
+      "path": "ramulator/python/ramulator/addr_mapper/ro_ba_ra_co_ch.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "b91a2f9373904d98026c245a362d32b9fa2d551cc0f3ba982bfe5f1ee8b6194d",
+      "path": "ramulator/python/ramulator/channel_mapper/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "ef38dd38fc9ca965f1eea0560bb4eabe53dcb3a26782990e3a36a9defa9d7e5e",
+      "path": "ramulator/python/ramulator/channel_mapper/cache_line_interleave.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "067ee31501af5f9c6adef9f7eed6c3b67140598c37ee9d6a2f24852464ebdb2e",
+      "path": "ramulator/python/ramulator/channel_mapper/gem5_port_interleave.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "5ed008e3091272af890e0e5a72abcc9e3960a0bea7e9ecdf77f5bbda810aec46",
+      "path": "ramulator/python/ramulator/channel_mapper/pass_through_channel_mapper.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "e4e8e0c20878330115a14b07e20fc3b134d363955b6ede6921b327aed5e6214c",
+      "path": "ramulator/python/ramulator/codegen.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "9bc7c2e340c25898aaeea9c48e83031e7af7c35e02e5ee78b17f7427bacab4d3",
+      "path": "ramulator/python/ramulator/components.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "aa0f8b2a795ea05a7c4a6bf38de6e35b6b055c87a40ffdbb27aeeec19f6f758d",
+      "path": "ramulator/python/ramulator/controller/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "751756286c063d8663ba3835f66624c1c9a4cc29a1accfe7e58993f67d29e9c6",
+      "path": "ramulator/python/ramulator/controller/atomic.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "b580453b87c51db34932b755a17644d74606a6c3a05a7eb6ff65422570656f9b",
+      "path": "ramulator/python/ramulator/controller/block_hammer.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "4f9f108cbf497fd223f225be0f2d1d916dc9738bb6bf2d32d4faab757175d66a",
+      "path": "ramulator/python/ramulator/controller/fixed_lat.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "5bf7b671eb0bd623e1c894123f9ecb916bd7ddf61a5c9e7728b68b32a0a11e36",
+      "path": "ramulator/python/ramulator/controller/gddr7.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "5d8308614fab5839ea153a9a23281003bee1f802322476adbe9a8ff74dab2281",
+      "path": "ramulator/python/ramulator/controller/generic_ddr.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "935bd5846bfebf74b9f094abc2648e838e66c56f65f0904295def75636239f3f",
+      "path": "ramulator/python/ramulator/controller/hbm12.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "bba05b244c6d6dc293c4abd8ca16391af6367ef44bbd340ae8407040b1e48027",
+      "path": "ramulator/python/ramulator/controller/hbm34.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "414838235c2c8147db4862db5fff48db61c1f3dda1005358cd7c55094b39adb5",
+      "path": "ramulator/python/ramulator/controller/lpddr5.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "48f6253044a3f14dad9b279a69b8c7e026450da7963764ff0f4197a702c9698b",
+      "path": "ramulator/python/ramulator/controller/lpddr6.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "856512e70ffa5b0b167a537c335008175771fdf68f4c978476e3046004ff672e",
+      "path": "ramulator/python/ramulator/controller/md1.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "6dc03c799db72e7054722db7fb0edea996f58df3c00932861b1155ed4fa011f1",
+      "path": "ramulator/python/ramulator/controller/mess.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "aec6efd04bc45ed4dc196661fc056fa593e29d47c5bf4d1f1bff1fdad893764c",
+      "path": "ramulator/python/ramulator/controller/prac.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "621c0395c6a70428dfe5a6ed6a41cb90078f86098d8fe33c94571406eec7ced3",
+      "path": "ramulator/python/ramulator/controller/wmg1.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "4471e1cc6f9f7eac426a962ddfcd72135ec8df93d16094b9c5f7d5ba218e8d0f",
+      "path": "ramulator/python/ramulator/controller_plugin/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "2d9ca3015fad834f470ed30f8aef2ad43ffe028bd37b62ddf87df43bef4d8467",
+      "path": "ramulator/python/ramulator/controller_plugin/aqua.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "85db61cb0a2338a8ea2b381a54f691e390b5a90f5ad32e207533a2cba151d3b8",
+      "path": "ramulator/python/ramulator/controller_plugin/bin_trace_recorder.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "859da94c4557bb34200a671cd79745c2629b896c9090c5e48d37f1844f87bd6a",
+      "path": "ramulator/python/ramulator/controller_plugin/cmd_trace_recorder.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "21cc424320b487633da5657e4682269b39519b7fa5807fb4f9758042ad218005",
+      "path": "ramulator/python/ramulator/controller_plugin/command_counter.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "b131ed9195f16733603e8d6aff155503d700d87ee6246f6047915d77e639c0b0",
+      "path": "ramulator/python/ramulator/controller_plugin/graphene.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "30a8b048818d17fc8aa8d5d087c8616e6e0f01e319eb65e6d27671ea3f165feb",
+      "path": "ramulator/python/ramulator/controller_plugin/hydra.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "7146ec9ac02a68c64af4366debad364860b15644bd089ce6917866d65ff36b75",
+      "path": "ramulator/python/ramulator/controller_plugin/hynix_trr.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "6179de6f8fcd569bff9eef11a8e0daee28620d898cc6b78ee97d86d3059e6313",
+      "path": "ramulator/python/ramulator/controller_plugin/ideal_trr.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "12e51518aef362e40ceb57e123d27affeeebfe1b9a819cff294dfc95a790d2e5",
+      "path": "ramulator/python/ramulator/controller_plugin/issued_command_validation_hook.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "843d545edf7655ce552f0646c729587542dade9cc3da65599b374325f4fd9300",
+      "path": "ramulator/python/ramulator/controller_plugin/live_trace_streamer.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "d7db176bd955514884cc4e2281b8fd92ddefbb37c1fa4911b78d6b56a53bc245",
+      "path": "ramulator/python/ramulator/controller_plugin/oracle_rh.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "b6626ba1a7216b3a5c421718e5f9c9624a0c207cf9f888e2f48d7df0427b6ccc",
+      "path": "ramulator/python/ramulator/controller_plugin/para.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "7ad475279a630e9f27df9cfbfbf734062564707c78d0f31222dd5ddbbcb2093e",
+      "path": "ramulator/python/ramulator/controller_plugin/req_trace_recorder.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "90466999a76b2d3129798935fbc65c0dce42a749af5e66d7c377107836d8973f",
+      "path": "ramulator/python/ramulator/controller_plugin/rfm_manager.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "3d98129d0b0c2db93992a85e59ce550d847faf5be5aec25a837cc506f444b899",
+      "path": "ramulator/python/ramulator/controller_plugin/rrs.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "0a0e5b01cf9835669d5ac7e543c91df48e9a96db49f09cca7fab52eb83182f62",
+      "path": "ramulator/python/ramulator/controller_plugin/samsung_trr.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "a4cc8e38a9cdebbc4cc3936d92d774784b6bd0603ce394e6d34ebcd11c13752c",
+      "path": "ramulator/python/ramulator/controller_plugin/t_wi_ce_ideal.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "be7394bf2e738acca199ec9e0d6e79492d85a6897db73d3bdf9f034121bc0ace",
+      "path": "ramulator/python/ramulator/cpp_parser.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "d31ce9917d86ceb6573cc3307147abe33e38453dea3172bd7d3cb1db1cc68eb0",
+      "path": "ramulator/python/ramulator/dram/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f72f7aabb2c8de96a30e0528c3ca3d71775e88911e36f82f14e955846c86e0e4",
+      "path": "ramulator/python/ramulator/dram/ddr3.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "8232b512b2f5eb5f5dfb67e38822d2c151c9b2b9ee17443d7d0b0d8ca1bdfca6",
+      "path": "ramulator/python/ramulator/dram/ddr4.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "12578cd507dcc58f6b5f2c134050d6687e86a6f71f7665f25ca944d7e7e42acf",
+      "path": "ramulator/python/ramulator/dram/ddr4_vrr.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "7207f3adfd253ee8e39725deda84ee8d9f493d81455ea03fefaf557ee9cac7a3",
+      "path": "ramulator/python/ramulator/dram/ddr5.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "86715fe5eb69ed4c8c3a8db5aa0de88614ebc4282d1da2fdb526173932fd480b",
+      "path": "ramulator/python/ramulator/dram/ddr5_vrr.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "96a693ad908d67b128be1cd3a786b3fe697a5cd3c2868895f6281f4f216bbd81",
+      "path": "ramulator/python/ramulator/dram/gddr6.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "eba1c159072ab3fb4a7c24ddd29c28a84407e69fe0b0dbae49966e593e51196c",
+      "path": "ramulator/python/ramulator/dram/gddr7.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "28dfc15001f7fe24e6ff4c38f16a6aa377ef47ed737e543096e495fc4e73b51d",
+      "path": "ramulator/python/ramulator/dram/hbm1.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "801da99f9ef58437543d1d8af7e26d085815f335d6a0e287a22bfd51c3f8e7bb",
+      "path": "ramulator/python/ramulator/dram/hbm2.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "61e2b3cb0bb38ef38c43d7eb9655bc6b63f26434891a355c526595f7b2ed6b8b",
+      "path": "ramulator/python/ramulator/dram/hbm3.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "0b6233efdc1ce74f50cea75e485a2ee2f64aec7d3cae2bc9ccfb86a22dded8cf",
+      "path": "ramulator/python/ramulator/dram/hbm4.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "d187d2026ff48a3a9c33fcb756671b3394d24e031e04324b8a46215fced1517c",
+      "path": "ramulator/python/ramulator/dram/lpddr5.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "a7bbc96d181d6e55c9eab85fb32adc65aa383b1e0acc94f8cb3c4c134061d72b",
+      "path": "ramulator/python/ramulator/dram/lpddr6.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "934cc075ad2922e93528d972c52cf5186a5b58f4a5c2faaadb7f97b2a6c90824",
+      "path": "ramulator/python/ramulator/dram/spec.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "0ccf0795588852a5aea5ac496ef3fcdd37a8acf7b59aaa1366a223836d4ca2f3",
+      "path": "ramulator/python/ramulator/export.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "c859a80c5b562753b9ca2b991a8d28104ca33826e5569d8b3f67978c6c388987",
+      "path": "ramulator/python/ramulator/frontend/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "09587ddf341e742a19a58675e29c216c892f69443266854c8ab1f114408fe4f2",
+      "path": "ramulator/python/ramulator/frontend/bho3.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "c7da5725c3727f008ce9f3ae3dc0b627b2df5e5398e7180d3d1c9b3111e17f61",
+      "path": "ramulator/python/ramulator/frontend/external.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "96eaffb6a76103c39a2602692b52fd6f46ee75b8d5cd420281f0a4784452f5d0",
+      "path": "ramulator/python/ramulator/frontend/latency_throughput_trace.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "69bf90aa11c04186eeed2f5f65def6ddc487d22bf42ce4bcb677471ead8fb45a",
+      "path": "ramulator/python/ramulator/frontend/load_store_trace.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "43f04c22a218d1d6e0f1a0ea8104a41a4e59e2cf14c4a49f19b321d4abcd1e4a",
+      "path": "ramulator/python/ramulator/frontend/read_write_trace.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "4920aeb602f7476bccd5de0b7ff4e5f108d1d82f2b0fa63083846104e17edf2b",
+      "path": "ramulator/python/ramulator/frontend/simple_o3.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "05d75eab287bfeec7def627b1b61ea00aa3d451668d323dbb0978ef83d1c5638",
+      "path": "ramulator/python/ramulator/frontend/synthetic_pattern.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "790fa7a8cef462d30810f4406956fb7b945055a8485f90d0d221164b5abb3008",
+      "path": "ramulator/python/ramulator/gem5.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "12435d7c32d9801fc6ea12ddd24f7fff23023d831cc1b7ff048a1940982a78f6",
+      "path": "ramulator/python/ramulator/memory_system/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "5f2bbf74c2b0dbde03566d6db8e51113cef9fe84fdafffb2d4b9637880f8db0e",
+      "path": "ramulator/python/ramulator/memory_system/generic_dram.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "90aec5183bb866efb16d9be7385e7a21cdc90862f9cfdb4473b54693d1cd7ab5",
+      "path": "ramulator/python/ramulator/param.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "5674c3d5da7cd66ce2532343d1d353ebf9af5af20142dbe4df666e93220e3465",
+      "path": "ramulator/python/ramulator/refresh_manager/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "9b36da219a9a191429487c7643685db655012c1120ab68cbeb0831bc2098f94b",
+      "path": "ramulator/python/ramulator/refresh_manager/all_bank.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "4877835bda43094d7e3306c2ab9598a458327fdd9324db3e12154df1ce5a2f66",
+      "path": "ramulator/python/ramulator/refresh_manager/hbm34_per_bank_refresh.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "5a99d31a15a1d99861bc121b65c420e4fcbe4df0fb44726b719ddb48a60abcc9",
+      "path": "ramulator/python/ramulator/refresh_manager/hbm_per_bank_refresh.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "23f5df438719a3c8c4196cab791c26ee140b25ffc5743ee37ed3afd16dec0007",
+      "path": "ramulator/python/ramulator/refresh_manager/no_refresh.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "e5658ebd202d854d9a4ebf0762bb9c7a358ed1803086cf3caa88c70d3043b69e",
+      "path": "ramulator/python/ramulator/refresh_manager/per_bank.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "e133a853f430681075527b39e6c3e56e88c7b8833b388f50c21ad254f1e96a9a",
+      "path": "ramulator/python/ramulator/row_policy/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "c9aea980c17301e3f67c67a3abe52290999c8ca96cfb104d7bc8a4ae72311ee6",
+      "path": "ramulator/python/ramulator/row_policy/closed_cap.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "20f5d67fdeeed398849d99648d6db78de73ed962d4d331ec6f8ae5daa859bd9f",
+      "path": "ramulator/python/ramulator/row_policy/open.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "752df2a556c50da083c488f72c04dbe0058d566c0530ccabeba6e71836441d08",
+      "path": "ramulator/python/ramulator/scheduler/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "fed8071c148faccb8929d0161c04a884288eb288dc65d1962ec9879bf018e467",
+      "path": "ramulator/python/ramulator/scheduler/frfcfs.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "961d2070f2c1e23020e015fd60a820fa1092dda17f2702c41813e0345d9788a9",
+      "path": "ramulator/python/ramulator/scheduler/frfcfs_row_hit.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "d7a5218d43c6b77a84912d7c167831b553e60c8b3d06532713fe65cf475de192",
+      "path": "ramulator/python/ramulator/translation/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "e44fbb9f06e755b0bbaf31efab8a2a05956d381fcf128a7f75424b327c59ea74",
+      "path": "ramulator/python/ramulator/translation/no_translation.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "39e4a48bb63d656baf1fac55e942ef3943a07e9cad919e381f381e820fc61fd8",
+      "path": "ramulator/python/ramulator/translation/random_translation.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f5602dd44cb1db70d678820b86995d0cdb6503abe980ed034046325db43e9d09",
+      "path": "ramulator/python/ramulator/visualizer.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "fcdd59cadad047a9c350ff35a93f0d3d501e7441e5b13058f307195babb196f5",
+      "path": "ramulator/resources/champsim_bridge/README.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "c0a22d279c0e9a741450139388f4beb809f5d214acb5c1bee22c8beb1af990aa",
+      "path": "ramulator/resources/champsim_bridge/continuous_contention.patch"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "2611c6c7c32d9c53814692433416fac13f024251c31ec9c2f87a124ff24d0c7f",
+      "path": "ramulator/resources/champsim_bridge/cs_gentest.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "dbf37c448402f576601ba50152dc24f2b92b435e37587a962b79bd2bad246f68",
+      "path": "ramulator/resources/champsim_bridge/gen_configs.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "3aee01953c1a90f30d401106c36b463ec86ef057c68ed96243c4f6d8991a7f35",
+      "path": "ramulator/resources/champsim_bridge/multicore_finite_jobs.patch"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "38f2eda1ed6d47c0d74d9dcb2f080cea53a990d590a94b571d97de97a8a80a89",
+      "path": "ramulator/resources/champsim_bridge/ramulator_bridge.cc"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "aa774a93b1b89f0116784a44b9cabdff21898071da873b3ac4cc87fdb2e71586",
+      "path": "ramulator/resources/champsim_bridge/ramulator_bridge.h"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "377cf08ddd5fee61f34c0ca92a88cc0360a70d86854c4dd12a3a8b2a4e486cc2",
+      "path": "ramulator/resources/champsim_bridge/ramulator_bridge_identity.h"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "aa2217e85b0770467437ceb23950ad106d9071f2da522f710ecdfcd41e03f48b",
+      "path": "ramulator/resources/champsim_bridge/ramulator_bridge_iface.h"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "87ff31f3b7b2a6e6c0b446ba52a549e851085c2a435bcbc429e0ca92e0e7cafd",
+      "path": "ramulator/resources/champsim_bridge/timing_independent_placement.patch"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "52fd03218114a4e8874583bfcb4972460710e14eda7e5a32405c74230538a5f6",
+      "path": "ramulator/resources/champsim_bridge/trace_pages.cc"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "128dddc766cdcde958ef24d11c30b36ccc88ba017659ede879a294129af68462",
+      "path": "ramulator/resources/gem5_wrappers/BUILD.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "7db45a9abaac1f455b676071c64f5d7f6255e5e3515484026ca864f03796e825",
+      "path": "ramulator/resources/gem5_wrappers/Ramulator2.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "5eaed9a4e0f1e933a4c4d3b186778fca9a7ffd1e777cd1571b4c1eb48b498552",
+      "path": "ramulator/resources/gem5_wrappers/Ramulator2VectorPorts.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "6f77429d76431b594b024c3c4ab539eadab63b718f489cf9feb5f3c40d3cc5b3",
+      "path": "ramulator/resources/gem5_wrappers/SConscript"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "01373decd5146b0a9c4ff8919d470472216cccf567a1002b013dde64591bcf7c",
+      "path": "ramulator/resources/gem5_wrappers/ramulator2.cc"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "1a52e215ee3b6b3c5732132e2607e73c835388f46e588253aaae53562f41c5a9",
+      "path": "ramulator/resources/gem5_wrappers/ramulator2.hh"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "cb0dda786f6abae60688cd8300a7ebf04857290fae1db2ce5e8bcb66b8a7cdd1",
+      "path": "ramulator/resources/gem5_wrappers/ramulator2_base.cc"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "6fb1df4df425512caffbd3fe4d6ccc425d1ce517a972fb88d8774ad26748de9d",
+      "path": "ramulator/resources/gem5_wrappers/ramulator2_base.hh"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f6e0946b184d30f7d1e5df56ee49ccfcf7cc6d45b6b660e35ba57bea6a37fea6",
+      "path": "ramulator/resources/gem5_wrappers/ramulator2_identity.hh"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f34e59af4a123585df737637813f159b352fb0bddaffc7d4748eff7a138d16bd",
+      "path": "ramulator/resources/gem5_wrappers/ramulator2_vector_ports.cc"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "25c2d7dbda723b8f5622fb8b92b57f688dd8234a8ffcd8879c555e81860e65ac",
+      "path": "ramulator/resources/gem5_wrappers/ramulator2_vector_ports.hh"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "24a254e31320455516561053161f305c4832e54f8d3f72e12738e0a7f62ee1fb",
+      "path": "chia-loop/native/champsim_trace_format.cpp"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "d4fbcb5b53ce65b6340f56942103b5e43cedb5b3974818ae081e3f7605e0dcfb",
+      "path": "chia-loop/src/ramulator_chia/claude_cli/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "0a4bc5e9be7d4f2967d528c7306b1a5718142400583510faed0475eb606d496b",
+      "path": "chia-loop/src/ramulator_chia/claude_cli/auth.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f23bf87abcd753004127e654bf3e15276358394db13ca2ca26fab4ff2b648dee",
+      "path": "chia-loop/src/ramulator_chia/codex_cli/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "2c9fe100cb9ce1195706068394ced2d68f39eba787721b82ee9c14895ddd38f8",
+      "path": "chia-loop/src/ramulator_chia/codex_cli/auth.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "80b3501b80ea045993cddb97e9e4954c3ed7abc77c411ca2e705fd4142fc58c6",
+      "path": "chia-loop/src/ramulator_chia/codex_cli/boundary.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f694bad1c06c9f2ebd2d5b8069fdd5f9bf3bb09d551f7d91c7b836077af00fdc",
+      "path": "chia-loop/src/ramulator_chia/core.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "94e64aa054a43d9c0e5607f81a1d01c743987649ef3e4d8358385a8c5650c990",
+      "path": "chia-loop/src/ramulator_chia/evaluation_config.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "ea3879e7257550fea063e20f72cad3e933b830a8c4f2e3ed98d4cf2368fa2471",
+      "path": "chia-loop/src/ramulator_chia/framework/README.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "8189cdbcc73562b339e94f7ae1d78fb721d97bc877ac9262989d6c9fbb252b7f",
+      "path": "chia-loop/src/ramulator_chia/framework/__init__.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "17c54d98a08ac4233e8286854320fde0f459ae9b5dad3d7520cbe8b9070d12c7",
+      "path": "chia-loop/src/ramulator_chia/framework/adk_summary_worker.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "3ef677c28a81e5f89ea8e97d6cd678aadfedfb84527e9133e6dd52c7c66fbd73",
+      "path": "chia-loop/src/ramulator_chia/framework/agent.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "160c186c6dd746d5b709e1a383024ae99c4bb4a09f780162624b67294b6716dc",
+      "path": "chia-loop/src/ramulator_chia/framework/archive.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "221a4ca8e492364f88eacf7549a85f02065546b5784d13ac823e1ce6e5740d07",
+      "path": "chia-loop/src/ramulator_chia/framework/archive_schema.json"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "819ab097fc84b20603423eb27d7970041921658c29046c08f6027fc3526dd1d5",
+      "path": "chia-loop/src/ramulator_chia/framework/build.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "e4c32c2b9f583cc052801dd1c4cf203d7337ce5116adf2092103f717a2830551",
+      "path": "chia-loop/src/ramulator_chia/framework/campaign.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "aacdee3485722f4170f87f9dfc55f5e1bff83c6d52fdd4c3b788aa93957c39c8",
+      "path": "chia-loop/src/ramulator_chia/framework/candidate.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "cb8eadfd194b62f3d726edc0b45eac3378ca71e0bff8620218f0cfdeee599b53",
+      "path": "chia-loop/src/ramulator_chia/framework/chia_tools.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "41434a2baca539e49b2db556ad91059d51a983f12e9f518266f7e4dc676ab544",
+      "path": "chia-loop/src/ramulator_chia/framework/compaction.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "e62f08689598fa2d287a56ee2dff508924d3aa57e444e98842485b83b5b9afa5",
+      "path": "chia-loop/src/ramulator_chia/framework/config.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "13a492d9f8d5205240cdabb0f7ece985f61792a71a2617c66e23fba3c47058a3",
+      "path": "chia-loop/src/ramulator_chia/framework/diagnostic_cases.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "4ff31219aa58e5e50e4c40c4f801d47e0a634572a8b8a7bf7b31bc54c6a208b1",
+      "path": "chia-loop/src/ramulator_chia/framework/dram.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "59a9c9c7164e3946c791e7122080c9622c400ff8d87d87bd6789140771244573",
+      "path": "chia-loop/src/ramulator_chia/framework/evaluation.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "63603fbc56f4c983503ac3ced7832121ccd90cffc2311a9bce4fb21a31318a2f",
+      "path": "chia-loop/src/ramulator_chia/framework/execution.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "d8045cfa8fe58020ae7d6d8f55565027e4cdafbce526940ef5b91bda4a1dd912",
+      "path": "chia-loop/src/ramulator_chia/framework/export.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "89d72e52823bc3ccce76f55dfce7b73599c4552d91d011b4467925174955bcc2",
+      "path": "chia-loop/src/ramulator_chia/framework/external_frontends.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "422275cc3a7bb1f971bfebabd13c1ee7fe8dbaadadf9aa420f2032791cdadb02",
+      "path": "chia-loop/src/ramulator_chia/framework/failures.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "7e33ece18829f233fd4b10d31c12f864c5b1283611f8cbc7cd61546f74fbae30",
+      "path": "chia-loop/src/ramulator_chia/framework/identity.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "a64e8e5917c244d398b7783229af9fd449e52cf1bef8a4ea471fff3215d300f9",
+      "path": "chia-loop/src/ramulator_chia/framework/inputs.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "9ae0fa15df612ec58aff9bf3ef8f73d110688923a74de25728e6bfaf1ddb3d24",
+      "path": "chia-loop/src/ramulator_chia/framework/inspect.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "e885939bf70187e36f0abf981566d79479d6f687d0fb3f42df7304885b4eb656",
+      "path": "chia-loop/src/ramulator_chia/framework/launch.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "7fb305fb617e5410d3fa8d7cc33f3611663c76678b4e9a7afcd6b649a24fae37",
+      "path": "chia-loop/src/ramulator_chia/framework/measurement_reports.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "0e2d798bcfa1115af3f57201b4d39bb4a3aea8de71168dc127072e6f8dc1b21e",
+      "path": "chia-loop/src/ramulator_chia/framework/model_sessions.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "79c6606fcc44590db9e5921100ca5b8aceb834c04f543e2456bdf2afe0d733ce",
+      "path": "chia-loop/src/ramulator_chia/framework/native_process.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "87ffbc2f0a0c6af7d1540bf90698f0662cc9be13611f3c1751916080c5082770",
+      "path": "chia-loop/src/ramulator_chia/framework/prepare_staged.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "a17dc6fc176ea2592aaaaa8f4a496f672e2b9721aed14e4b0a68dad5e8a2a1ad",
+      "path": "chia-loop/src/ramulator_chia/framework/prompts/final_audit.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "a5f5356830865fe2a6bb7f50f3429b48ac6235afb04952df3d95b9f16f77c89a",
+      "path": "chia-loop/src/ramulator_chia/framework/prompts/staged_v1/multicore.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "1c66e6883fb0be14e9ca36844ab205c9153b74a6c37cd30c6973ed5cdda5d32f",
+      "path": "chia-loop/src/ramulator_chia/framework/prompts/staged_v1/promotion_review.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "8e7c3f12555a2b1aea14f350b47b368ddbf65e5d35251451e274ba283b640a5f",
+      "path": "chia-loop/src/ramulator_chia/framework/prompts/staged_v1/reflection.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f3151402d39b6225c4500c7ff2c3ed849686db16fe50a107735a1fcd3e3f43b8",
+      "path": "chia-loop/src/ramulator_chia/framework/prompts/staged_v1/single_core.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "44caa6ebac74c5d8d917fbea1ffe513561c3cbc21a3e0446939d79bef04e8539",
+      "path": "chia-loop/src/ramulator_chia/framework/prompts/staged_v1/task.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "c872eaf9ba1e51bfd45f5a5bc7313576d9050f6371cdce72747fd8f298b53d30",
+      "path": "chia-loop/src/ramulator_chia/framework/prompts/task.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "5f90c4ab777b359bcc5db556505924c45a599af8077a7db09ec473235bb25236",
+      "path": "chia-loop/src/ramulator_chia/framework/rate_limit.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "5b0b805d3e1a1a2993a6c654b8583bffaf0741e2ca8380593fb20fab2f56cf87",
+      "path": "chia-loop/src/ramulator_chia/framework/records.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "47922fbb63eb43bff999260054aabc724921e98b621f63d2592da183db5d42a8",
+      "path": "chia-loop/src/ramulator_chia/framework/review.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "a43d3b7043af02bb93c3016d83b04b3ee4f952996f0b68e7f7857f3d271dcbfb",
+      "path": "chia-loop/src/ramulator_chia/framework/scoring.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "9f76cedb658912cc6535e2163e54528d49f67d4f4a3508a11257f2b7fdb6d45e",
+      "path": "chia-loop/src/ramulator_chia/framework/snapshots.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "34b3e501e6838dd6705dc087de2d7540558b0725cae9b617976862b923d67b28",
+      "path": "chia-loop/src/ramulator_chia/framework/staged_report.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "bd1b859fd539b4515d62bccad288b4331324cdc8c502b9bde085e8bf0e9c90ff",
+      "path": "chia-loop/src/ramulator_chia/framework/tool_server.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "dd2cddef7a2db85192918147c3885fcb34defbf0cae3dbd99463a2c9b2759cb6",
+      "path": "chia-loop/src/ramulator_chia/framework/transport.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "1c3d55c4a50dc12457aaa3cb6f0009d97113eceea66a111ba3d31ee38f873e0c",
+      "path": "chia-loop/src/ramulator_chia/framework/upstream/README.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "427df52035836d396d27125bc4511c1bc0734070d863e29ef1ac66f439ad7d0c",
+      "path": "chia-loop/src/ramulator_chia/framework/upstream/session-hooks.json"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "7c6714082ea1a71d38df85380ea3893d88d559faeb43d563d2e59a5ca8e470ed",
+      "path": "chia-loop/src/ramulator_chia/framework/upstream/session-hooks.patch"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "7ae89b0689c1b91b4196b6570081f907741ba966ad80cf7f4497b6aaab3b7045",
+      "path": "chia-loop/src/ramulator_chia/framework/usage.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "467df84729bf20d7580b4a91b0f6161dc1b20e92f2eb1c7ab26e50b463fc2143",
+      "path": "chia-loop/src/ramulator_chia/framework/usage_protocols.json"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "d39ec0c39584859dfbd9fb462379435d540e62d478e48c5f50abb186af5ce7da",
+      "path": "chia-loop/src/ramulator_chia/framework/workspace.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "08998810e0bb70d74434063316c9caa3e0dab756bebd6c0659a2a0cf6254e7df",
+      "path": "chia-loop/src/ramulator_chia/pareto.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "410ca36325052d5c1ff1b4969f694b2a662389e5aceb33e24169ec8e92ec28ad",
+      "path": "chia-loop/src/ramulator_chia/recovery.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "51b51de024b48f3a6c3450c8b836a29b6866d6e45eeb570a0cb9595dbe9fa36c",
+      "path": "chia-loop/src/ramulator_chia/sandbox.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "4d1cb06763108ed588db33f60ac8ff9baadb00e71248d1b3d378a98ff2a40358",
+      "path": "chia-loop/src/ramulator_chia/transfer_gem5_board.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "300108a446a32fb693867b08fff11db06d128d5c8ead990f9678ccd0abfaab5b",
+      "path": "chia-loop/src/ramulator_chia/eval/archive_results.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f0b6363ddbdd39dee6b6a9aee27bcab16b9a984caac4371a24b2e68b19f5a3ff",
+      "path": "chia-loop/src/ramulator_chia/eval/artifacts.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "9c1ebefb9142922a0d3b9a862c9f7cc9a874ea44d2702e20c310793b8b810379",
+      "path": "chia-loop/src/ramulator_chia/eval/calibration/README.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "3b2b8f7664173f185249b8a447b0bdebd37e0be7d0a9ac77eca275389cfa3417",
+      "path": "chia-loop/src/ramulator_chia/eval/calibration/mess_DDR5.txt"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "e5709de1516c83f9eaa51267fc712a4bc90a650ca93cb4fd3fd728d1b5d85a68",
+      "path": "chia-loop/src/ramulator_chia/eval/champsim_contention.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "4647f286ddd85270b5baded15a75d3c2f48f406e7df40fc8c9f0c87af7cd2453",
+      "path": "chia-loop/src/ramulator_chia/eval/champsim_mixes.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "7676e76ac7490693c56796f209a025b2c415bed902fa693132a4312b2d25afcb",
+      "path": "chia-loop/src/ramulator_chia/eval/champsim_placement.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "f2c09f5a8051426da7a720b7764a59540b060ced9092f5526bb3cbf9b1bbdcb8",
+      "path": "chia-loop/src/ramulator_chia/eval/chia_baselines.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "04106cfe6e7911f311b36f5bda2412a4f58c8e229f0bab25a6b79741e93b2d0f",
+      "path": "chia-loop/src/ramulator_chia/eval/config.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "3dc91a3654be464e2e8af268b66df59e3b5ff8c5ab5bbbd5935c31dc7c7175e2",
+      "path": "chia-loop/src/ramulator_chia/eval/controller_replay.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "65af3175fb669d8ce246c028d386e3c773802e05a12e15ffd34a63a059114018",
+      "path": "chia-loop/src/ramulator_chia/eval/final_study.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "fd16385dda1b3f886d5140f4f1e1039dd58816d207c36365cabc1d5f2d2f409a",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/PUBLIC_SUITE.md"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "40ac35d2620a36eab8d185d30185ab2ba85bc702d9b29f8e82b720b873418410",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/build_suite.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "4e9f2981308d8338ff76fda305d3286d40e44dfa10c62f79bc5f7015923e5e19",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/fs_board.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "fc9c6ccc89e6535a26b3da06b09c6e7a3c0cae4f2d109ae3fb6b65e70ffdfddb",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/fs_workloads.json"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "c5c23415b40d73471be38d7456649fd7c64f967851b1454c921ffed6d872aaea",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/prepare_fs.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "84ee1abe1aa25a3e3d6b06f33aca53a36640feefc3267099760caeb35f5509f6",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/public_suite.json"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "43fb721530e957aa3a9c7ac36e29e5b0c8c460d1dc4f386c1ac7d8607e6023d2",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/roi_report.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "42c22c38722b3c1233a387fa65255dbf4c026a3f4d18a01eaa0313004005f284",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/roi_study.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "d221a188f24e912b85296e84992fd8d8b90a30e2cddaefdb29a6a080149baece",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/run_fs.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "b60471ab43ccf1a939e37657cc882162db21167c0138de158eb03fdde660100b",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/run_gem5.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "2748581d064eaa4d737f2efca208bdb3012d7e6d72f8f67c9ea686932056d3d0",
+      "path": "chia-loop/src/ramulator_chia/eval/gem5/se_board.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "674c9126ab91467d44bed55060ff8af4367f691897d93c7f658132280d86158d",
+      "path": "chia-loop/src/ramulator_chia/eval/hardware_sweep.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "51977de02ae90d50025957b147838cdae7f38ef8465f7526c49858a9b4e5b549",
+      "path": "chia-loop/src/ramulator_chia/eval/lat_tp_models.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "298ddb5d6c8a2d367873554d382901ef6f49d16d5b16b6e37b3f52cb60696c37",
+      "path": "chia-loop/src/ramulator_chia/eval/layout.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "6908ed8a2a07275f7fbe468b306d3a3cd003e60d22dca87803da6806ed3ccb96",
+      "path": "chia-loop/src/ramulator_chia/eval/match_champsim.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "9d79b52ccc24200826a00b0010191790b459ebd8b587fc3160261a2f581a4019",
+      "path": "chia-loop/src/ramulator_chia/eval/matchlib.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "840d2d4948ad306087c35f8ec174429d89953c6f4911b39c24aad59c05be29ea",
+      "path": "chia-loop/src/ramulator_chia/eval/metrics.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "0adbeeda8bb631b50f58cbd26c7722286613ebeea729dc7b70504f0b23dc49b9",
+      "path": "chia-loop/src/ramulator_chia/eval/postprocess.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "94677f961bcfee657dfc3f0bea2c1b068caf3dc2582d048d79ba941ebea84aae",
+      "path": "chia-loop/src/ramulator_chia/eval/replay_screen.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "a9a66946c935d361beebfbcf5016f65f991e7f34803a9c61ddf98d823526fba5",
+      "path": "chia-loop/src/ramulator_chia/eval/reqjoin.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "4f9187294e641957b1e48e5631dec6a3b3cc42f7af3948c720d3a60a962dc3a5",
+      "path": "chia-loop/src/ramulator_chia/eval/run_champsim.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "eb50cfd85ca2a08a0619a3d6891e499b1f859ae53f04b9141d1c67e91b0b142d",
+      "path": "chia-loop/src/ramulator_chia/eval/run_simpleo3.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "790bfa7c45ade4b2c1108443b5c65165dccdebdb622ffe0b019e31e82e8002d3",
+      "path": "chia-loop/src/ramulator_chia/eval/scenarios/ddr5_core.json"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "6bd7c0d2f946af3724ffc1b937d421ab3eb6596c027f11bfd18f0f8a74cf4d87",
+      "path": "chia-loop/src/ramulator_chia/eval/scenarios/ddr5_ext.json"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "3e06d7fb527eda62719456a8da65e46d060185b68dfe67ce331ff48040eb80c9",
+      "path": "chia-loop/src/ramulator_chia/eval/scenarios/ddr5_pingpong.json"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "2ff4cf0f99811ab971442ca7f2d425939e207e9c59be5eda01fd662d7a8fd46c",
+      "path": "chia-loop/src/ramulator_chia/eval/simpleo3.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "53dae19b1b2e9bced92aa2c9e12a902086705913ff4cbdc9d16ac74b3d34ffb8",
+      "path": "chia-loop/src/ramulator_chia/eval/simpleo3_logical.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "2cafa43c32fe4ea1d7f6f9168fef2d6103809041e8b421ec42167b89dbe6db38",
+      "path": "chia-loop/src/ramulator_chia/eval/synth.py"
+    },
+    {
+      "origin": "qualified-opus-launch-harness",
+      "original_sha256": "2ebb67d2bdbbd2d1ceb060bfee6a0ad6c0de85699dff421a664eb9c9f98e6e3d",
+      "path": "chia-loop/src/ramulator_chia/eval/synthetic.py"
+    },
+    {
+      "origin": "speed-frontend-binding",
+      "original_sha256": "8a16bd4212ece9cc23d64c09c19e3281f936bf0e8833cc2b1a82979f1ec6122c",
+      "path": "ramulator/python/ramulator/frontend/latency_throughput_trace.py"
+    },
+    {
+      "origin": "qualified-study-driver",
+      "original_sha256": "136cbdd58caf8b56479c1b47a6cad0555f01babe1413a430efa252b68dca6e36",
+      "path": "chia-loop/src/ramulator_chia/eval/lat_tp_campaigns.py"
+    },
+    {
+      "origin": "qualified-study-driver",
+      "original_sha256": "b5a47b9249e6e50dd9704a04c51aa613f6eb131465940ed5bf177df02ad61e8a",
+      "path": "chia-loop/src/ramulator_chia/eval/dram_speed.py"
+    },
+    {
+      "origin": "qualified-study-driver",
+      "original_sha256": "e7cf8caa795742a8bed0dc0b4d4cabe7c629d994a9ad5d93b884af11c8215ddc",
+      "path": "chia-loop/src/ramulator_chia/eval/dram_speed_pilot.py"
+    },
+    {
+      "origin": "verified-results-analysis",
+      "original_sha256": "34b586f2b120d6a84e500b04de5816f31e20ec105400747f58b70c133bb1ba8a",
+      "path": "analyses/campaign_results.py"
+    },
+    {
+      "origin": "verified-results-analysis",
+      "original_sha256": "3ca3c15b63840c28dd76be826f38e4b42dd6fd7d37286dd9b45325982ca0cdba",
+      "path": "analyses/campaign_results_notebook.py"
+    },
+    {
+      "origin": "verified-results-analysis",
+      "original_sha256": "993887390100af3152ee5281f02ec252b716b787994d425cb0cb7f6c90ae9e2a",
+      "path": "analyses/campaign_results_plots.py"
+    },
+    {
+      "origin": "verified-results-analysis",
+      "original_sha256": "04f28d2d94a9164ae7200e980f690442a90f78f83d72857e462227a33adc8b65",
+      "path": "analyses/final_study_report.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "356b0f676c5b799c92e817462a0a4b9ad14437d63f8cbf0b93a6e4cf8ecc04af",
+      "path": "chia-loop/tests/test_chia_framework_snapshots.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "7aaca966c6705ffe1ef35c6057b6d65bad7a59c79bc9a2bf962c2afccaec2e98",
+      "path": "chia-loop/tests/test_chia_framework_rate_limit.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "16d483f72c6f280c37873960d07ce803f11a243325206cfc3398e6c8560b3a45",
+      "path": "chia-loop/tests/test_champsim_contention.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "f91fdae2a45285f35c72a657a4eb36756c200006fe999be7ca821921a9035235",
+      "path": "chia-loop/tests/test_chia_framework_evaluation.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "f80c4895d6b98d649b6e1928a1cc2e3c163f13ae4ad7010bbfeadb98b2ca9b3d",
+      "path": "chia-loop/tests/test_chia_framework_champsim_search.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "34e020894ef3598410a2df610c1d44be74b93df57da98bdbd0074581215664b2",
+      "path": "chia-loop/tests/test_chia_framework_vertex_claude.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "0634ecae55b814b45ff877d39325fc7de21eea00373455bb8158dc8e8ee53a3b",
+      "path": "chia-loop/tests/test_chia_framework_failures.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "f1be304663dcde9e081c1c2b89576f5d4080b3be01fa8851ac983e32158828f5",
+      "path": "chia-loop/tests/test_campaign_results.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "76e6d8d4e59c895de5028f9e0e44f85bbb572db29b19c761c8a3c091ff740443",
+      "path": "chia-loop/tests/test_chia_framework_deepseek.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "e9970f9862f1d996d0ac8ebe835ec60b5af3d589c83db83214acd216cad0cb7d",
+      "path": "chia-loop/tests/test_chia_framework_transport.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "9ebf15e00d7da410083eb06d0f899c17efa3a1e6c418aa978c698a9f942b8e5e",
+      "path": "chia-loop/tests/test_final_study_lifecycle.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "9243d2d9719c5d981b6d4d1701c223d0a39b14904aa0c1138718a6293118e6d1",
+      "path": "chia-loop/tests/test_chia_framework_agent.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "a9eab6ec6b9a02987fa3acbe38ad98f867545c8e78f0b3bec1e2ac7cb596dfeb",
+      "path": "chia-loop/tests/test_champsim_placement.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "1a45dc4280599dfeeaf21d45be9bd4d2363333f8c12a93da9b96aa8d06fc508e",
+      "path": "chia-loop/tests/test_chia_framework_execution.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "7c0411eaab9144301492e51965766c13ee725ac5c4b1f23fa7bbc63a59083dbf",
+      "path": "chia-loop/tests/test_chia_framework_archive.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "1becd30285774dcbeea778fbe80cdc704d8d61624082c6e1e0d2af9cde78c6a1",
+      "path": "chia-loop/tests/test_chia_framework_diagnostic_deadlines.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "0b2fbaf3f5d16f238c5f3b66f4bd9a8bd2e51f98ae48db36cd75951ba17ba332",
+      "path": "chia-loop/tests/test_chia_framework_workspace.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "8ef445ded5af1b88f40418e7a02ad3a284112a5ed852746bc8b30b4713f42ca6",
+      "path": "chia-loop/tests/test_final_study.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "938bbaacbfe789d53361d369531c3b6964e1208525dff2f8b1a4b8d4ad11b6e0",
+      "path": "chia-loop/tests/test_chia_framework_export.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "2309e6b5886d65e3422f47c3ccda5d76ef42cd13c14c84415f3038d8e059415d",
+      "path": "chia-loop/tests/test_dram_speed.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "51b0730f1f3b26e3863f76954c049e4332f2b53379f760a720fb9c187c8c8e01",
+      "path": "chia-loop/tests/test_chia_framework_tools.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "8529eb5f5f7ef4615c5def9b412c0be6878aabe69eb47f4f7ae398ebd27d99ff",
+      "path": "chia-loop/tests/test_chia_framework_campaign.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "592e8e8bc72c49d1ce0bb6899929b0c7e47f48a0276ed6b26f1a1b1c32443766",
+      "path": "chia-loop/tests/test_baseline_upstream.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "5b717301b9dfc31fab34f5e69689f797f1b4306ebc13a1f6d4b7c5edc20496db",
+      "path": "chia-loop/tests/test_chia_framework_transfer_requests.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "8dfe34cf365822a04b4e6f9487e048436e688464a7e1f9d30b75d612e5b1c739",
+      "path": "chia-loop/tests/test_chia_framework_config.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "4dfac781d14998985f3dcd85e9abde45666e5d446e7df7a39f0fd840fffa9c8d",
+      "path": "chia-loop/tests/test_champsim_mixes.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "72c22f45df70dab5666252dafd6c11d84cb41ae0de28d3ba987ab915637ff414",
+      "path": "chia-loop/tests/test_chia_framework_build.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "bf01a62a50446774cbe87a4becdf580c41e35416137760bd49c813733408c98f",
+      "path": "chia-loop/tests/test_chia_framework_model_adapters.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "5bc013cae184fe1bf5751a8790b9eacd698208ab6206cd4a749b9a465266851e",
+      "path": "chia-loop/tests/test_chia_framework_staged.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "a359861fde43fd82887e332a98b14c28a90901c4b1bebe85e5e04799415754c6",
+      "path": "chia-loop/tests/test_chia_framework_scoring.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "e365d19d786130ead4ba89c45f3b97b7c4314c3bc40c9cf051abb1b952f6f3a0",
+      "path": "chia-loop/tests/test_chia_framework_candidate.py"
+    },
+    {
+      "origin": "existing-qualification-test",
+      "original_sha256": "e287b5b4ac27719c1674b21e5cc7e9166bd133037303e9f7b994a44b17f5c67e",
+      "path": "chia-loop/tests/test_chia_framework_compaction.py"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "e077a1a52e7081381b460bcc707836e0b8ca82de48adaa40f9ba54fc125d388f",
+      "path": "chia-loop/tests/utils/check_chia_authenticated_tools.py"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "fff9187c6041fb2c58a510a0c737d6c335c11e735571dd4f38715a896fc057ed",
+      "path": "chia-loop/tests/utils/baseline_trace_driver.cpp"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "be124a81c3abda56f63f70358aa029ee58a58827afb0e2ab12c4df0d1db5ab67",
+      "path": "chia-loop/tests/utils/check_chia_native_parity.py"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "ea750f50e512b2863e7714b48077061cecc2f2b5554baff4a21a94b7aac88bbb",
+      "path": "chia-loop/tests/utils/check_champsim_contention_traffic.py"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "5b651b73d88951bfec0c5eafbf4e9717e31fa67bd178edad8c8ef2c19a4d1645",
+      "path": "chia-loop/tests/utils/check_champsim_placement.cc"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "e43da78d95fb2f88335c56fcb4a85bffeeca8eb582ace12249860cb4fd860bd7",
+      "path": "chia-loop/tests/utils/check_champsim_contention.cc"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "e0a688d391baffd8d6bd42b47bd5822e5e48c9237465b7500d401aea549de803",
+      "path": "chia-loop/tests/utils/check_champsim_multicore.cc"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "1307ac9299206914940fcecce4655c6cd77a0ef3fffe5da736dd0c3beeedc487",
+      "path": "chia-loop/tests/utils/check_chia_backend_boundary.py"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "fd28d073dc459c131f09b9faa0f1cab3da6be098bb1bbba7aedd76fdaacd51b0",
+      "path": "chia-loop/tests/utils/check_champsim_retirement_progress.py"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "86a6939671f8d631189ee0e33a67dcdb0a62c07bbb7e24e763686b8a4e76c744",
+      "path": "chia-loop/tests/utils/check_chia_native_tasks.py"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "c24ac90c07791692c3448797ab17277e4c18a5f03d3e45d7a54ccf46da111139",
+      "path": "chia-loop/tests/utils/check_champsim_placement_traffic.py"
+    },
+    {
+      "origin": "existing-qualification-fixture",
+      "original_sha256": "2c3e01317a9f59dbe7e2c2aa7e1a5e70f501686e339429f7ed6f6024f7131051",
+      "path": "chia-loop/tests/utils/check_chia_clean_campaign.py"
+    },
+    {
+      "origin": "ramulator-upstream-license",
+      "original_sha256": "74a1f19701bb06cb80b4ec31e6de6472f5fd767e5949c1c4d51f70007d18b3f2",
+      "path": "LICENSE"
+    }
+  ],
+  "upstream_ramulator_revision": "72427a1bba3771564c4fb0e494ba02242fd1eaa7"
+}

@@ -1,0 +1,132 @@
+--- a/queue_model_windowed_mg1.cc
++++ b/queue_model_windowed_mg1.cc
+@@ -1,11 +1,9 @@
+ #include "queue_model_windowed_mg1.h"
+-#include "simulator.h"
+-#include "config.hpp"
+-#include "log.h"
+-#include "stats.h"
+ 
+-QueueModelWindowedMG1::QueueModelWindowedMG1(String name, UInt32 id)
+-   : m_window_size(SubsecondTime::NS(Sim()->getCfg()->getInt("queue_model/windowed_mg1/window_size")))
++namespace Ramulator::Sniper {
++
++QueueModelWindowedMG1::QueueModelWindowedMG1(SubsecondTime window)
++   : m_window_size(window)
+    , m_total_requests(0)
+    , m_total_utilized_time(SubsecondTime::Zero())
+    , m_total_queue_delay(SubsecondTime::Zero())
+@@ -13,9 +11,8 @@
+    , m_service_time_sum(0)
+    , m_service_time_sum2(0)
+ {
+-   registerStatsMetric(name, id, "num-requests", &m_total_requests);
+-   registerStatsMetric(name, id, "total-time-used", &m_total_utilized_time);
+-   registerStatsMetric(name, id, "total-queue-delay", &m_total_queue_delay);
++   if (window <= SubsecondTime::Zero())
++      throw std::invalid_argument("WMG1 requires a positive window");
+ }
+ 
+ QueueModelWindowedMG1::~QueueModelWindowedMG1()
+@@ -26,9 +23,8 @@
+ {
+    SubsecondTime t_queue = SubsecondTime::Zero();
+ 
+-   // Advance the window based on the global (barrier) time, as this guarantees the earliest time any thread may be at.
+-   // Use a backup value of 10 window sizes before the current request to avoid excessive memory usage in case something fishy is going on.
+-   removeItems(std::max(Sim()->getClockSkewMinimizationServer()->getGlobalTime() - m_window_size, pkt_time - 10*m_window_size));
++   // Ramulator delivers globally ordered arrivals; global time is pkt_time.
++   removeItems(pkt_time - m_window_size);
+ 
+    if (m_num_arrivals > 1)
+    {
+@@ -78,3 +74,5 @@
+       m_window.erase(entry);
+    }
+ }
++
++}  // namespace Ramulator::Sniper
+--- a/queue_model_windowed_mg1.h
++++ b/queue_model_windowed_mg1.h
+@@ -1,34 +1,53 @@
+-#ifndef __QUEUE_MODEL_WINDOWED_MG1_H__
+-#define __QUEUE_MODEL_WINDOWED_MG1_H__
++// Sniper WMG1 adapter declarations. See LICENSE, UPSTREAM.json and the patch.
++// No Sniper runtime, global singleton or statistics registry is imported.
++#ifndef RAMULATOR_SNIPER_WMG1_H
++#define RAMULATOR_SNIPER_WMG1_H
++
++#include <algorithm>
++#include <compare>
++#include <cstdint>
++#include <map>
++#include <stdexcept>
+ 
+-#include "queue_model.h"
+-#include "fixed_types.h"
+-#include "contention_model.h"
++namespace Ramulator::Sniper {
+ 
+-#include <map>
++using core_id_t = int;
++using UInt64 = uint64_t;
+ 
+-class QueueModelWindowedMG1 : public QueueModel
+-{
+-public:
+-   QueueModelWindowedMG1(String name, UInt32 id);
+-   ~QueueModelWindowedMG1();
+-
+-   SubsecondTime computeQueueDelay(SubsecondTime pkt_time, SubsecondTime processing_time, core_id_t requester = INVALID_CORE_ID);
+-
+-private:
+-   const SubsecondTime m_window_size;
+-
+-   UInt64 m_total_requests;
+-   SubsecondTime m_total_utilized_time;
+-   SubsecondTime m_total_queue_delay;
+-
+-   std::multimap<SubsecondTime, SubsecondTime> m_window;
+-   UInt64 m_num_arrivals;
+-   UInt64 m_service_time_sum; // In ps
+-   UInt64 m_service_time_sum2; // In ps^2
++// The kernel uses picoseconds. Negative cutoff times are intentional at
++// startup; unlike simulated timestamps they must not wrap to UINT64_MAX.
++// PS() truncates nonnegative floating-point delays just like upstream PS().
++class SubsecondTime {
++ public:
++  static SubsecondTime PS(int64_t ps) { return SubsecondTime(ps); }
++  static SubsecondTime Zero() { return PS(0); }
++  uint64_t getPS() const { return m_ps; }
++  auto operator<=>(const SubsecondTime&) const = default;
++  SubsecondTime operator-(SubsecondTime other) const { return PS(m_ps - other.m_ps); }
++  SubsecondTime& operator+=(SubsecondTime other) { m_ps += other.m_ps; return *this; }
++ private:
++  explicit SubsecondTime(int64_t ps) : m_ps(ps) {}
++  int64_t m_ps;
++};
+ 
+-   void addItem(SubsecondTime pkt_time, SubsecondTime service_time);
+-   void removeItems(SubsecondTime earliest_time);
++class QueueModelWindowedMG1 {
++ public:
++  explicit QueueModelWindowedMG1(SubsecondTime window);
++  ~QueueModelWindowedMG1();
++  SubsecondTime computeQueueDelay(SubsecondTime pkt_time, SubsecondTime processing_time,
++                                 core_id_t requester = -1);
++ private:
++  const SubsecondTime m_window_size;
++  UInt64 m_total_requests;
++  SubsecondTime m_total_utilized_time;
++  SubsecondTime m_total_queue_delay;
++  std::multimap<SubsecondTime, SubsecondTime> m_window;
++  UInt64 m_num_arrivals;
++  UInt64 m_service_time_sum;
++  UInt64 m_service_time_sum2;
++  void addItem(SubsecondTime pkt_time, SubsecondTime service_time);
++  void removeItems(SubsecondTime earliest_time);
+ };
+ 
+-#endif /* __QUEUE_MODEL_WINDOWED_MG1_H__ */
++}  // namespace Ramulator::Sniper
++#endif

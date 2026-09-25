@@ -1,0 +1,6 @@
+Campaign,Frozen date,Request context,cache_write,cache_write_1h,cache_write_5m,cached_input,input,output,Units,Source,Tariff SHA256
+Astra,2026-09-19,≤ 272000,12.5,,,1.0,10.0,50.0,USD per million tokens,https://developers.openai.com/api/docs/models/gpt-6-astra,60fac09345e2d91c666f8922ed9e4ee4614aaa21ab1466e740b16de853a97fac
+Astra,2026-09-19,> 272000,25.0,,,2.0,20.0,75.0,USD per million tokens,https://developers.openai.com/api/docs/models/gpt-6-astra,60fac09345e2d91c666f8922ed9e4ee4614aaa21ab1466e740b16de853a97fac
+DeepSeek,2026-09-19,All,0.0,,,0.006,0.3,1.2,USD per million tokens,https://api-docs.deepseek.com/quick_start/pricing/ (V4.1 Flash peak-rate equivalent; not time-adjusted billing),979716e5d35219a7536bf9d715bed5024a1ad1d73e576abf4b994e8b43f379d9
+Gemini,2026-09-19,All,0.75,,,0.075,0.75,3.75,USD per million tokens,https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing,56daad123036fd22a12ba24914dd424c523a80dfaecd27b02b2d0dbe9bd4c1b7
+Opus 5.5,2026-09-23,All,5.0,8.0,5.0,0.2,4.0,20.0,USD per million tokens,https://platform.claude.com/docs/en/models/opus-5-5/whats-new-opus-5-5,8bba2cdfdee50f0786f812c76c75f9e771a700e07ec1d203a439391bd47dc74b

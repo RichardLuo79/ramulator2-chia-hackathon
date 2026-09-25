@@ -1,0 +1,25 @@
+{
+  "files": [
+    {
+      "path": "tools/eval/lat_tp_models.py",
+      "sha256": "6c1acb3796466307e1573c882d1ccd1c3f8c93da81ff96a3ef79636b415f433b",
+      "in_original_inventory": true
+    },
+    {
+      "path": "tests/latency_throughput/utils/spec.py",
+      "sha256": "d5477f029d0f426a50eef8dc11892e3a85bc5475c47187f8cfd58201ee5fa0ad",
+      "in_original_inventory": false
+    },
+    {
+      "path": "tests/latency_throughput/utils/runner.py",
+      "sha256": "1d51afaa9e34df8658b9622f0783d3522e1aa80744c3ddb956f32828e439a9f3",
+      "in_original_inventory": false
+    },
+    {
+      "path": "tests/latency_throughput/testcases/ddr5.py",
+      "sha256": "b9e978b3e6cac5ed417f45e84d46ce1f18bc3cedcf875ffa618d5c8182ce0feb",
+      "in_original_inventory": false
+    }
+  ],
+  "adaptation": "module relocation and minimal source selection; qualified case and numerical routines unchanged"
+}

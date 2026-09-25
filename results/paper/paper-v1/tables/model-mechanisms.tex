@@ -1,0 +1,10 @@
+\begingroup\footnotesize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.06}
+\begin{tabular}{@{}p{0.18\columnwidth}p{0.37\columnwidth}p{0.40\columnwidth}@{}}
+\toprule
+\raggedright Mechanism & \raggedright GPT-6 Astra & \raggedright Opus 5.5 \tabularnewline
+\midrule
+\raggedright Row locality & \raggedright Recent-row history; separate read/write row histories & \raggedright Open-row windows; hit/conflict timing \tabularnewline
+\raggedright Contention & \raggedright Bank/group/channel readiness; averaged activation demand & \raggedright Activation and column-command calendars \tabularnewline
+\raggedright Writes & \raggedright Amortized write cost and recovery estimates & \raggedright Buffered writes, forwarding, and drain estimates \tabularnewline
+\bottomrule
+\end{tabular}\endgroup

@@ -1,0 +1,12 @@
+{
+  "schema": "paper-convergence-v1",
+  "evidence": "6bb696a558ddc9e41ed01d4fb7d788d6d462598d7f8a12d1afcf41fec760dfdd",
+  "payload_sha256": "8e9e8fa3a7539e9a9ed81e2b5b2c2fcaf043c1b54681d1da0496a80423e74bee",
+  "generator_sha256": "015dba63cd9a131f6c2ed1e485e26d5a0985d6930ef79aabed6c1f5829fbb17d",
+  "files": {
+    "foundation-convergence.pdf": "9e85c843e69ee6c9e59228a6f4221e8eec9fefb1b18134aa2703ff0955eac4fd",
+    "foundation-convergence.svg": "0b9e116233156d94d6136a18ae91960591914b1a8a0bc2fc1fd486f677b63361",
+    "foundation-convergence.png": "25e1ef20613ba6189c36e61196d47a42d43dab3c36b7851dbe7a0c59a7de1911",
+    "foundation-convergence.csv": "21de82d6183e5b9db20d5f72b11cea994cc579900b2a12d157c83066d07c9aa4"
+  }
+}

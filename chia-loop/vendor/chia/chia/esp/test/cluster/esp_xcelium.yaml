@@ -1,0 +1,102 @@
+# Chia cluster for the license-gated ESP simulation flow (make xmsim):
+# head on this machine, one chia-esp worker container on a remote sim host
+# with the site's CAD installs bind-mounted read-only. (ESP's xmsim flow
+# needs Xcelium, plus Vivado once per checkout to compile the Xilinx
+# simulation libraries.)
+#
+# No hostnames or site paths live in this file — they come from environment
+# variables (expanded at config load), normally via the gitignored
+# esp_site_env.sh that esp_cluster.sh auto-sources; see
+# esp_site_env.example.sh for the shape:
+#
+#   CHIA_ESP_SIM_HOST       machine to run the worker on
+#   CHIA_ESP_CAD_MOUNT_OPTS -v flags bind-mounting the CAD tool trees
+#   CHIA_ESP_CAD_ENV        command putting the tools + licenses in the env
+#
+# Prerequisites beyond esp_local.yaml's: passwordless SSH to the sim host,
+# docker there, and the ghcr.io/ucb-bar/chia-esp image present on it
+# (build it there, or docker-save/load it, until the image is published).
+#
+# Bring up / tear down:
+#   ESP_CLUSTER_YAML=chia/esp/test/cluster/esp_xcelium.yaml \
+#       ./chia/esp/test/cluster/esp_cluster.sh up -y
+
+cluster_name: chia-esp-xcelium
+
+# The head must be identified by an IP routable FROM the sim host: loopback
+# here would make the remote worker join whatever listens on ITS OWN 6379.
+provider:
+    head_ip: "${CHIA_ESP_HEAD_IP}"
+
+# NOTE: if the sim host cannot reach the head's Ray ports directly (campus
+# firewalls), run the WHOLE cluster on the sim host instead: set
+# CHIA_ESP_HEAD_IP and CHIA_ESP_SIM_HOST to 127.0.0.1 in the site env and
+# bring the cluster up from that machine. chia's SSH reverse tunneling is
+# not an option on hosts without sudo (it needs route_localnet + iptables).
+auth:
+    ssh_user: ${USER}
+
+available_node_types:
+    # One ESP sim worker. esp_xcelium models license seats (how many
+    # concurrent xmsim runs this worker admits); esp_fpga (capacity 1)
+    # serializes access to the one attached board. NOTE: esp_vivado (FPGA
+    # synthesis) is advertised on the HEAD, not here — Vivado's synthesis
+    # hangs in this Ubuntu-18 image, so synth runs on the bare host worker
+    # against a same-path shared workspace (see CHIA_ESP_SHARED_WORKSPACE).
+    esp_sim:
+        resources: {"esp": 4, "esp_xcelium": 4, "esp_fpga": 1}
+        num_workers: 1
+        # Quoted: an unquoted ${...} inside a YAML flow sequence parses as a
+        # flow mapping and errors out.
+        compatible_ips: ["${CHIA_ESP_SIM_HOST}"]
+        worker_setup_commands:
+            - "source /home/espuser/esp_env.sh"
+            - "${CHIA_ESP_CAD_ENV}"
+            # Vivado is needed once per checkout (Xilinx simlib compile) and
+            # its bin dir is not always covered by the CAD env script.
+            - "export PATH=$PATH:${CHIA_ESP_VIVADO_BIN}"
+            # vivado_hls (ESP's C++ accelerator flow) last shipped with
+            # Vivado 2020.1; appended last so a newer `vivado` still wins.
+            - "export PATH=$PATH:${CHIA_ESP_VIVADO_HLS_BIN}"
+        docker:
+            image: "ghcr.io/ucb-bar/chia-esp:latest"
+            container_name: "chia_esp_sim"
+            pull_before_run: false
+            run_options:
+                # One or more -v flags (items are space-joined). Bind the
+                # concrete tool subtrees, NOT an autofs root — binding the
+                # autofs mount point yields empty stub dirs in the container.
+                - ${CHIA_ESP_CAD_MOUNT_OPTS}
+                # Shared ESP workspace, bind-mounted at the SAME host path so
+                # the container (configure/build) and the head's bare Vivado
+                # worker (synth) operate on one tree — Vivado bakes absolute
+                # paths into its project, so the paths must match. Drivers
+                # pass this path as esp_root.
+                - "-v ${CHIA_ESP_SHARED_WORKSPACE}:${CHIA_ESP_SHARED_WORKSPACE}"
+                # Required on rootless-podman hosts without subuid ranges
+                # (single-UID namespace: only container-root is mappable, and
+                # image layers are ownership-squashed); harmless under docker.
+                - --user root
+
+head_env_commands:
+    - "${CHIA_HEAD_ENV_SETUP}"
+    # Synthesis toolchain for the head's esp_vivado worker: the synth Vivado
+    # on PATH, its matching XILINX_VIVADO, and the Xilinx license. Kept
+    # separate from the container's CAD env because synth may need a
+    # different (era-matched) Vivado than the sim/simlib flow.
+    - "${CHIA_ESP_SYN_ENV}"
+
+head_start_ray_commands:
+    - ray stop
+    # The head is a bare host process with the site's Vivado + a shared view
+    # of the workspace, so it carries the esp_vivado seat(s): FPGA synthesis
+    # schedules here, off the container (whose old userland hangs Vivado).
+    # Whole line quoted: the inline resources JSON would otherwise parse as a
+    # YAML flow mapping.
+    - "ulimit -c unlimited && ray start --head --port=6379 --include-dashboard=True --dashboard-agent-listen-port=0 --resources='{\"esp_vivado\": 2}'"
+
+worker_start_ray_commands:
+    - ray stop
+    - ray start --address=$RAY_HEAD_IP:6379 --dashboard-agent-listen-port=0
+
+file_mounts: {}

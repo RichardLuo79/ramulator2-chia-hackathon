@@ -1,0 +1,8 @@
+arm,complete,failed,incomplete,pending
+oracle,157,0,0,0
+fixedlat,52,3,0,102
+md1,157,0,0,0
+wmg1,157,0,0,0
+mess,51,2,0,104
+astra_single_core,157,0,0,0
+deepseek_single_core,157,0,0,0

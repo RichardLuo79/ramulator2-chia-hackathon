@@ -1,0 +1,25 @@
+% Generated from the verified paper additions; cache latencies are core cycles.
+\begingroup\fontsize{7}{8}\selectfont\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.02}
+\begin{tabular}{@{}p{0.39\columnwidth}p{0.575\columnwidth}@{}}\toprule
+\textbf{Component} & \textbf{Configuration} \\\midrule
+Core & Out-of-order, 4 GHz \\
+Fetch/decode/dispatch & \mbox{6/6/6/4/5} instructions/cycle \\
+\quad /execute/retire &  \\
+ROB; load/store queue & 352; 128/72 entries \\
+Branch prediction & Bimodal; basic BTB \\
+L1I & 32 KiB, 8-way, 4 cycles \\
+L1D & 48 KiB, 12-way, 5 cycles \\
+L2 & 512 KiB, 8-way, 10 cycles \\
+LLC & 2 MiB, 16-way, 20 cycles \\
+Cache line; prefetching & 64 B; disabled \\
+Pages; first-touch penalty & 4 KiB; 200 cycles \\
+Physical placement & Timing-independent, preassigned \\
+Warmup / measured & 2M / 20M instructions \\
+\midrule
+DRAM & DDR5-4800AN, 8 GiB, $\times$8 devices \\
+Channel/rank/banks & 1 / 1 / $8\times4$ (groups $\times$ banks) \\
+Oracle; row policy & GenericDDR / FRFCFS-RowHit; open \\
+Read/write queues & 64/64 entries \\
+Write-drain low/high & 0.5/0.8 \\
+Refresh & Disabled \\
+\bottomrule\end{tabular}\endgroup

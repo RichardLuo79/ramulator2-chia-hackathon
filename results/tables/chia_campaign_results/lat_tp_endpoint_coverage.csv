@@ -1,0 +1,6 @@
+arm,complete,failed,incomplete,pending
+oracle,157,0,0,0
+astra_single_core,157,0,0,0
+astra_multicore,157,0,0,0
+deepseek_single_core,157,0,0,0
+deepseek_multicore,157,0,0,0

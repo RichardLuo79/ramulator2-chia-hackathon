@@ -1,0 +1,11 @@
+# Install the pinned, patched CHIA source from vendor/chia, not unpatched PyPI CHIA.
+pydantic==2.12.4
+google-genai==2.8.0
+openai==2.29.0
+anthropic[vertex]==1.7.0
+httpx==0.28.1
+mcp==1.27.1
+numpy==2.3.3
+pandas==2.3.2
+matplotlib==3.10.6
+pytest==9.0.3

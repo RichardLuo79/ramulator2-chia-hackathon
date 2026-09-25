@@ -1,0 +1,427 @@
+{
+  "schema": "chia-paper-figures-v1",
+  "snapshot": "paper-v1",
+  "paper_revision": "67034d3b5512b63b66fb0bc6d4e114bf7514a0d7",
+  "uses_working_tree": true,
+  "paper_sources": {
+    "main.tex": "6c92a384c6da7b694ef39e3286e2cbd79c0036e59757aad595d98ae1b8d281e3",
+    "sections/00-abstract.tex": "5cb1313160c212aa73112ec05217fbeb5f5e0f3cadfc824b8f3fbcaf8075ef05",
+    "sections/01-introduction.tex": "f5fa5a93a6bee2dcc64d99f72dcb33f53c2ab4b3d32025f0f11fd6a3f98b4678",
+    "sections/02-methodology.tex": "43da4e992795d5df9c8c2d7a0dd0efb9f89dd723dbf1c07fd894177f4aa8ecc1",
+    "sections/03-single-core-results.tex": "2b7a2bfe1ca2b3ea48c768c7c5a5eeba8b72b154adbf6f7d7f80ec3aa6977534",
+    "sections/04-extensions.tex": "82a259dc51f305c281bba544c00777487fd4f72665f12384547b3542acc0c920",
+    "sections/06-conclusion.tex": "57b28b7281845d6639614ec86d0809783add62bf1c0a7a99489fe1c4c2fdfeba",
+    "scripts/plot_paper.py": "6bfc2a8450bf19b265508d38870dbad6c2b90d3eb4f66cd1a9f40272489bd936",
+    "scripts/plot_chia_workflow.py": "e90bb48016a733a83df6028df4ae2ed23a8d0e37fa7ff88f1f37b9e2d3c9f087",
+    "scripts/import_paper_evidence.py": "bec0f18e71dd64901935f5aafe6dc5c80f0c85443cc611c8724288612e54a4a9"
+  },
+  "files": {
+    "paper-evidence.json": {
+      "sha256": "0e2fd553ad2c4acaf339688d68ef40d569e62255f9be4af72070520cbe3b524e",
+      "bytes": 1078835
+    },
+    "paper-additions.json": {
+      "sha256": "727b675f163c299780fe50f1c8845161eb632e9ff070968078622c3c6c8d484e",
+      "bytes": 1857838
+    },
+    "paper-convergence.json": {
+      "sha256": "0d5c25f122ba3b21f8bf1203a1536f23fecf6cab35d81381b8e571367a56f423",
+      "bytes": 54623
+    },
+    "paper-extensions.json": {
+      "sha256": "7fc035baa0c519fb0587e1ab3545543dc6daa129d0ece98b96f5234f78b838d5",
+      "bytes": 1913405
+    },
+    "tables/simulation-configuration.tex": {
+      "sha256": "153e01038a0fafcb8002686fa84dfda06b69d120d521c89d1e00437611c0e191",
+      "bytes": 1153
+    },
+    "tables/model-mechanisms.tex": {
+      "sha256": "7b33f7055875599b02b9372d2be66b1e491ddc5f3966e5d7f4a824eef7ad7e47",
+      "bytes": 800
+    },
+    "reference-tables/foundation-accuracy.csv": {
+      "sha256": "0dd0b370f8a94564fe76181c074254c637d34055fd83b5e844666cc41f98b7f0",
+      "bytes": 637
+    },
+    "reference-tables/foundation-convergence.csv": {
+      "sha256": "21de82d6183e5b9db20d5f72b11cea994cc579900b2a12d157c83066d07c9aa4",
+      "bytes": 14471
+    },
+    "reference-tables/foundation-speed.csv": {
+      "sha256": "ec4e02e311adebdd02f59d4959ecb4b950007e34b3786a5a93bfb40d2c32ab3b",
+      "bytes": 20905
+    },
+    "reference-tables/foundation-speed-summary.csv": {
+      "sha256": "1698e9e3a03ff4eace77e1e8122bd5fa77071e10837ab8021ebf388b870fb9f5",
+      "bytes": 376
+    },
+    "reference-tables/foundation-usage.csv": {
+      "sha256": "a50f2ce62fb8f2a23ad0f47703000d8e46e4fa6be3b925abcd0e4318d5f4527d",
+      "bytes": 1683
+    },
+    "reference-tables/extension-gem5.csv": {
+      "sha256": "83f620336008f1b09614dc6d3a96cc2925d346b407ff923f664949a3f2d504c2",
+      "bytes": 695
+    },
+    "reference-tables/extension-hardware.csv": {
+      "sha256": "cb480514a12055b6ad75428557c9d74bb68f741e12b32f078444fb791980a53d",
+      "bytes": 2290
+    },
+    "reference-tables/extension-multicore.csv": {
+      "sha256": "f8a3313d8d464b2540cf01471d66bdf8f26c77e288b1c847809855a002862689",
+      "bytes": 2158
+    }
+  },
+  "figures": [
+    {
+      "number": 1,
+      "name": "chia-loop-workflow",
+      "label": "fig:workflow",
+      "caption_latex": "Workflow of our CHIA loop.",
+      "caption_markdown": "Workflow of our CHIA loop.",
+      "section": "sections/02-methodology.tex",
+      "paper_asset": "figures/chia-loop-workflow.pdf",
+      "data": [],
+      "function": "draw",
+      "module": "paper_workflow",
+      "paper_exports": {
+        "pdf": "4ee8ef795032ca8987af4318da4079fc91968eff642f1ea9ed93bea8bb06ba11",
+        "svg": "140dbf800cfffbb5ff0e62638063952ab2d0273ee2930d863ccdccae43b49462",
+        "png": "c83e9894f610e0d597fc9789bb1412de1e1365e88257fff9d73aa7e3438661b6"
+      },
+      "reference_tables": []
+    },
+    {
+      "number": 2,
+      "name": "foundation-accuracy",
+      "label": "fig:foundation-accuracy",
+      "caption_latex": "Mean error (core-cycle, top plot, and $\\MAEReq$, bottom plot) on the test set.",
+      "caption_markdown": "Mean error (core-cycle, top plot, and $\\mathrm{MAE}_{\\mathrm{Req}}$, bottom plot) on the test set.",
+      "section": "sections/03-single-core-results.tex",
+      "paper_asset": "figures/foundation-accuracy.pdf",
+      "data": [
+        "paper-evidence.json"
+      ],
+      "function": "foundation_accuracy",
+      "module": "paper_plots",
+      "paper_exports": {
+        "pdf": "2bedf5e461e94dbd9ad9b044016e7fa37bb0524d7977c729bbeb9dc0a7bdb43d",
+        "svg": "89d585a785f032b53a9b5e3081dad21d6d518672b38d3cec6059ad88ec8b4ea7",
+        "png": "e7397f121a129df93ffa24f2db276af7f3e20c93f73c6461381b5e4c12c0ae5b"
+      },
+      "reference_tables": [
+        "foundation-accuracy.csv"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "foundation-convergence",
+      "label": "fig:foundation-convergence",
+      "caption_latex": "Evolution of simulation errors (core-cycle, top plots, log-scale, and $\\MAEReq$, bottom plots) during the CHIA loops.",
+      "caption_markdown": "Evolution of simulation errors (core-cycle, top plots, log-scale, and $\\mathrm{MAE}_{\\mathrm{Req}}$, bottom plots) during the CHIA loops.",
+      "section": "sections/03-single-core-results.tex",
+      "paper_asset": "figures/foundation-convergence.pdf",
+      "data": [
+        "paper-evidence.json",
+        "paper-convergence.json"
+      ],
+      "function": "foundation_convergence",
+      "module": "paper_plots",
+      "paper_exports": {
+        "pdf": "9e85c843e69ee6c9e59228a6f4221e8eec9fefb1b18134aa2703ff0955eac4fd",
+        "svg": "0b9e116233156d94d6136a18ae91960591914b1a8a0bc2fc1fd486f677b63361",
+        "png": "25e1ef20613ba6189c36e61196d47a42d43dab3c36b7851dbe7a0c59a7de1911"
+      },
+      "reference_tables": [
+        "foundation-convergence.csv"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "foundation-speed",
+      "label": "fig:foundation-speed",
+      "caption_latex": "DRAM simulation speedup over the cycle-level oracle, by traffic pattern, read ratio, and request arrival interval. Each data point represents the median across five measurement repetitions.",
+      "caption_markdown": "DRAM simulation speedup over the cycle-level oracle, by traffic pattern, read ratio, and request arrival interval. Each data point represents the median across five measurement repetitions.",
+      "section": "sections/03-single-core-results.tex",
+      "paper_asset": "figures/foundation-speed.pdf",
+      "data": [
+        "paper-additions.json"
+      ],
+      "function": "foundation_speed",
+      "module": "paper_plots",
+      "paper_exports": {
+        "pdf": "7348c7f3ac766dd173d51dcd230df1d3b5598bdf51a565aa122708befff58c02",
+        "svg": "e11a1ae4c3fdd74b97fdc86cceabf93d3feb6bffa572c1ffa871be645e87b3fc",
+        "png": "139737ea4ec26d2ee07a4e97d129d01ccd67e1c60471107b2321818f7e0ca6dd"
+      },
+      "reference_tables": [
+        "foundation-speed.csv",
+        "foundation-speed-summary.csv"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "foundation-usage",
+      "label": "fig:foundation-usage",
+      "caption_latex": "Recorded LLM token usage (solid: input; hatched: output) and estimated API-equivalent LLM cost for all 10 iterations (log scales).",
+      "caption_markdown": "Recorded LLM token usage (solid: input; hatched: output) and estimated API-equivalent LLM cost for all 10 iterations (log scales).",
+      "section": "sections/03-single-core-results.tex",
+      "paper_asset": "figures/foundation-usage.pdf",
+      "data": [
+        "paper-additions.json"
+      ],
+      "function": "foundation_usage",
+      "module": "paper_plots",
+      "paper_exports": {
+        "pdf": "0a2a790de0850b3bcda843a0ed6fb82a013923127d9c9c45c19ad124f50540ae",
+        "svg": "17a565b7699979b7964903e60d0b684ba9c932185f374a32ee319634dc0ce743",
+        "png": "75eecf32c1d0e50e96ad3c38dda35f0c948eefb7ee13029de6e27fe1aed95a28"
+      },
+      "reference_tables": [
+        "foundation-usage.csv"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "extension-gem5",
+      "label": "fig:extension-gem5",
+      "caption_latex": "gem5 accuracy of the models.",
+      "caption_markdown": "gem5 accuracy of the models.",
+      "section": "sections/04-extensions.tex",
+      "paper_asset": "figures/extension-gem5.pdf",
+      "data": [
+        "paper-extensions.json"
+      ],
+      "function": "extension_gem5",
+      "module": "paper_plots",
+      "paper_exports": {
+        "pdf": "a0baeecee5dafb84dd74c630296ec4346c33d8cf9421d5b89528c4b0e9220e9f",
+        "svg": "ae192eead159a4dc7c8aa835ceb77498675f84567d4494bdec78b6b40f5f3900",
+        "png": "75e7d1849b6542ef838b54f2e3c439865f5d733ec86dac548ba86f6c99a5afd3"
+      },
+      "reference_tables": [
+        "extension-gem5.csv"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "extension-hardware",
+      "label": "fig:extension-hardware",
+      "caption_latex": "ChampSim accuracy after changing DRAM bank organizaiton and controller queue depth \\emph{without} retraining the model.",
+      "caption_markdown": "ChampSim accuracy after changing DRAM bank organizaiton and controller queue depth *without* retraining the model.",
+      "section": "sections/04-extensions.tex",
+      "paper_asset": "figures/extension-hardware.pdf",
+      "data": [
+        "paper-extensions.json"
+      ],
+      "function": "extension_hardware",
+      "module": "paper_plots",
+      "paper_exports": {
+        "pdf": "05cb9b836dae55ada457d2dba369471c95af58362563bff1314a41643af0b70d",
+        "svg": "fc1640b0a966cbd7cb9556a085c85a90a3427813ca29bbd252fbecbf5fbf026c",
+        "png": "ec508d2691f2168631e8d2a611b48db7e0f22d8e66a589f38fc2d6e4b53e337b"
+      },
+      "reference_tables": [
+        "extension-hardware.csv"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "extension-multicore",
+      "label": "fig:extension-multicore",
+      "caption_latex": "Multicore errors, averaging eight test mixes separately at four and eight cores. Open/filled model markers denote synthesis after 10 single-core iterations/5 additional multicore iterations. Baselines have one result per core count; fill has no stage meaning for them.",
+      "caption_markdown": "Multicore errors, averaging eight test mixes separately at four and eight cores. Open/filled model markers denote synthesis after 10 single-core iterations/5 additional multicore iterations. Baselines have one result per core count; fill has no stage meaning for them.",
+      "section": "sections/04-extensions.tex",
+      "paper_asset": "figures/extension-multicore.pdf",
+      "data": [
+        "paper-extensions.json"
+      ],
+      "function": "extension_multicore",
+      "module": "paper_plots",
+      "paper_exports": {
+        "pdf": "eba560ccc1a06403b41e9c94121d61a2d104b58f47ea803017a86e62e672face",
+        "svg": "ac9c04e3231b62fea4678771a879fb03f02b3aa3d42da026dd875faa1f688545",
+        "png": "6eb2bda5822fdab4f5f7a97b59762004b4b5b16b10f1fa283d2ee57680e5a53d"
+      },
+      "reference_tables": [
+        "extension-multicore.csv"
+      ]
+    }
+  ],
+  "renderer_adaptations": [
+    "Repository-relative bundle paths and validator imports.",
+    "SVG display after export for notebook output; original plotting calculations unchanged.",
+    "Workflow export separated from its original command-line main function."
+  ],
+  "plotting_functions": {
+    "COLORS": {
+      "original_sha256": "fb28edc0549a6e7a8e0e034dcf262a9c2720bff567f32738cf7bb0ed4a0a7845",
+      "adapted_sha256": "fb28edc0549a6e7a8e0e034dcf262a9c2720bff567f32738cf7bb0ed4a0a7845"
+    },
+    "NAMES": {
+      "original_sha256": "f4d523eb0939bb8d1bda494cdbd870208f7856dbbaa1bd9cc887de1db29a127a",
+      "adapted_sha256": "f4d523eb0939bb8d1bda494cdbd870208f7856dbbaa1bd9cc887de1db29a127a"
+    },
+    "ARMS": {
+      "original_sha256": "703bf0f08a54ae04d56951b64f9bd36b91f051dd8654c709deb7152cf52375c7",
+      "adapted_sha256": "703bf0f08a54ae04d56951b64f9bd36b91f051dd8654c709deb7152cf52375c7"
+    },
+    "ADDITION_COLORS": {
+      "original_sha256": "92f4d610e01c38b6d30a30096e97fe667380c941b049352ac8f94b341449d3da",
+      "adapted_sha256": "92f4d610e01c38b6d30a30096e97fe667380c941b049352ac8f94b341449d3da"
+    },
+    "COMPACT_WIDTH": {
+      "original_sha256": "f686f96fc290b7355edd4f2d89322aad20cf53382df5b393527a3fe09e9ba902",
+      "adapted_sha256": "f686f96fc290b7355edd4f2d89322aad20cf53382df5b393527a3fe09e9ba902"
+    },
+    "WRAPPED_NAMES": {
+      "original_sha256": "4f828324160889dc43c3de78a8199d1611e18c0cd5393055d52a697f3c5f1ed5",
+      "adapted_sha256": "4f828324160889dc43c3de78a8199d1611e18c0cd5393055d52a697f3c5f1ed5"
+    },
+    "style": {
+      "original_sha256": "5789fa9e01215aaefedb12f5b53af989e3430643f87df276f8d03828d898a53e",
+      "adapted_sha256": "5789fa9e01215aaefedb12f5b53af989e3430643f87df276f8d03828d898a53e"
+    },
+    "vertical_export_bbox": {
+      "original_sha256": "7ccddadce28fe16ea231c562f76d0112efbb34b5ac7c57e5f6a963db311a5fd7",
+      "adapted_sha256": "7ccddadce28fe16ea231c562f76d0112efbb34b5ac7c57e5f6a963db311a5fd7"
+    },
+    "save": {
+      "original_sha256": "02a2ba4d2e51be88366103d8a334a82a59839abcc1324a4aa1ccb044e710762c",
+      "adapted_sha256": "da3212e0a287e005282d8637a38a639709959c655b0b7afff1722b9361adcf97"
+    },
+    "csv_table": {
+      "original_sha256": "28e625a74965f4dc9a11ae456acc82f2480d330d53aa43b21e9061f6457cd7dd",
+      "adapted_sha256": "28e625a74965f4dc9a11ae456acc82f2480d330d53aa43b21e9061f6457cd7dd"
+    },
+    "check_figure_text": {
+      "original_sha256": "d154968c2a30eef2d53308063aecc7ba8577cb3f8262b6a31295ab421ceac49c",
+      "adapted_sha256": "d154968c2a30eef2d53308063aecc7ba8577cb3f8262b6a31295ab421ceac49c"
+    },
+    "foundation_accuracy": {
+      "original_sha256": "a75376a0ca1c76f89ac84e9014303112298206ccebc176a384a6d1ad5cba3125",
+      "adapted_sha256": "a75376a0ca1c76f89ac84e9014303112298206ccebc176a384a6d1ad5cba3125"
+    },
+    "foundation_speed": {
+      "original_sha256": "7e201a2a8150677edfdfd8f3957780adcf18c7cddb95dddbd566fd627e5386b1",
+      "adapted_sha256": "7e201a2a8150677edfdfd8f3957780adcf18c7cddb95dddbd566fd627e5386b1"
+    },
+    "foundation_usage": {
+      "original_sha256": "a002169d34ef2c357ad9c0d0c9fbe3c6d4cf50db6172ebb5cbb6e9eb0412cf46",
+      "adapted_sha256": "a002169d34ef2c357ad9c0d0c9fbe3c6d4cf50db6172ebb5cbb6e9eb0412cf46"
+    },
+    "foundation_convergence": {
+      "original_sha256": "7dcf33da837316579f68406cb6041fcaae53817ecbe7e94fdf6d2567b44cf4f2",
+      "adapted_sha256": "ce034ebe481cecdc6c0179edd4ef4df1beb527a04e5db40fb28059a9a84ef808"
+    },
+    "gem5_mode_means": {
+      "original_sha256": "a8c054ca1a6b1e54c8bbae431c6879bb88376608a54490a3fd67deaaaadbf598",
+      "adapted_sha256": "a8c054ca1a6b1e54c8bbae431c6879bb88376608a54490a3fd67deaaaadbf598"
+    },
+    "extension_gem5": {
+      "original_sha256": "465edeab2cdddef04e5e4591a9ea7ceb9c83e15aa61f8f4bb364bac08ab17970",
+      "adapted_sha256": "465edeab2cdddef04e5e4591a9ea7ceb9c83e15aa61f8f4bb364bac08ab17970"
+    },
+    "extension_hardware": {
+      "original_sha256": "df344e66289687641371bbaffb8583123c47d3448b8db2f06761f5f911390b9a",
+      "adapted_sha256": "df344e66289687641371bbaffb8583123c47d3448b8db2f06761f5f911390b9a"
+    },
+    "extension_multicore": {
+      "original_sha256": "00b80e85d731a877a02ff9a32fae79ebcadac600ae417969d03944cf45c527c8",
+      "adapted_sha256": "00b80e85d731a877a02ff9a32fae79ebcadac600ae417969d03944cf45c527c8"
+    }
+  },
+  "validation_functions": {
+    "close": {
+      "original_sha256": "561af62bfd9bd5e92aec7d4114de59b333946a1f8e271c05ca438d7377c94cb7",
+      "adapted_sha256": "561af62bfd9bd5e92aec7d4114de59b333946a1f8e271c05ca438d7377c94cb7"
+    },
+    "require": {
+      "original_sha256": "e30f7615afeb69929b13710dd78b625db9aa518d6e978b0c63554ee0f419ef76",
+      "adapted_sha256": "e30f7615afeb69929b13710dd78b625db9aa518d6e978b0c63554ee0f419ef76"
+    },
+    "check_speed_study": {
+      "original_sha256": "38a12dd03fde9ab300d706d91253b6e685bbb92044ecc0e4c6a65558312fb88e",
+      "adapted_sha256": "38a12dd03fde9ab300d706d91253b6e685bbb92044ecc0e4c6a65558312fb88e"
+    },
+    "check_convergence": {
+      "original_sha256": "7ea8ed8435cc1035c20eb03a4d90ee71800b040bbb11a5c6bdce46483ebbb4c3",
+      "adapted_sha256": "7ea8ed8435cc1035c20eb03a4d90ee71800b040bbb11a5c6bdce46483ebbb4c3"
+    },
+    "extension_headlines": {
+      "original_sha256": "802646c50ec644732771c9da306388dd09eafaa8ebf62d59e2b4ee4fafa7c9e5",
+      "adapted_sha256": "802646c50ec644732771c9da306388dd09eafaa8ebf62d59e2b4ee4fafa7c9e5"
+    },
+    "check_extensions": {
+      "original_sha256": "90eaf62710c7c338af6fe907f53133248ec56b863ef15a7453e1bac5ee7e2858",
+      "adapted_sha256": "90eaf62710c7c338af6fe907f53133248ec56b863ef15a7453e1bac5ee7e2858"
+    }
+  },
+  "workflow_functions": {
+    "WIDTH": {
+      "original_sha256": "004cba98598f1cf1f6d073756fba950ff1f89a09910f9ea3c4927343c597398c",
+      "adapted_sha256": "004cba98598f1cf1f6d073756fba950ff1f89a09910f9ea3c4927343c597398c"
+    },
+    "LAYOUT_HEIGHT": {
+      "original_sha256": "4afa5cf15694c47cc0e8792e76a02ea3ded299d475f9c3f0193672789fa9f226",
+      "adapted_sha256": "4afa5cf15694c47cc0e8792e76a02ea3ded299d475f9c3f0193672789fa9f226"
+    },
+    "INK": {
+      "original_sha256": "f9ba907459cdbefbefdfebfbe3311d0a41bd3919e37714dc0599fa0945ac79ff",
+      "adapted_sha256": "f9ba907459cdbefbefdfebfbe3311d0a41bd3919e37714dc0599fa0945ac79ff"
+    },
+    "TEAL": {
+      "original_sha256": "93a1d2225958c4de6eef9f1451ee1585bd7150441a20da9d88ff21833d1ea334",
+      "adapted_sha256": "93a1d2225958c4de6eef9f1451ee1585bd7150441a20da9d88ff21833d1ea334"
+    },
+    "MUTED": {
+      "original_sha256": "211a039017c32241a6c97b5bf8a6639a626b2ae8458b13acbb025611bb208bb0",
+      "adapted_sha256": "211a039017c32241a6c97b5bf8a6639a626b2ae8458b13acbb025611bb208bb0"
+    },
+    "LINE": {
+      "original_sha256": "ca2035505385324fddcf08d2b624c36cc62abe01eb4e7b4f8fa41daff9f80c21",
+      "adapted_sha256": "ca2035505385324fddcf08d2b624c36cc62abe01eb4e7b4f8fa41daff9f80c21"
+    },
+    "PALE": {
+      "original_sha256": "3868b7143fed2dd78589af3292e4e083c7b3193a92570c8a1aca8751209ece72",
+      "adapted_sha256": "3868b7143fed2dd78589af3292e4e083c7b3193a92570c8a1aca8751209ece72"
+    },
+    "BORDER": {
+      "original_sha256": "d61193a43ccd5efa11f1c3f935742b6e34c6d5fb4374ccc6300f8f1c4caf66c1",
+      "adapted_sha256": "d61193a43ccd5efa11f1c3f935742b6e34c6d5fb4374ccc6300f8f1c4caf66c1"
+    },
+    "CAPTION": {
+      "original_sha256": "b2bccd859ccf9f3e13d437d7c5deef98c94a4e15ea32b2407a58e07473e79942",
+      "adapted_sha256": "b2bccd859ccf9f3e13d437d7c5deef98c94a4e15ea32b2407a58e07473e79942"
+    },
+    "elbow_path": {
+      "original_sha256": "1a82678fddc9af70fd840560ae4d58440a20594752fb4a1f9f9173ea1cefed97",
+      "adapted_sha256": "1a82678fddc9af70fd840560ae4d58440a20594752fb4a1f9f9173ea1cefed97"
+    },
+    "draw": {
+      "original_sha256": "5af7d47f8646b81c640797257b261179451cdb8458619d1e799cd6a77a2cbcff",
+      "adapted_sha256": "5af7d47f8646b81c640797257b261179451cdb8458619d1e799cd6a77a2cbcff"
+    },
+    "validate_layout": {
+      "original_sha256": "6b803d3d6fc1c0895395fa9a25faf4ae925b50c861f540e89092d29532052ce2",
+      "adapted_sha256": "6b803d3d6fc1c0895395fa9a25faf4ae925b50c861f540e89092d29532052ce2"
+    }
+  },
+  "renderers": {
+    "analyses/paper_plots.py": "015dba63cd9a131f6c2ed1e485e26d5a0985d6930ef79aabed6c1f5829fbb17d",
+    "analyses/paper_checks.py": "6b2fd9a06511d14789fd1ffc1c9cf10bc92a23b0e2b29f1eb54f8e003cf35451",
+    "analyses/paper_workflow.py": "bcc0b65e04b668635d7b576a098bb22170f43e3084ab13b13b61b8015ed182a0"
+  },
+  "dependency_files": {
+    "analyses/requirements.txt": "f66fac2387c2bd0b98e7f53fb9ffe0537f8ad6abd567cf6c26e48fa1c1ab6073",
+    "analyses/requirements.lock.txt": "b54e2de4cb741ac36f29fe1b7ec9c994dae5899ef7b0e0898a961e55a634b332"
+  },
+  "execution_dependencies": {
+    "python": "3.12",
+    "external_services": [],
+    "raw_archives": [],
+    "common_helpers": ["analyses/paper_evidence.py", "analyses/paper_notebook.py"],
+    "note": "All figures use the pinned analysis dependencies and shared helpers; code hashes are also in the release inventory."
+  }
+}

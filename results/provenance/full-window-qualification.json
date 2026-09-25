@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "results": [
+    {
+      "case": "validation-c1-bwaves",
+      "model": "oracle",
+      "returncode": 0,
+      "wall_seconds": 52.2162709236145,
+      "passed": true,
+      "checks": {
+        "per_core_cycles": true,
+        "frontend_stats": true,
+        "controller_stats": true,
+        "observations": true
+      }
+    },
+    {
+      "case": "training-c4-05",
+      "model": "astra_single_core",
+      "returncode": 0,
+      "wall_seconds": 706.4057891368866,
+      "passed": true,
+      "checks": {
+        "per_core_cycles": true,
+        "frontend_stats": true,
+        "controller_stats": true,
+        "observations": true
+      }
+    },
+    {
+      "case": "test-c8-03",
+      "model": "oracle",
+      "returncode": 0,
+      "wall_seconds": 1629.635333776474,
+      "passed": true,
+      "checks": {
+        "per_core_cycles": true,
+        "frontend_stats": true,
+        "controller_stats": true,
+        "observations": true
+      }
+    },
+    {
+      "case": "training-c4-05",
+      "model": "oracle",
+      "returncode": 0,
+      "wall_seconds": 701.4742345809937,
+      "passed": true,
+      "checks": {
+        "per_core_cycles": true,
+        "frontend_stats": true,
+        "controller_stats": true,
+        "observations": true
+      }
+    },
+    {
+      "case": "test-c8-03",
+      "model": "astra_single_core",
+      "returncode": 0,
+      "wall_seconds": 1546.0709075927734,
+      "passed": true,
+      "checks": {
+        "per_core_cycles": true,
+        "frontend_stats": true,
+        "controller_stats": true,
+        "observations": true
+      }
+    },
+    {
+      "case": "validation-c1-bwaves",
+      "model": "astra_single_core",
+      "returncode": 0,
+      "wall_seconds": 52.50666356086731,
+      "passed": true,
+      "checks": {
+        "per_core_cycles": true,
+        "frontend_stats": true,
+        "controller_stats": true,
+        "observations": true
+      }
+    }
+  ],
+  "passed": true
+}

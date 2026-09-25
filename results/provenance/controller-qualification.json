@@ -1,0 +1,85 @@
+{
+  "passed": true,
+  "models": [
+    {
+      "model": "oracle",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "preserved qualified deterministic measurement",
+      "event_digest": 745042586573789739,
+      "admission_digest": 17163804165410778617
+    },
+    {
+      "model": "fixedlat",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "preserved qualified deterministic measurement",
+      "event_digest": 2137548556480728171,
+      "admission_digest": 3849106528896794814
+    },
+    {
+      "model": "md1",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "preserved qualified deterministic measurement",
+      "event_digest": 4693687785599692061,
+      "admission_digest": 3849106528896794814
+    },
+    {
+      "model": "wmg1",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "preserved qualified deterministic measurement",
+      "event_digest": 11739338674009643614,
+      "admission_digest": 3849106528896794814
+    },
+    {
+      "model": "mess",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "preserved qualified deterministic measurement",
+      "event_digest": 16017960111072311725,
+      "admission_digest": 3849106528896794814
+    },
+    {
+      "model": "astra_single_core",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "preserved qualified deterministic measurement",
+      "event_digest": 312410163954992499,
+      "admission_digest": 14947764631344378177
+    },
+    {
+      "model": "astra_multicore",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "preserved qualified deterministic measurement",
+      "event_digest": 6835672728342118320,
+      "admission_digest": 12756124156503929172
+    },
+    {
+      "model": "deepseek_single_core",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "preserved qualified deterministic measurement",
+      "event_digest": 9270741276336362858,
+      "admission_digest": 4053306066702135554
+    },
+    {
+      "model": "deepseek_multicore",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "preserved qualified deterministic measurement",
+      "event_digest": 11822981380857632369,
+      "admission_digest": 9488867584299464073
+    },
+    {
+      "model": "opus_single_core",
+      "passed": true,
+      "fixture_sha256": "6d04ca1922fa304f5157645c921058b3217f8c24719b9a85c669684c3f138911",
+      "reference": "same frozen source through qualified reference runtime",
+      "event_digest": 7805262863522921639,
+      "admission_digest": 8196447125047206068
+    }
+  ]
+}

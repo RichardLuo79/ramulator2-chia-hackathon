@@ -1,0 +1,8 @@
+arm,Low-load probe latency (ns),Low-load status,Pure-read streaming (GB/s),Streaming status
+oracle,45.7769312,complete,19.230721153004794,complete
+fixedlat,17.929308799999998,complete,19.24923076923077,complete
+md1,19.4716288,complete,1230.7692307692307,complete
+wmg1,17.887999999999998,complete,595.9630769230769,complete
+mess,45.76,complete,1113.2553846153846,complete
+astra_single_core,45.7769312,complete,19.23100961838946,complete
+deepseek_single_core,45.7760992,complete,19.23100961838946,complete

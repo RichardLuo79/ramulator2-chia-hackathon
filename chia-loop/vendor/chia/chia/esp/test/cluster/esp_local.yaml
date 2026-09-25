@@ -1,0 +1,90 @@
+# Single-machine (localhost) Chia cluster for exercising the ESP worker
+# image (ghcr.io/ucb-bar/chia-esp) against the REAL ESP tools.
+#
+# It is deliberately GENERIC over the ESP nodes: the worker advertises the
+# "esp" resource that every @ChiaFunction esp task schedules against
+# (workspace make/put_file/collect, esp-config, soft/linux builds, and the
+# later sim/accel/FPGA nodes). The soft-build e2e driver in this directory is
+# just the first user of it.
+#
+# Only the LICENSE-FREE flows work on this bare config: ESP images ship no
+# CAD tools. For sim/HLS/bitstream targets, add the host tool mounts and
+# license env vars to docker.run_options (see the commented lines below) and
+# a seat-count resource (e.g. "esp_questa").
+#
+# Topology:
+#   - head:   runs on the host (no docker) — just `ray start --head`. Needs
+#             SOME env with ray + chia active (yours); see head_env_commands.
+#   - worker: one `ghcr.io/ucb-bar/chia-esp` container on the same host. The
+#             image ships the ESP checkout (at /home/espuser/esp, exported as
+#             $ESP_ROOT) + cross-toolchains + a py_worker venv with ray/chia.
+#
+# Prerequisites on the host:
+#   - any conda/venv with ray (2.54.0) + chia, ACTIVATED before you run
+#   - passwordless SSH to 127.0.0.1 (`ssh 127.0.0.1` must not prompt)
+#   - the chia-esp image pullable (or built locally: set pull_before_run: false)
+#
+# Bring up / tear down (activate your env first; the wrapper passes it through):
+#   ./chia/esp/test/cluster/esp_cluster.sh up
+#   ./chia/esp/test/cluster/esp_cluster.sh down
+#
+# Then run the e2e driver (see soft_build_e2e_test.py in this directory).
+
+cluster_name: chia-esp-local
+
+provider:
+    head_ip: 127.0.0.1
+
+auth:
+    ssh_user: ${USER}
+
+available_node_types:
+    # One ESP worker container. `resources.esp` is the pool the
+    # @ChiaFunction(resources={"esp": 1}) tasks schedule against; 4 lets a few
+    # lightweight tasks (put_file/collect, config) run in parallel. NOTE:
+    # concurrent MAKE targets in ONE container share the single baked-in ESP
+    # checkout — a chained flow reserves its own {"CPU":1,"esp":1} bundle via
+    # EspWorkspaceNode, but two independent flows against the same board dir
+    # in the same container will race. Scale independent flows by adding
+    # containers/machines (each container = a private checkout), not by
+    # raising this number.
+    esp:
+        resources: {"esp": 4}
+        num_workers: 1
+        compatible_ips: [127.0.0.1]
+        # esp_env.sh sets up ESP's paths (and, in esp_env_cad.sh's case, CAD
+        # tools) for the login shell that starts ray, so ESP make flows
+        # inherit it. It lives in the image user's home dir.
+        worker_setup_commands:
+            - "source /home/espuser/esp_env.sh"
+        docker:
+            image: "ghcr.io/ucb-bar/chia-esp:latest"
+            container_name: "chia_esp"
+            # Locally built for now; flip back to true once the image is
+            # published to ghcr.
+            pull_before_run: false
+            # For license-gated flows, mount the host CAD installs + license
+            # (see esp_xcelium.yaml for the full simulation setup):
+            # run_options:
+            #     - -v /path/to/cad/tools:/path/to/cad/tools:ro
+            #     - -e CDS_LIC_FILE=<port>@<license-server>
+
+# The head runs on the host via a fresh SSH shell that does NOT inherit your
+# interactive env, so it must re-activate one with ray + chia. The
+# esp_cluster.sh wrapper sets CHIA_HEAD_ENV_SETUP automatically from your
+# currently-active venv/conda env; if you invoke chia directly, export it
+# first. head_env_commands run on both `up` and `down`.
+head_env_commands:
+    - "${CHIA_HEAD_ENV_SETUP}"
+
+head_start_ray_commands:
+    - ray stop
+    - ulimit -c unlimited && ray start --head --port=6379 --include-dashboard=True --dashboard-agent-listen-port=0
+
+# Inside the container ray + chia are on PATH (py_worker venv); the
+# provisioner injects --resources={"esp":4} into this start command.
+worker_start_ray_commands:
+    - ray stop
+    - ray start --address=$RAY_HEAD_IP:6379 --dashboard-agent-listen-port=0
+
+file_mounts: {}

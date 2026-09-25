@@ -1,0 +1,23 @@
+{
+  "candidate": {
+    "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+      "model.cpp": {
+        "bytes": 10453,
+        "sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+      },
+      "parameters.json": {
+        "bytes": 2,
+        "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "050f4c158ac5315d7ca52c1c4cf027f3a0d69b9424bdcf5414525828ab22bad6"
+  },
+  "introduced_round": 10,
+  "retained_at_round": 10,
+  "original_endpoint_manifest_sha256": "7e5c1a2bdcd683d37c511a8524c4b743c0211654cf00d683a72fb49811daf6aa"
+}

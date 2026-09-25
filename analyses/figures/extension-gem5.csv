@@ -1,0 +1,15 @@
+model,arm,mode,cases,mean_absolute_elapsed_time_error_pct
+GPT-6 Astra,astra_single_core,SE,6,0.546612180506379
+GPT-6 Astra,astra_single_core,FS,9,0.34992636638876945
+DeepSeek V4.1 Flash,deepseek_single_core,SE,6,0.5649529106231008
+DeepSeek V4.1 Flash,deepseek_single_core,FS,9,0.8005398176794123
+Queued FixedLat,fixedlat,SE,6,10.202779906587864
+Queued FixedLat,fixedlat,FS,9,10.84400474220839
+M/D/1,md1,SE,6,11.333989240531496
+M/D/1,md1,FS,9,10.362699569179899
+MeSS,mess,SE,6,4.570440674234617
+MeSS,mess,FS,9,3.245582235259794
+Opus 5.5,opus_single_core,SE,6,0.15926458609330962
+Opus 5.5,opus_single_core,FS,9,0.3874003584141107
+WMG1,wmg1,SE,6,14.076683678047793
+WMG1,wmg1,FS,9,11.44886517565713

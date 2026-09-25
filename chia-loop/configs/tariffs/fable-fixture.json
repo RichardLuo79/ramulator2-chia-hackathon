@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "model": "claude-fable-5-1",
+  "accepted_response_models": [],
+  "source": "https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing#claude-models",
+  "checked_date": "2026-09-21",
+  "units": "USD per million tokens",
+  "tiers": [{
+    "maximum_input_tokens": null,
+    "rates": {
+      "input": "10", "output": "50", "cached_input": "0.25",
+      "cache_write": "12.5", "cache_write_5m": "12.5", "cache_write_1h": "20"
+    }
+  }],
+  "request_bounds": {
+    "maximum_input_tokens": 1000000,
+    "maximum_output_tokens": 128000,
+    "source": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/claude/fable-5-1",
+    "checked_date": "2026-09-21"
+  }
+}

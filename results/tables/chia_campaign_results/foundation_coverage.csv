@@ -1,0 +1,13 @@
+arm,cohort,completed_cases,expected_cases,status,schedule
+astra_single_core,training,14,14,complete,10+5
+astra_single_core,validation,14,14,complete,10+5
+astra_single_core,test,24,24,complete,10+5
+deepseek_single_core,training,14,14,complete,10+5
+deepseek_single_core,validation,14,14,complete,10+5
+deepseek_single_core,test,24,24,complete,10+5
+opus_single_core,training,14,14,complete,10 only
+opus_single_core,validation,14,14,complete,10 only
+opus_single_core,test,24,24,complete,10 only
+gemini_single_core,training,14,14,complete,10+5
+gemini_single_core,validation,14,14,complete,10+5
+gemini_single_core,test,24,24,complete,10+5

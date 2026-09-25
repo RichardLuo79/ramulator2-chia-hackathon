@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "Please cite this research artifact when using its sources or results."
+title: "Ramulator–CHIA loop: frozen immediate-response DRAM models and research artifact"
+type: software
+version: "0.1.0"
+date-released: 2026-09-25
+authors:
+  - name: "Research artifact contributors"
+abstract: "Source, frozen models, evidence and reproduction tools for CHIA-based DRAM modeling."

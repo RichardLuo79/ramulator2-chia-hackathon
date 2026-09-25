@@ -1,0 +1,206 @@
+# Single-machine (localhost) Chia cluster covering the union of every backend
+# exercised by the live_remote permission tests (chia/models/tests/conftest.py
+# + the test_live_remote_* tests). 
+#
+#   claude       -> claude_creds       (chia-claude-code)
+#   opencode     -> opencode_creds      (chia-opencode)
+#   antigravity  -> antigravity_creds   (chia-antigravity)
+#   codex        -> codex_creds          (codex CLI layered onto chia-claude-code)
+#   copilot      -> copilot_creds        (copilot CLI layered onto chia-claude-code)
+#   api          -> bedrock_creds, vertex_creds, openai_creds  (one chia-ollama
+#                   worker: the raw-API backends just make HTTPS calls, so a
+#                   single node with all three SDKs + creds serves all of them)
+#   ollama       -> ollama_creds         (chia-ollama, local server)
+#   vllm         -> vllm_creds            (chia-vllm, GPU REQUIRED)
+#
+# The conftest `remote_prompt` fixture SKIPS a test whose creds resource isn't
+# advertised, so COMMENT OUT any node you can't satisfy (no GPU -> drop vllm; no
+# AWS/GCP/OpenAI creds -> drop api; etc.) and the rest still run.
+#
+# Usage (activate an env with ray + chia first):
+#   chia up   chia/models/tests/cluster/all_models.yaml
+#   CHIA_LIVE_CLUSTER=1 RAY_ADDRESS=127.0.0.1:6379 \
+#       pytest chia/models/tests -k live_remote -v
+#   chia down chia/models/tests/cluster/all_models.yaml
+#
+# SITE-SPECIFIC — edit before first use:
+#   * Each CLI/API reads credentials from a mounted dir or env var (see each
+#     node). Point them at YOUR authenticated config; do NOT commit real keys.
+#     Agentic CLIs must already have accepted any "bypass permissions"
+#     disclaimer, or the CLI hangs on first launch.
+#   * The chia-antigravity image tag is a best guess — adjust if needed.
+#   * The provider model is carried on the LLM object built in the test process,
+#     selected by each provider's *_TEST_MODEL env var — set it when you run.
+
+cluster_name: chia-all-models
+
+provider:
+    head_ip: 127.0.0.1
+
+auth:
+    ssh_user: ${USER}
+
+available_node_types:
+
+    # --- Agentic CLIs (the --dangerously-skip-permissions / permission block
+    #     actually executes inside these worker containers) ---
+
+    # ClaudeCodeLLM.prompt gates on {"claude_creds": 0.01}.
+    claude:
+        resources: {"claude_creds": 1}
+        num_workers: 1
+        compatible_ips: [127.0.0.1]
+        docker:
+            image: "ghcr.io/ucb-bar/chia-claude-code:latest"
+            container_name: "chia_test_claude_${USER}"
+            pull_before_run: false
+            pull_timeout: 1800
+            run_options:
+                - "--user $(id -u):$(id -g)"
+                - "-v /scratch/${USER}/.claude:/home/ray/.claude"
+
+    # OpenCodeLLM.prompt gates on {"opencode_creds": 0.01}.
+    opencode:
+        resources: {"opencode_creds": 1}
+        worker_setup_commands: ["source ~/.bashrc"]
+        num_workers: 1
+        compatible_ips: [127.0.0.1]
+        docker:
+            image: ghcr.io/ucb-bar/chia-opencode:latest
+            container_name: "chia_test_opencode_${USER}"
+            pull_before_run: false
+            pull_timeout: 1800
+
+    # AntigravityLLM.prompt gates on {"antigravity_creds": 0.01}.
+    antigravity:
+        resources: {"antigravity_creds": 1}
+        num_workers: 1
+        compatible_ips: [127.0.0.1]
+        docker:
+            image: "ghcr.io/ucb-bar/chia-antigravity:latest"
+            container_name: "chia_test_antigravity_${USER}"
+            pull_before_run: false
+            pull_timeout: 1800
+            run_options:
+                - "--user $(id -u):$(id -g)"
+                - "-v /scratch/${USER}/.gemini:/home/ray/.gemini"
+
+    # CodexLLM.prompt gates on {"codex_creds": 0.01}. No published codex image,
+    # so layer the codex CLI (a Node package) onto chia-claude-code. The global
+    # `npm install -g` needs write access to /usr/lib/node_modules, so this node
+    # runs as root (--user 0:0); HOME stays /home/ray, so its mounted ~/.codex
+    # is still read.
+    codex:
+        resources: {"codex_creds": 1}
+        num_workers: 1
+        compatible_ips: [127.0.0.1]
+        worker_setup_commands:
+            - npm install -g @openai/codex
+        docker:
+            image: "ghcr.io/ucb-bar/chia-claude-code:latest"
+            container_name: "chia_test_codex_${USER}"
+            pull_before_run: false
+            pull_timeout: 1800
+            run_options:
+                # root so `npm install -g` can write to /usr/lib/node_modules
+                - "--user 0:0"
+                - "-v /scratch/${USER}/.codex:/home/ray/.codex"
+
+    # CopilotLLM.prompt gates on {"copilot_creds": 0.01}. No published copilot
+    # image, so layer the copilot CLI (a Node package) onto chia-claude-code,
+    # the same way as the codex node above. In a container copilot has no
+    # system credential store, so it reads credentials from the mounted
+    # ~/.copilot (or from a COPILOT_GITHUB_TOKEN / GH_TOKEN env var).
+    copilot:
+        resources: {"copilot_creds": 1}
+        num_workers: 1
+        compatible_ips: [127.0.0.1]
+        worker_setup_commands:
+            - npm install -g @github/copilot
+        docker:
+            image: "ghcr.io/ucb-bar/chia-claude-code:latest"
+            container_name: "chia_test_copilot_${USER}"
+            pull_before_run: false
+            pull_timeout: 1800
+            run_options:
+                # root so `npm install -g` can write to /usr/lib/node_modules
+                - "--user 0:0"
+                - "-v /scratch/${USER}/.copilot:/home/ray/.copilot"
+
+    # --- Raw-API backends (no permission gate; one node serves all three since
+    #     they only make HTTPS calls). chia-ollama already ships chia + ray +
+    #     the openai SDK; boto3 / google-genai are pip-installed at setup. ---
+    api:
+        resources: {"bedrock_creds": 1, "vertex_creds": 1, "openai_creds": 1}
+        num_workers: 1
+        compatible_ips: [127.0.0.1]
+        worker_setup_commands: ["pip install --no-cache-dir boto3 google-genai"]
+        docker:
+            image: "ghcr.io/ucb-bar/chia-ollama:latest"
+            container_name: "chia_test_api_${USER}"
+            pull_before_run: false
+            pull_timeout: 1800
+            run_options:
+                # chia-ollama's entrypoint needs root (mkdir ~/.ollama etc.)
+                # Bedrock (boto3): mount ~/.aws or pass AWS_* env.
+                - "-v /scratch/${USER}/.aws:/home/ray/.aws"
+                - "-e AWS_REGION=us-east-1"
+                # Vertex (google-genai): ADC + project.
+                - "-v /scratch/${USER}/.config/gcloud:/home/ray/.config/gcloud"
+                - "-e GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}"
+                # OpenAI / OpenAI-compatible providers.
+                - "-e OPENAI_API_KEY=${OPENAI_API_KEY}"
+
+    # --- Local-server backends ---
+
+    # OllamaLLM.prompt gates on {"ollama_creds": 0.01}. Mirrors ollama_local.yaml:
+    # the chia-ollama entrypoint starts `ollama serve` and pre-pulls OLLAMA_PULL.
+    ollama:
+        resources: {"ollama_creds": 1}
+        num_workers: 1
+        compatible_ips: [127.0.0.1]
+        docker:
+            image: "ghcr.io/ucb-bar/chia-ollama:latest"
+            container_name: "chia_test_ollama_${USER}"
+            pull_before_run: false
+            pull_timeout: 1800
+            run_options:
+                # chia-ollama's entrypoint needs root (mkdir ~/.ollama etc.)
+                - "-e OLLAMA_PULL=qwen2.5:3b"
+                - "-e OLLAMA_CONTEXT_LENGTH=32768"
+                - "--shm-size=10.24gb"
+
+    # VLLMLLM.prompt gates on {"vllm_creds": 0.01}. GPU REQUIRED (vLLM is
+    # GPU-first) — comment this whole node out on a CPU-only host. Mirrors
+    # vllm_local.yaml; switch image to a local `chia-vllm:test` build if needed.
+    # vllm:
+    #     resources: {"vllm_creds": 1}
+    #     num_workers: 1
+    #     compatible_ips: [127.0.0.1]
+    #     docker:
+    #         image: "ghcr.io/ucb-bar/chia-vllm:latest"
+    #         container_name: "chia_test_vllm_${USER}"
+    #         pull_before_run: false
+    #         pull_timeout: 1800
+    #         run_options:
+    #             - "--gpus all"
+    #             - "--shm-size=16g"
+    #             - "-e VLLM_MODEL=Qwen/Qwen2.5-3B-Instruct"
+    #             - '-e "VLLM_SERVE_ARGS=--max-model-len 8192 --enable-auto-tool-choice --tool-call-parser hermes"'
+    #             - "-v ${HOME}/.cache/huggingface:/root/.cache/huggingface"
+
+# The head runs on the host via a fresh SSH shell that does NOT inherit your
+# interactive env, so re-activate one with ray + chia here (edit to match your
+# install, e.g. "source ~/.bashrc && conda activate chia_env").
+head_env_commands:
+    - "source ~/.bashrc && conda activate chia_env"
+
+head_start_ray_commands:
+    - ray stop
+    - ulimit -c unlimited && ray start --head --port=6379 --include-dashboard=True --dashboard-agent-listen-port=0
+
+worker_start_ray_commands:
+    - ray stop
+    - ray start --address=$RAY_HEAD_IP:6379 --dashboard-agent-listen-port=0
+
+file_mounts: {}

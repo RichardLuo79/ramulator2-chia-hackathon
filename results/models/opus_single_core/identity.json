@@ -1,0 +1,35 @@
+{
+  "candidate": {
+    "candidate_id": "6fc705a0b0bcb31148657c91ffc08919e9e677e7bfe290cfa47932edac2fa21f",
+    "configuration_sha256": "008f589e1edcf55a5a9df431c737f34066b1af0782dd6b832a58e9ec0dd1f491",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+      "model.cpp": {
+        "bytes": 37546,
+        "sha256": "2356f8d33f125a22881c43f65c893c51513f0795278e90dffe3616d39c27867b"
+      },
+      "parameters.json": {
+        "bytes": 219,
+        "sha256": "f6d5fab9a9ef0e2a7464247ce7abda557993692fc0cdf71189d5ff13e69d152b"
+      }
+    },
+    "parameters": {
+      "arrival_buckets": 32,
+      "arrival_model": 3,
+      "col_slip": 1,
+      "drain_after_reads": 3,
+      "drain_block": 1,
+      "drain_pending": 0.5,
+      "pending_cap": 1,
+      "pending_unforced": 1,
+      "pre_wait": 1,
+      "same_cycle_writes": 1,
+      "slip_sync": 1
+    },
+    "schema_version": 1,
+    "source_sha256": "49756d9e3bbc55a10dbb4e2a62fcf91ad6ce4d6b4cb22b3df9999ff37133d58e"
+  },
+  "introduced_round": 10,
+  "retained_at_round": 10,
+  "original_database_sha256": "8713d8b80df603197bbe3534cda55dde934d6d28fdaf0c47560e0ca26173e05c"
+}

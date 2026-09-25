@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ramulator-chia"
+version = "1.0.0"
+description = "Reproduction artifact for agent-synthesized immediate-response DRAM models"
+requires-python = ">=3.11"
+dependencies = ["pyyaml==6.0.3", "numpy>=2,<3", "pydantic==2.12.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ramulator_chia = ["framework/*.json", "framework/prompts/**/*.md", "framework/upstream/*", "eval/calibration/*", "eval/scenarios/*.json", "eval/gem5/*.json", "eval/gem5/*.patch"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=prepend"

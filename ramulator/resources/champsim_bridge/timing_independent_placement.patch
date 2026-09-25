@@ -1,0 +1,243 @@
+diff --git a/inc/vmem.h b/inc/vmem.h
+index f2b461b..b96b3f0 100644
+--- a/inc/vmem.h
++++ b/inc/vmem.h
+@@ -22,6 +22,7 @@
+ #include <map>
+ #include <optional>
+ #include <random>
++#include <string>
+ 
+ #include "address.h"
+ #include "champsim.h"
+@@ -38,8 +39,16 @@ private:
+   std::map<std::tuple<uint32_t, uint32_t, champsim::address_slice<champsim::dynamic_extent>>, champsim::address> page_table;
+   std::optional<uint64_t> randomization_seed;
+   MEMORY_CONTROLLER& dram;
++  decltype(vpage_to_ppage_map) fixed_data;
++  decltype(page_table) fixed_tables;
++  uint64_t placement_bytes = 0;
++  bool fixed_placement = false;
++  void load_placement(const std::string& path);
+ 
+ public:
++  // Untimed preparation only. Live runs load the result in the constructor,
++  // before PTW constructors acquire their root addresses.
++  void prepare_placement(const std::string& inventory, const std::string& output);
+   const champsim::chrono::clock::duration minor_fault_penalty;
+   const std::size_t pt_levels;
+   const pte_entry pte_page_size; // Size of a PTE page
+diff --git a/src/main.cc b/src/main.cc
+index cdc4724..1fc0db6 100644
+--- a/src/main.cc
++++ b/src/main.cc
+@@ -57,6 +57,13 @@ int main(int argc, char** argv) // NOLINT(bugprone-exception-escape)
+ {
+   configured_environment gen_environment{};
+ 
++  // Preparation instantiates the configured VM geometry but runs no cycles,
++  // reads no instructions, and never invokes a DRAM model.
++  if (argc == 4 && std::string{argv[1]} == "--prepare-placement") {
++    gen_environment.ptw_view().front().get().vmem->prepare_placement(argv[2], argv[3]);
++    return 0;
++  }
++
+   CLI::App app{"A microarchitecture simulator for research and education"};
+ 
+   bool knob_cloudsuite{false};
+diff --git a/src/vmem.cc b/src/vmem.cc
+index 5a7cc93..e81c136 100644
+--- a/src/vmem.cc
++++ b/src/vmem.cc
+@@ -17,7 +17,11 @@
+ #include "vmem.h"
+ 
+ #include <cassert>
++#include <cstdlib>
++#include <fstream>
+ #include <fmt/core.h>
++#include <set>
++#include <stdexcept>
+ 
+ #include "champsim.h"
+ #include "dram_controller.h"
+@@ -46,6 +50,8 @@ VirtualMemory::VirtualMemory(champsim::data::bytes page_table_page_size, std::si
+   }
+   populate_pages();
+   shuffle_pages();
++  if (const char* path = std::getenv("CHAMPSIM_PLACEMENT_FILE"))
++    load_placement(path);
+ }
+ 
+ VirtualMemory::VirtualMemory(champsim::data::bytes page_table_page_size, std::size_t page_table_levels, champsim::chrono::clock::duration minor_penalty,
+@@ -57,7 +63,8 @@ VirtualMemory::VirtualMemory(champsim::data::bytes page_table_page_size, std::si
+ void VirtualMemory::populate_pages()
+ {
+   assert(dram.size() > 1_MiB);
+-  ppage_free_list.resize(((dram.size() - 1_MiB) / PAGE_SIZE).count());
++  const auto capacity = placement_bytes ? champsim::data::bytes{static_cast<long long>(placement_bytes)} : dram.size();
++  ppage_free_list.resize(((capacity - 1_MiB) / PAGE_SIZE).count());
+   assert(ppage_free_list.size() != 0);
+   champsim::page_number base_address =
+       champsim::page_number{champsim::lowest_address_for_size(std::max<champsim::data::mebibytes>(champsim::data::bytes{PAGE_SIZE}, 1_MiB))};
+@@ -88,6 +95,8 @@ uint64_t VirtualMemory::get_offset(champsim::page_number vaddr, std::size_t leve
+ 
+ champsim::page_number VirtualMemory::ppage_front() const
+ {
++  if (placement_bytes && available_ppages() == 0)
++    throw std::runtime_error("placement exceeds physical memory capacity");
+   assert(available_ppages() > 0);
+   return ppage_free_list.front();
+ }
+@@ -95,7 +104,7 @@ champsim::page_number VirtualMemory::ppage_front() const
+ void VirtualMemory::ppage_pop()
+ {
+   ppage_free_list.pop_front();
+-  if (available_ppages() == 0) {
++  if (available_ppages() == 0 && !placement_bytes) {
+     fmt::print("[VMEM] WARNING: Out of physical memory, freeing ppages\n");
+     populate_pages();
+     shuffle_pages();
+@@ -106,10 +115,11 @@ std::size_t VirtualMemory::available_ppages() const { return (ppage_free_list.si
+ 
+ std::pair<champsim::page_number, champsim::chrono::clock::duration> VirtualMemory::va_to_pa(uint32_t cpu_num, champsim::page_number vaddr)
+ {
+-  auto [ppage, fault] = vpage_to_ppage_map.try_emplace({cpu_num, champsim::page_number{vaddr}}, ppage_front());
++  const auto key = std::make_pair(cpu_num, champsim::page_number{vaddr});
++  auto [ppage, fault] = vpage_to_ppage_map.try_emplace(key, fixed_placement ? fixed_data.at(key) : ppage_front());
+ 
+   // this vpage doesn't yet have a ppage mapping
+-  if (fault) {
++  if (fault && !fixed_placement) {
+     ppage_pop();
+   }
+ 
+@@ -125,11 +135,12 @@ std::pair<champsim::page_number, champsim::chrono::clock::duration> VirtualMemor
+ std::pair<champsim::address, champsim::chrono::clock::duration> VirtualMemory::get_pte_pa(uint32_t cpu_num, champsim::page_number vaddr, std::size_t level)
+ {
+   champsim::dynamic_extent pte_table_entry_extent{champsim::address::bits, shamt(level + 1)};
+-  auto [ppage, fault] =
+-      page_table.try_emplace({cpu_num, level, champsim::address_slice{pte_table_entry_extent, vaddr}}, champsim::splice(active_pte_page, next_pte_page));
++  const auto key = std::make_tuple(cpu_num, uint32_t(level), champsim::address_slice{pte_table_entry_extent, vaddr});
++  auto [ppage, fault] = page_table.try_emplace(
++      key, fixed_placement ? fixed_tables.at(key) : champsim::address{champsim::splice(active_pte_page, next_pte_page)});
+ 
+   // this PTE doesn't yet have a mapping
+-  if (fault) {
++  if (fault && !fixed_placement) {
+     next_pte_page++;
+     if (champsim::page_offset{next_pte_page} == champsim::page_offset{0}) {
+       active_pte_page = ppage_front();
+@@ -153,3 +164,112 @@ std::pair<champsim::address, champsim::chrono::clock::duration> VirtualMemory::g
+ 
+   return {paddr, penalty};
+ }
++
++void VirtualMemory::prepare_placement(const std::string& inventory, const std::string& output)
++{
++  if (fixed_placement)
++    throw std::runtime_error("cannot prepare a map from an already fixed placement");
++  std::ifstream in(inventory);
++  std::string magic;
++  uint64_t cores = 0, page_bytes = 0, capacity = 0;
++  if (!(in >> magic >> cores >> page_bytes >> capacity) || magic != "CHAMPSIM_PAGES_V1" ||
++      cores != NUM_CPUS || page_bytes != PAGE_SIZE || capacity <= (1ULL << 20) ||
++      capacity > static_cast<uint64_t>(dram.size().count()) || capacity % PAGE_SIZE ||
++      static_cast<uint64_t>(pte_page_size.count() * pte_entry::byte_multiple) != PAGE_SIZE)
++    throw std::runtime_error("placement inventory geometry does not match this frontend");
++  std::set<std::pair<uint32_t, champsim::page_number>> pages;
++  uint32_t cpu;
++  uint64_t vpn;
++  while (in >> cpu >> vpn) {
++    if (cpu >= cores || vpn >= (1ULL << (64 - LOG2_PAGE_SIZE)) ||
++        !pages.emplace(cpu, champsim::page_number{vpn}).second)
++      throw std::runtime_error("duplicate or invalid inventory page");
++  }
++  if (!in.eof() || pages.empty())
++    throw std::runtime_error("invalid or empty placement inventory");
++  std::set<decltype(page_table)::key_type> tables;
++  auto add_table = [&](uint32_t core, champsim::page_number page, uint32_t level) {
++    tables.emplace(core, level, champsim::address_slice{
++        champsim::dynamic_extent{champsim::address::bits, shamt(level + 1)}, page});
++  };
++  for (uint32_t core = 0; core < cores; ++core)
++    add_table(core, champsim::page_number{0}, static_cast<uint32_t>(pt_levels));
++  for (const auto& [core, page] : pages)
++    for (uint32_t level = 1; level <= pt_levels; ++level)
++      add_table(core, page, level);
++  placement_bytes = capacity;
++  populate_pages();
++  shuffle_pages();
++  if (tables.size() + pages.size() > available_ppages())
++    throw std::runtime_error("data and page tables exceed physical memory capacity");
++  std::ofstream out(output);
++  out << "CHAMPSIM_PLACEMENT_V1 " << cores << ' ' << PAGE_SIZE << ' '
++      << pte_page_size.count() * pte_entry::byte_multiple << ' ' << pt_levels << ' '
++      << capacity << ' ' << randomization_seed.value_or(0) << ' ' << pages.size() << ' ' << tables.size() << '\n';
++  // One 4 KiB frame per 512-entry page table. Reuse the allocator's shuffled
++  // free-frame pool, but do not pack distinct tables into overlapping offsets.
++  for (const auto& [core, level, prefix] : tables) {
++    out << "P " << core << ' ' << level << ' ' << prefix.to<uint64_t>() << ' '
++        << (ppage_front().to<uint64_t>() << LOG2_PAGE_SIZE) << '\n';
++    ppage_pop();
++  }
++  for (const auto& [core, page] : pages) {
++    out << "D " << core << ' ' << page.to<uint64_t>() << ' ' << ppage_front().to<uint64_t>() << '\n';
++    ppage_pop();
++  }
++  out.close();
++  if (!out)
++    throw std::runtime_error("failed to write placement");
++  fmt::print("[VMEM] Prepared placement: data={} tables={} bytes={}\n", pages.size(), tables.size(), capacity);
++}
++
++void VirtualMemory::load_placement(const std::string& path)
++{
++  std::ifstream in(path);
++  std::string magic;
++  uint64_t cores = 0, page_bytes = 0, table_bytes = 0, levels = 0, capacity = 0, seed = 0, data_count = 0, table_count = 0;
++  if (!(in >> magic >> cores >> page_bytes >> table_bytes >> levels >> capacity >> seed >> data_count >> table_count) ||
++      magic != "CHAMPSIM_PLACEMENT_V1" || cores != NUM_CPUS || page_bytes != PAGE_SIZE ||
++      table_bytes != static_cast<uint64_t>(pte_page_size.count() * pte_entry::byte_multiple) || table_bytes != PAGE_SIZE ||
++      levels != pt_levels || seed != randomization_seed.value_or(0) || capacity <= (1ULL << 20) ||
++      capacity > static_cast<uint64_t>(dram.size().count()) || capacity % PAGE_SIZE || !data_count || !table_count ||
++      data_count + table_count > (capacity - (1ULL << 20)) / PAGE_SIZE)
++    throw std::runtime_error("placement header does not match this frontend");
++  std::set<uint64_t> frames;
++  auto check_frame = [&](uint64_t frame) {
++    if (frame < (1ULL << 20) / PAGE_SIZE || frame >= capacity / PAGE_SIZE || !frames.insert(frame).second)
++      throw std::runtime_error("placement has an aliased or out-of-range frame");
++  };
++  for (uint64_t i = 0; i < table_count; ++i) {
++    char kind;
++    uint32_t cpu = 0, level = 0;
++    uint64_t prefix = 0, base = 0;
++    if (!(in >> kind >> cpu >> level >> prefix >> base) || kind != 'P' || cpu >= cores ||
++        !level || level > pt_levels || base % PAGE_SIZE)
++      throw std::runtime_error("invalid placement page table");
++    auto extent = champsim::dynamic_extent{champsim::address::bits, shamt(level + 1)};
++    auto slice = champsim::address_slice{extent, prefix};
++    if (slice.to<uint64_t>() != prefix || !fixed_tables.emplace(std::make_tuple(cpu, level, slice), champsim::address{base}).second)
++      throw std::runtime_error("duplicate or invalid page-table key");
++    check_frame(base / PAGE_SIZE);
++  }
++  for (uint64_t i = 0; i < data_count; ++i) {
++    char kind;
++    uint32_t cpu = 0;
++    uint64_t vpn = 0, ppn = 0;
++    if (!(in >> kind >> cpu >> vpn >> ppn) || kind != 'D' || cpu >= cores || vpn >= (1ULL << (64 - LOG2_PAGE_SIZE)) ||
++        !fixed_data.emplace(std::make_pair(cpu, champsim::page_number{vpn}), champsim::page_number{ppn}).second)
++      throw std::runtime_error("invalid placement data page");
++    check_frame(ppn);
++  }
++  std::string extra;
++  if (in >> extra)
++    throw std::runtime_error("unexpected trailing placement records");
++  // These maps record actual first touches, not addresses allocated during preparation.
++  vpage_to_ppage_map.clear();
++  page_table.clear();
++  placement_bytes = capacity;
++  fixed_placement = true;
++  ppage_free_list.clear();
++  fmt::print("[VMEM] Fixed placement loaded: data={} tables={} bytes={}\n", data_count, table_count, capacity);
++}

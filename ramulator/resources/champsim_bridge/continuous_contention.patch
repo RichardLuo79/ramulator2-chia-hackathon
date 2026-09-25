@@ -1,0 +1,332 @@
+--- /dev/null
++++ b/inc/measurement_protocol.h
+@@ -0,0 +1,35 @@
++#ifndef CHAMPSIM_MEASUREMENT_PROTOCOL_H
++#define CHAMPSIM_MEASUREMENT_PROTOCOL_H
++
++#include <cstdint>
++#include <cstdlib>
++#include <stdexcept>
++#include <string>
++
++namespace champsim {
++inline bool background_replay_enabled()
++{
++  static const bool enabled = [] {
++    const char* setting = std::getenv("CHAMPSIM_COMPLETION_POLICY");
++    const std::string policy = setting ? setting : "finite";
++    if (policy != "finite" && policy != "background-replay")
++      throw std::invalid_argument("unknown CHAMPSIM_COMPLETION_POLICY");
++    return policy == "background-replay";
++  }();
++  return enabled;
++}
++
++// Sample at the existing ten-million-cycle cadence. Low IPC with positive
++// retirement is valid; two empty windows are a reported no-progress failure.
++struct retirement_watchdog {
++  std::uint64_t last = 0;
++  unsigned empty_windows = 0;
++  bool sample(std::uint64_t retired)
++  {
++    empty_windows = retired == last ? empty_windows + 1 : 0;
++    last = retired;
++    return empty_windows >= 2;
++  }
++};
++} // namespace champsim
++#endif
+--- a/inc/repeatable.h
++++ b/inc/repeatable.h
+@@ -31,12 +31,14 @@
+   static_assert(std::is_move_assignable_v<T>);
+   std::tuple<Args...> args_;
+   T intern_{std::apply([](auto... x) { return T{x...}; }, args_)};
++  std::uint64_t repeats_ = 0;
+   explicit repeatable(Args... args) : args_(args...) {}
+ 
+   auto operator()()
+   {
+     // Reopen trace if we've reached the end of the file
+     if (intern_.eof()) {
++      ++repeats_;
+       fmt::print("*** Reached end of trace: {}\n", args_);
+       intern_ = T{std::apply([](auto... x) { return T{x...}; }, args_)};
+     }
+@@ -45,6 +47,7 @@
+   }
+ 
+   [[nodiscard]] bool eof() const { return false; }
++  [[nodiscard]] std::uint64_t repeats() const { return repeats_; }
+ };
+ } // namespace champsim
+ 
+--- a/inc/tracereader.h
++++ b/inc/tracereader.h
+@@ -37,6 +37,7 @@
+     virtual ~reader_concept() = default;
+     virtual ooo_model_instr operator()() = 0;
+     [[nodiscard]] virtual bool eof() const = 0;
++    [[nodiscard]] virtual uint64_t repeats() const = 0;
+   };
+ 
+   template <typename T>
+@@ -46,6 +47,15 @@
+ 
+     template <typename U>
+     using has_eof = decltype(std::declval<U>().eof());
++    template <typename U>
++    using has_repeats = decltype(std::declval<U>().repeats());
++
++    [[nodiscard]] uint64_t repeats() const override
++    {
++      if constexpr (champsim::is_detected_v<has_repeats, T>)
++        return intern_.repeats();
++      return 0;
++    }
+ 
+     ooo_model_instr operator()() override { return intern_(); }
+     [[nodiscard]] bool eof() const override
+@@ -75,6 +85,7 @@
+   }
+ 
+   [[nodiscard]] auto eof() const { return pimpl_->eof(); }
++  [[nodiscard]] auto repeats() const { return pimpl_->repeats(); }
+ };
+ 
+ template <typename T, typename F>
+--- a/inc/ramulator_bridge_iface.h
++++ b/inc/ramulator_bridge_iface.h
+@@ -16,6 +16,9 @@
+ bool active();
+ long warmup_cycle(std::vector<champsim::channel*>& queues);
+ long cycle(std::vector<champsim::channel*>& queues);
++void measurement_begin();
++void measurement_end(unsigned cpu);
++void measurement_report();
+ } // namespace ramulator_bridge
+ 
+ #endif
+--- a/inc/ramulator_bridge.h
++++ b/inc/ramulator_bridge.h
+@@ -48,8 +48,51 @@
+   int m_tx_bytes;
+   std::FILE* m_reqtrace = nullptr;
+   uint64_t m_cycle = 0;
++  struct Window {
++    int64_t begin = 0, end = -1;
++    uint64_t reads = 0, begin_reads = 0, measured_reads = 0;
++  };
++  std::vector<Window> m_windows = std::vector<Window>(NUM_CPUS);
++  int64_t m_next_admission = 0;
++
++  void note_admission(const Ramulator::Request& req)
++  {
++    if (req.admission_ordinal < m_next_admission || req.source_id < 0 ||
++        static_cast<std::size_t>(req.source_id) >= NUM_CPUS)
++      throw std::runtime_error("invalid admission identity for measurement window");
++    m_next_admission = req.admission_ordinal + 1;
++    if (req.type_id == Ramulator::Request::Type::Read)
++      ++m_windows.at(req.source_id).reads;
++  }
+ 
+ public:
++  void measurement_begin()
++  {
++    for (auto& window : m_windows) {
++      window.begin = m_next_admission;
++      window.begin_reads = window.reads;
++    }
++  }
++
++  void measurement_end(unsigned cpu)
++  {
++    auto& window = m_windows.at(cpu);
++    if (window.end != -1)
++      throw std::runtime_error("measurement window ended twice");
++    window.end = m_next_admission;
++    window.measured_reads = window.reads - window.begin_reads;
++  }
++
++  void measurement_report() const
++  {
++    for (unsigned cpu = 0; cpu < m_windows.size(); ++cpu) {
++      const auto& w = m_windows[cpu];
++      std::printf("CONTENTION_WINDOW {\"core\":%u,\"begin\":%lld,\"end\":%lld,\"admitted_reads\":%llu,\"total_admitted_reads\":%llu}\n",
++          cpu, static_cast<long long>(w.begin), static_cast<long long>(w.end),
++          static_cast<unsigned long long>(w.measured_reads), static_cast<unsigned long long>(w.reads));
++    }
++  }
++
+   explicit RamulatorBridge(const std::string& cfg_path)
+   {
+     Ramulator::ConfigNode cfg = Ramulator::Config::parse_config_file(cfg_path);
+@@ -100,6 +143,7 @@
+     };
+     if (!m_ms->send(req))
+       return false;
++    note_admission(req);
+     if (m_reqtrace != nullptr) {
+       std::fprintf(m_reqtrace, "%lu,0,%d,%lu,%lld,%lld,%lld\n", static_cast<unsigned long>(m_cycle), req.source_id, static_cast<unsigned long>(addr),
+                    static_cast<long long>(req.frontend_id), static_cast<long long>(req.frontend_sub_id), static_cast<long long>(req.admission_ordinal));
+@@ -120,6 +164,8 @@
+     req.frontend_sub_id = 0;
+     req.size_bytes = m_tx_bytes;
+     bool ok = m_ms->send(req);
++    if (ok)
++      note_admission(req);
+     if (ok && m_reqtrace != nullptr) {
+       std::fprintf(m_reqtrace, "%lu,1,%d,%lu,%lld,%lld,%lld\n", static_cast<unsigned long>(m_cycle), req.source_id, static_cast<unsigned long>(addr),
+                    static_cast<long long>(req.frontend_id), static_cast<long long>(req.frontend_sub_id), static_cast<long long>(req.admission_ordinal));
+--- a/src/ramulator_bridge.cc
++++ b/src/ramulator_bridge.cc
+@@ -15,6 +15,10 @@
+ 
+ namespace ramulator_bridge
+ {
++
++void measurement_begin() { if (g_bridge) g_bridge->measurement_begin(); }
++void measurement_end(unsigned cpu) { if (g_bridge) g_bridge->measurement_end(cpu); }
++void measurement_report() { if (g_bridge) g_bridge->measurement_report(); }
+ 
+ bool active()
+ {
+--- a/src/champsim.cc
++++ b/src/champsim.cc
+@@ -28,6 +28,8 @@
+ #include "ooo_cpu.h"
+ #include "operable.h"
+ #include "phase_info.h"
++#include "measurement_protocol.h"
++#include "ramulator_bridge_iface.h"
+ #include "tracereader.h"
+ 
+ constexpr int DEADLOCK_CYCLE{500};
+@@ -39,7 +41,7 @@
+ namespace champsim
+ {
+ long do_cycle(environment& env, std::vector<tracereader>& traces, std::vector<std::size_t> trace_index,
+-              champsim::chrono::clock& global_clock, const std::vector<bool>& phase_complete)
++              champsim::chrono::clock& global_clock, const std::vector<bool>& phase_complete, bool park_finished)
+ {
+   auto operables = env.operable_view();
+   std::sort(std::begin(operables), std::end(operables),
+@@ -50,7 +52,7 @@
+   for (champsim::operable& op : operables) {
+     // Finite jobs: stop core execution at its own instruction target. Caches
+     // and memory continue servicing outstanding traffic while other jobs run.
+-    if (auto* cpu = dynamic_cast<O3_CPU*>(&op); cpu != nullptr && phase_complete[cpu->cpu]) {
++    if (auto* cpu = dynamic_cast<O3_CPU*>(&op); cpu != nullptr && park_finished && phase_complete[cpu->cpu]) {
+       // Keep a parked warmup core aligned with global time before ROI resumes.
+       cpu->current_time = global_clock.now();
+       continue;
+@@ -60,7 +62,7 @@
+ 
+   // Read from trace
+   for (O3_CPU& cpu : env.cpu_view()) {
+-    if (phase_complete[cpu.cpu])
++    if (park_finished && phase_complete[cpu.cpu])
+       continue;
+     auto& trace = traces.at(trace_index.at(cpu.cpu));
+     for (auto pkt_count = cpu.IN_QUEUE_SIZE - static_cast<long>(std::size(cpu.input_queue)); !trace.eof() && pkt_count > 0; --pkt_count) {
+@@ -75,11 +77,17 @@
+ {
+   auto operables = env.operable_view();
+   auto [phase_name, is_warmup, length, trace_index, trace_names] = phase;
++  const bool background = background_replay_enabled();
++  const bool park_finished = is_warmup || !background;
+ 
+   // Initialize phase
+   for (champsim::operable& op : operables) {
+     op.warmup = is_warmup;
+     op.begin_phase();
++  }
++  if (!is_warmup && background) {
++    fmt::print("CONTENTION_PROTOCOL background-replay-v1\n");
++    ramulator_bridge::measurement_begin();
+   }
+ 
+   const auto time_quantum = std::accumulate(std::cbegin(operables), std::cend(operables), champsim::chrono::clock::duration::max(),
+@@ -91,6 +99,8 @@
+   //                                   die | critical | warning
+   std::vector<double> livelock_threshold{0.01, 0.02, 0.05};
+   std::vector<uint64_t> livelock_instr(std::size(env.cpu_view()), 0);
++  std::vector<retirement_watchdog> retirement_watchdogs(std::size(env.cpu_view()));
++  std::vector<uint64_t> measured_instructions(std::size(env.cpu_view()), 0);
+ 
+   // Perform phase
+   int stalled_cycle{0};
+@@ -99,7 +109,7 @@
+     auto next_phase_complete = phase_complete;
+     global_clock.tick(time_quantum);
+ 
+-    auto progress = do_cycle(env, traces, trace_index, global_clock, phase_complete);
++    auto progress = do_cycle(env, traces, trace_index, global_clock, phase_complete, park_finished);
+ 
+     if (progress == 0) {
+       ++stalled_cycle;
+@@ -112,15 +122,21 @@
+     if (livelock_timer >= livelock_period) {
+       // for each cpu
+       for (O3_CPU& cpu : env.cpu_view()) {
+-        if (phase_complete[cpu.cpu])
++        if (park_finished && phase_complete[cpu.cpu])
+           continue;
++        if (background && retirement_watchdogs[cpu.cpu].sample(cpu.sim_instr())) {
++          fmt::print("NO_PROGRESS CPU {}: no retirement in two 10M-cycle windows\n", cpu.cpu);
++          livelock_trigger = true;
++        }
+         // for each threshold
+         for (auto thres = std::begin(livelock_threshold); thres != std::end(livelock_threshold); thres++) {
+           double livelock_ipc = std::ceil(cpu.sim_instr() - livelock_instr[cpu.cpu]) / std::ceil(livelock_period);
+           if (livelock_ipc <= *thres) {
+             if (std::distance(std::begin(livelock_threshold), thres) == 0) {
+-              livelock_trigger = true;
+-              fmt::print("{} CPU {} panic: IPC {:.5g} < {:.5g}\n", phase_name, cpu.cpu, livelock_ipc, *thres);
++              if (!background)
++                livelock_trigger = true;
++              fmt::print("{} CPU {} {}: IPC {:.5g} < {:.5g}\n", phase_name, cpu.cpu,
++                         background ? "warning" : "panic", livelock_ipc, *thres);
+             } else if (std::distance(std::begin(livelock_threshold), thres) == 1)
+               fmt::print("{} CPU {} critical: IPC {:.5g} < {:.5g}\n", phase_name, cpu.cpu, livelock_ipc, *thres);
+             else
+@@ -152,6 +168,11 @@
+ 
+     for (O3_CPU& cpu : env.cpu_view()) {
+       if (next_phase_complete[cpu.cpu] != phase_complete[cpu.cpu]) {
++        if (background && traces.at(trace_index.at(cpu.cpu)).repeats() != 0)
++          throw std::runtime_error("trace wrapped before its measured window completed");
++        measured_instructions[cpu.cpu] = cpu.sim_instr();
++        if (!is_warmup && background)
++          ramulator_bridge::measurement_end(cpu.cpu);
+         for (champsim::operable& op : operables) {
+           op.end_phase(cpu.cpu);
+         }
+@@ -165,11 +186,16 @@
+   }
+ 
+   for (O3_CPU& cpu : env.cpu_view()) {
++    if (!is_warmup && background)
++      fmt::print("CONTENTION_CORE {{\"core\":{},\"background_instructions\":{},\"wraps\":{}}}\n", cpu.cpu,
++                 cpu.sim_instr() - measured_instructions[cpu.cpu], traces.at(trace_index.at(cpu.cpu)).repeats());
+     fmt::print("{} complete CPU {} instructions: {} cycles: {} cumulative IPC: {:.4g} (Simulation time: {:%H hr %M min %S sec})\n", phase_name, cpu.cpu,
+                cpu.sim_instr(), cpu.sim_cycle(), std::ceil(cpu.sim_instr()) / std::ceil(cpu.sim_cycle()), elapsed_time());
+   }
+ 
+   phase_stats stats;
++  if (!is_warmup && background)
++    ramulator_bridge::measurement_report();
+   stats.name = phase.name;
+ 
+   for (std::size_t i = 0; i < std::size(trace_index); ++i) {
+--- a/src/ooo_cpu.cc
++++ b/src/ooo_cpu.cc
+@@ -750,7 +750,7 @@
+                       entry.scheduled,
+                       entry.executed,
+                       entry.completed,
+-                      reg_allocator.count_reg_dependencies(entry),
++                      entry.scheduled ? reg_allocator.count_reg_dependencies(entry) : 0,
+                       entry.num_mem_ops() - entry.completed_mem_ops,
+                       entry.ready_time.time_since_epoch() / period};
+   };

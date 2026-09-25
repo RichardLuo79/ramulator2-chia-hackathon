@@ -1,0 +1,21 @@
+{
+  "original": {
+    "count_fs.py": "1b39699057c2a7f1909a1d7ba477afa9dc35100577866b584d07196bfee6fd76",
+    "fs_board.py": "4e9f2981308d8338ff76fda305d3286d40e44dfa10c62f79bc5f7015923e5e19",
+    "roi_report.py": "43fb721530e957aa3a9c7ac36e29e5b0c8c460d1dc4f386c1ac7d8607e6023d2",
+    "roi_study.py": "42c22c38722b3c1233a387fa65255dbf4c026a3f4d18a01eaa0313004005f284"
+  },
+  "artifact": {
+    "__init__.py": "5e380f5fe3560feb43df6481d01f606e0509f06c73f8b016181e79151f935036",
+    "build_suite.py": "ae6988c777d52aec3389e6d9515caff771a8fe16b883aa9ee3bf927478f16d9a",
+    "prepare_fs.py": "243856cd6ec7553e3e274dab8d7a19ea3dd266de8073808dd4f5b667901fb0ef",
+    "se_board.py": "10ca1f39248edeea47cf815195766d3028c5c48cdebacc1ba677abaa0ba208af",
+    "fs_board.py": "4e9f2981308d8338ff76fda305d3286d40e44dfa10c62f79bc5f7015923e5e19",
+    "roi_report.py": "43fb721530e957aa3a9c7ac36e29e5b0c8c460d1dc4f386c1ac7d8607e6023d2",
+    "checkpoint.py": "3f1967f0f5ceb7aa8bf5f67ef517137cb4f8e664e6007c2a4fb47965c6ed3210",
+    "run_gem5.py": "a7268e5e11ab2ad60035e4cc31326434a65a25296ff7a01d64761bfbafbe30bc",
+    "run_fs.py": "d221a188f24e912b85296e84992fd8d8b90a30e2cddaefdb29a6a080149baece",
+    "roi_study.py": "21633e4cfe2bd245f987cac8ca54bbad648b17bc6ee759e29d44e4dac9234c16"
+  },
+  "adaptation": "checkpoint metadata helper extracted; no instruction/ROI/model computation changed"
+}

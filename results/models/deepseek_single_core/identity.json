@@ -1,0 +1,38 @@
+{
+  "candidate": {
+    "candidate_id": "7792bdb014c5ae064cfccad04a0d5db7e7b3b7e16165d3b95e078e14539dcdb0",
+    "configuration_sha256": "6e5c00cdc942b092d8f5874f917d765853b459f8bd7ec6a5e4521b21b16f4991",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+      "model.cpp": {
+        "bytes": 10718,
+        "sha256": "4f90034491b18cca0016a351bc89003f6bdde74a90b18bb1c29ae0ee9cdd93c5"
+      },
+      "parameters.json": {
+        "bytes": 352,
+        "sha256": "5f13f463f9cece7eb9e8c064707b14e8210467b558ed3083e5f3251304d064d4"
+      }
+    },
+    "parameters": {
+      "burst_cycles": 8.0,
+      "bus_gap": 0.0,
+      "bus_interval": 8.0,
+      "drain_conflict_extra": 90.0,
+      "drain_window_cycles": 250.0,
+      "fixed_offset": 0.0,
+      "precharge_scale": 1.0,
+      "queue_extra": 0.0,
+      "same_bank_interval": 12.0,
+      "t_activate": 34.0,
+      "t_cmd_to_data": 35.0,
+      "t_precharge": 33.0,
+      "write_extra": 10.0,
+      "write_wait_scale": 0.0
+    },
+    "schema_version": 1,
+    "source_sha256": "749f70db77e55a205004be02620989bd58522c2b3d4c4b3e37611327ceef9702"
+  },
+  "introduced_round": 7,
+  "retained_at_round": 10,
+  "original_endpoint_manifest_sha256": "7e5c1a2bdcd683d37c511a8524c4b743c0211654cf00d683a72fb49811daf6aa"
+}

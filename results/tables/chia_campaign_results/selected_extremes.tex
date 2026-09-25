@@ -1,0 +1,22 @@
+\begin{tabular}{llrrrrrrrrl}
+\toprule
+Workload / mix & Model & Core error (\%) & Request MAE/L & P99 |error|/L & P99.9 |error|/L & Min error (cycles) & Max error (cycles) & Paired reads & Oracle pairing (\%) & Selection reason \\
+\midrule
+Ligra CF & Astra · SC & 8.232 & 0.2762 & 1.36 & 1.688 & -896 & 351 & 316908 & 95.44 & largest core error \\
+CAM4 & Astra · SC & 0.1407 & 0.5268 & 1.577 & 2.055 & -1166 & 727 & 17860 & 99.08 & largest request MAE/L \\
+Sierra 3 / 0006 & Astra · SC & 0.3039 & 0.299 & 3.727 & 6.813 & -1240 & 1268 & 173253 & 90.9 & largest P99.9/L below median core error \\
+Sierra 6 / 0001 & Astra · SC & 0.7768 & 0.2174 & 2.388 & 5.559 & -1222 & 1457 & 201861 & 89.62 & largest absolute request error below both medians \\
+Ligra CF & DeepSeek · SC & 4.709 & 0.2014 & 1.344 & 1.688 & -806 & 236 & 314985 & 94.86 & largest core error \\
+CAM4 & DeepSeek · SC & 0.3222 & 0.5243 & 1.379 & 2.333 & -1142 & 511 & 17849 & 99.02 & largest request MAE/L \\
+Sierra 6 / 0001 & DeepSeek · SC & 0.05272 & 0.2137 & 1.732 & 4.744 & -1309 & 467 & 201747 & 89.57 & largest P99.9/L below median core error \\
+Sierra 3 / 0001 & DeepSeek · SC & 0.2911 & 0.2059 & 1.843 & 2.638 & -1073 & 433 & 160378 & 89.02 & largest absolute request error below both medians \\
+Ligra CF & Opus 5.5 · SC & 1.528 & 0.1159 & 1.392 & 1.432 & -756 & 237 & 318662 & 95.97 & largest core error \\
+CAM4 & Opus 5.5 · SC & 0.3147 & 0.5161 & 2.101 & 2.804 & -1524 & 1101 & 17877 & 99.17 & largest request MAE/L \\
+Tahoe / 0035 & Opus 5.5 · SC & 0.02502 & 0.05641 & 1.273 & 6.131 & -2067 & 2572 & 254835 & 89.97 & largest P99.9/L below median core error \\
+BioGPT & Opus 5.5 · SC & 0.03569 & 0.002615 & 0.02164 & 0.3679 & -986 & 913 & 2883155 & 99.79 & largest absolute request error below both medians \\
+GAP BC & Gemini · SC & 6.645 & 0.3253 & 2.255 & 9.566 & -2971 & 1695 & 908670 & 99.51 & largest core error \\
+CAM4 & Gemini · SC & 2.821 & 0.5819 & 1.76 & 2.465 & -1286 & 367 & 17867 & 99.12 & largest request MAE/L \\
+Sierra 6 / 0001 & Gemini · SC & 1.958 & 0.219 & 1.74 & 4.919 & -1447 & 437 & 201823 & 89.6 & largest P99.9/L below median core error \\
+Sierra 6 / 0011 & Gemini · SC & 0.411 & 0.2168 & 1.688 & 2.312 & -1186 & 495 & 251039 & 92.53 & largest absolute request error below both medians \\
+\bottomrule
+\end{tabular}
