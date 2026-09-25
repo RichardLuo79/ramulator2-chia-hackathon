@@ -1,8 +1,6 @@
 # Ramulator–CHIA loop research artifact
 
-Source code, measurements, and figure reproduction for agent-synthesized
-immediate-response DRAM latency models. CHIA develops and evaluates models
-against a cycle-level Ramulator 2 oracle, using ChampSim workloads during search.
+Artifact submission for the CHIA Hackathon at A3 Workshop at MICRO 2026.
 
 ## Start here
 
