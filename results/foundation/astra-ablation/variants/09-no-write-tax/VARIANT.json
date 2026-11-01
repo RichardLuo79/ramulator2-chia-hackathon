@@ -1,0 +1,18 @@
+{
+ "id": "09",
+ "name": "no-write-tax",
+ "description": "amortized write turnaround tax disabled: write_tax = 0 (L61)",
+ "header": "amortized write turnaround tax disabled (write_tax = 0)",
+ "edits": [
+  {
+   "old": "write_tax=(timing(\"nRTW\",base)+timing(\"nWTRL\",timing(\"nWTR_L\",ccd)))/batch;",
+   "new": "write_tax=0*batch;  // ABLATION 09"
+  }
+ ],
+ "lines_changed": 1,
+ "lines_removed": 1,
+ "lines_added": 1,
+ "model_cpp_sha256": "4d898f18a716591ae17b97b89026b614d928fb52690768648ea53eca92ca0d00",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}

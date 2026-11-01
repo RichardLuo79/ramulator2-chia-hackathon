@@ -1,0 +1,30 @@
+{
+ "id": "10",
+ "name": "bank-less",
+ "description": "all per-bank state disabled: hit=false/cold=true (row_cost = tRCD), class_hit=false, backlog=0 (no batch hits), bank readiness = t+tRCD+A with no b.ready+service term; write-recovery/WR-RD/read-run rules become inert; channel, bank-group column and activation clocks kept (L72, L82, L83, L150-151)",
+ "header": "all per-bank state disabled (closed-bank cost, no bank backlog); channel, bank-group and activation clocks kept",
+ "edits": [
+  {
+   "old": "bool cold=b.row<0, hit=b.row==a.levels[row_level];",
+   "new": "bool cold=true, hit=false;  // ABLATION 10"
+  },
+  {
+   "old": "bool class_hit=hit || b.class_row[kind]==a.levels[row_level];",
+   "new": "bool class_hit=false;  // ABLATION 10"
+  },
+  {
+   "old": "double backlog=std::max(0.0,b.ready-now);",
+   "new": "double backlog=0;  // ABLATION 10"
+  },
+  {
+   "old": "double ready=std::max(double(now)+row_cost+activation_wait,\n                          b.ready+service*bank_scale);",
+   "new": "double ready=double(now)+row_cost+activation_wait;  // ABLATION 10"
+  }
+ ],
+ "lines_changed": 5,
+ "lines_removed": 5,
+ "lines_added": 4,
+ "model_cpp_sha256": "94a2b3d84d549d685a840567d6b04914644db39cf4e789a7a39be7f47fcf0a6d",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}

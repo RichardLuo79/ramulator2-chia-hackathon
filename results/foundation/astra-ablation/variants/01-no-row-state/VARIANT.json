@@ -1,0 +1,18 @@
+{
+ "id": "01",
+ "name": "no-row-state",
+ "description": "open-row proxy removed: hit=false, cold=true for every access, so row_cost = tRCD always (L72)",
+ "header": "open-row proxy removed (hit=false, cold=true): every access pays row_cost = tRCD; all hit-gated rules see a miss",
+ "edits": [
+  {
+   "old": "bool cold=b.row<0, hit=b.row==a.levels[row_level];",
+   "new": "bool cold=true, hit=false;  // ABLATION 01"
+  }
+ ],
+ "lines_changed": 1,
+ "lines_removed": 1,
+ "lines_added": 1,
+ "model_cpp_sha256": "22465cfa5d392ec492884b468129659422eaf3106abbf6658d2435abb8cee7fe",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}

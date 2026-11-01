@@ -1,0 +1,32 @@
+{
+  "candidate": {
+    "candidate_id": "80d044412a8fd74248ae97d67bbc1faf2eb083426c8bdac944f32e9aff14c8e0",
+    "configuration_sha256": "9dc2b21f5afde073fdcd760a2c9a4919df7682fd3d80d2441f0f4d787c7b473c",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+      "model.cpp": {
+        "bytes": 16569,
+        "sha256": "1508cbe76d57abef3aca8ebdf9873869700a74b5041d9c1dd83aef3fea4e2899"
+      },
+      "parameters.json": {
+        "bytes": 228,
+        "sha256": "0ffc387a2b4b6df2595c5104a0a56e81a48c18c8b5899947a1441f1bb8e118eb"
+      }
+    },
+    "parameters": {
+      "ca_bank_delay": 1.2,
+      "ca_bg_delay": 0.15,
+      "ca_bg_hit_delay": 0.08,
+      "ca_linear_delay": 0.5,
+      "ca_quad_delay": 0.02,
+      "ca_quad_hit_delay": 0.008,
+      "drain_cycles_per_write": 11.0,
+      "write_congestion_weight": 0.75
+    },
+    "schema_version": 1,
+    "source_sha256": "5a6c65efc1fe8577a2c02879900fb2c3b01bc6e7b3268614f342b19bdee648d5"
+  },
+  "introduced_round": 13,
+  "original_database_sha256": "c562143c07ae9c83983032cabc5a46466c3cc2d956ff0b77ecec0c6bf863ad66",
+  "retained_at_round": 15
+}

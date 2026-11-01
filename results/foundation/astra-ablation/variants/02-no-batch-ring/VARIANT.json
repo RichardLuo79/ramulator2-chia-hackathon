@@ -1,0 +1,18 @@
+{
+ "id": "02",
+ "name": "no-batch-ring",
+ "description": "8-entry recent-row ring / batch-hit rule disabled: batch_hit never set (L88); ring bookkeeping left inert",
+ "header": "8-entry recent-row ring batch-hit rule disabled (batch_hit always false)",
+ "edits": [
+  {
+   "old": "batch_hit=backlog>ccd && now-b.recent[i].seen < std::max(rc,backlog);",
+   "new": "batch_hit=false;  // ABLATION 02"
+  }
+ ],
+ "lines_changed": 1,
+ "lines_removed": 1,
+ "lines_added": 1,
+ "model_cpp_sha256": "35911f4f38fd573258d49f5cf1b868031beca2da38aca70b629b90a2a6360c51",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}

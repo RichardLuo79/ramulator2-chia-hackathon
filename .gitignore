@@ -1,0 +1,21 @@
+.work/
+.data/
+.venv*/
+.archives/
+**/__pycache__/
+**/*.pyc
+**/*.egg-info/
+**/.pytest_cache/
+**/.ipynb_checkpoints/
+**/build/
+**/*.so
+**/*.o
+**/*.a
+.env
+credentials.json
+auth.json
+*.pem
+*.key
+# figures and tables written by scripts/reproduce-figures
+results/figures/
+results/tables/

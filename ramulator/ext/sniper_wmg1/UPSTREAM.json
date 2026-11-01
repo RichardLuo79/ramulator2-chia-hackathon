@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/snipersim/snipersim",
+  "commit": "56505e42fd98bca863fac181e769bd3c98d2bb33",
+  "upstream_directory": "common/performance_model",
+  "upstream_sha256": {
+    "queue_model_windowed_mg1.cc": "eab0a37224b02c534f35d43118cd9ee143a8a3078857e2ac0f7d1c3b474e8d95",
+    "queue_model_windowed_mg1.h": "da103a82380d93d22a9a89830aa12a893649e2ab71ca9b6b1b392b5b25ef8cd3",
+    "LICENSE": "88d92c19479a5b28582fa0652f3fcdc6e3b69def5fb0509c6e0d1c3964df5904"
+  },
+  "patch": "ramulator.patch",
+  "changes": [
+    "Constructor/configuration/statistics integration removed; namespace added.",
+    "Globally ordered request time replaces Sniper global barrier time.",
+    "Minimal integer-picosecond time adapter; negative startup cutoffs remain negative.",
+    "computeQueueDelay numerical body and addItem/removeItems retained."
+  ]
+}

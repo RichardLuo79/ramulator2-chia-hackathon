@@ -1,0 +1,18 @@
+{
+ "id": "06",
+ "name": "no-act-throttle",
+ "description": "rank (max(nRRDS,nFAW/4)) and bank-group (nRRDL) activation clocks disabled: A = 0, clocks never advance (L140)",
+ "header": "rank and bank-group activation clocks disabled (activation_wait A = 0)",
+ "edits": [
+  {
+   "old": "if(!class_hit && !batch_hit) {",
+   "new": "if(false && !class_hit && !batch_hit) {  // ABLATION 06"
+  }
+ ],
+ "lines_changed": 1,
+ "lines_removed": 1,
+ "lines_added": 1,
+ "model_cpp_sha256": "888a0bdcb1b4435358bbe22e0433398a547a558f4469b9fdbf66d75ace4e5ad7",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}

@@ -1,0 +1,16 @@
+--- frozen/model.cpp
++++ 05-no-wr-rd-turnaround/model.cpp
+@@ -1,3 +1,4 @@
++// ABLATION 05 no-wr-rd-turnaround: same-bank same-row write-to-read floor (nCWL+nBL+nWTRL) disabled.
+ #include "ramulator/controller/atomic_model/api.h"
+ 
+ // Admission-order transaction service envelopes. No command objects, command
+@@ -121,7 +122,7 @@
+     // A read following a same-row write still waits for write data and
+     // write-to-read bus recovery; row reuse eliminates precharge, not this
+     // direction turnaround. Under deep backlog admission order is uncertain.
+-    if(kind==0 && b.last_kind==1 && hit && now>b.last_arrival) {
++    if(false && kind==0 && b.last_kind==1 && hit && now>b.last_arrival) {  // ABLATION 05
+       double confidence=std::clamp(1.0-std::max(0.0,backlog-row_cost)/rc,0.0,1.0);
+       service=std::max(service,confidence*write_to_read);
+     }

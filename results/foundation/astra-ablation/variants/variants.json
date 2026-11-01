@@ -1,0 +1,225 @@
+[
+ {
+  "id": "00",
+  "name": "control",
+  "description": "unmodified frozen model (byte-identical copy)",
+  "header": null,
+  "edits": [],
+  "lines_changed": 0,
+  "lines_removed": 0,
+  "lines_added": 0,
+  "model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "01",
+  "name": "no-row-state",
+  "description": "open-row proxy removed: hit=false, cold=true for every access, so row_cost = tRCD always (L72)",
+  "header": "open-row proxy removed (hit=false, cold=true): every access pays row_cost = tRCD; all hit-gated rules see a miss",
+  "edits": [
+   {
+    "old": "bool cold=b.row<0, hit=b.row==a.levels[row_level];",
+    "new": "bool cold=true, hit=false;  // ABLATION 01"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "22465cfa5d392ec492884b468129659422eaf3106abbf6658d2435abb8cee7fe",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "02",
+  "name": "no-batch-ring",
+  "description": "8-entry recent-row ring / batch-hit rule disabled: batch_hit never set (L88); ring bookkeeping left inert",
+  "header": "8-entry recent-row ring batch-hit rule disabled (batch_hit always false)",
+  "edits": [
+   {
+    "old": "batch_hit=backlog>ccd && now-b.recent[i].seen < std::max(rc,backlog);",
+    "new": "batch_hit=false;  // ABLATION 02"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "35911f4f38fd573258d49f5cf1b868031beca2da38aca70b629b90a2a6360c51",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "03",
+  "name": "no-class-rows",
+  "description": "separate read-row/write-row classes disabled: class_hit = hit (L82)",
+  "header": "separate read/write row classes disabled (class_hit = hit only)",
+  "edits": [
+   {
+    "old": "bool class_hit=hit || b.class_row[kind]==a.levels[row_level];",
+    "new": "bool class_hit=hit;  // ABLATION 03"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "dbfaf1ce918d02f4b1b4e3d896a05b3e7d5d3cfb89383e80419954123848390c",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "04",
+  "name": "no-write-recovery",
+  "description": "write-recovery floor (nCWL+nBL+nWR+nRP+nRCD = 180 after a write before a conflict) disabled (L108)",
+  "header": "write-recovery floor (nCWL+nBL+nWR+nRP+nRCD after a write, before a conflict) disabled",
+  "edits": [
+   {
+    "old": "if(b.last_kind==1 && !hit) {",
+    "new": "if(false && b.last_kind==1 && !hit) {  // ABLATION 04"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "acc7ea0e31802c2d6b6c3aa154bcb2979fe3aee9ea129bdd0f8dac8f71e9dd29",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "05",
+  "name": "no-wr-rd-turnaround",
+  "description": "same-bank write-to-read floor (nCWL+nBL+nWTRL = 64) disabled (L124)",
+  "header": "same-bank same-row write-to-read floor (nCWL+nBL+nWTRL) disabled",
+  "edits": [
+   {
+    "old": "if(kind==0 && b.last_kind==1 && hit && now>b.last_arrival) {",
+    "new": "if(false && kind==0 && b.last_kind==1 && hit && now>b.last_arrival) {  // ABLATION 05"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "4cae5f9408755714e1dce540ab756e9e5779b61aeacdb92e437c5780ae00da99",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "06",
+  "name": "no-act-throttle",
+  "description": "rank (max(nRRDS,nFAW/4)) and bank-group (nRRDL) activation clocks disabled: A = 0, clocks never advance (L140)",
+  "header": "rank and bank-group activation clocks disabled (activation_wait A = 0)",
+  "edits": [
+   {
+    "old": "if(!class_hit && !batch_hit) {",
+    "new": "if(false && !class_hit && !batch_hit) {  // ABLATION 06"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "888a0bdcb1b4435358bbe22e0433398a547a558f4469b9fdbf66d75ace4e5ad7",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "07",
+  "name": "no-bankgroup-clock",
+  "description": "per-bank-group column clock disabled: group_wait = 0 (L162); its update stays inert",
+  "header": "per-bank-group column clock disabled (group_wait = 0)",
+  "edits": [
+   {
+    "old": "double group_wait=std::max(0.0,groups[gi]-now);",
+    "new": "double group_wait=0;  // ABLATION 07"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "403f572960bf27bd30c001a36be4b3c8bd69421b92b0116efda8f58ebd3d7ad7",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "08",
+  "name": "no-bus",
+  "description": "channel data-bus clocks disabled: channel_wait = 0, i.e. C = t (L161); bank-only model, write tax becomes inert",
+  "header": "channel data-bus clocks disabled (channel_wait = 0, C = t): bank-only model",
+  "edits": [
+   {
+    "old": "double channel_wait=std::max(0.0,shared-now);",
+    "new": "double channel_wait=0;  // ABLATION 08"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "8d2da3bb68fbf789bb62887b32b5470270a1ce60cbc1d0648a06eacf9cb9cb85",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "09",
+  "name": "no-write-tax",
+  "description": "amortized write turnaround tax disabled: write_tax = 0 (L61)",
+  "header": "amortized write turnaround tax disabled (write_tax = 0)",
+  "edits": [
+   {
+    "old": "write_tax=(timing(\"nRTW\",base)+timing(\"nWTRL\",timing(\"nWTR_L\",ccd)))/batch;",
+    "new": "write_tax=0*batch;  // ABLATION 09"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "4d898f18a716591ae17b97b89026b614d928fb52690768648ea53eca92ca0d00",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "10",
+  "name": "bank-less",
+  "description": "all per-bank state disabled: hit=false/cold=true (row_cost = tRCD), class_hit=false, backlog=0 (no batch hits), bank readiness = t+tRCD+A with no b.ready+service term; write-recovery/WR-RD/read-run rules become inert; channel, bank-group column and activation clocks kept (L72, L82, L83, L150-151)",
+  "header": "all per-bank state disabled (closed-bank cost, no bank backlog); channel, bank-group and activation clocks kept",
+  "edits": [
+   {
+    "old": "bool cold=b.row<0, hit=b.row==a.levels[row_level];",
+    "new": "bool cold=true, hit=false;  // ABLATION 10"
+   },
+   {
+    "old": "bool class_hit=hit || b.class_row[kind]==a.levels[row_level];",
+    "new": "bool class_hit=false;  // ABLATION 10"
+   },
+   {
+    "old": "double backlog=std::max(0.0,b.ready-now);",
+    "new": "double backlog=0;  // ABLATION 10"
+   },
+   {
+    "old": "double ready=std::max(double(now)+row_cost+activation_wait,\n                          b.ready+service*bank_scale);",
+    "new": "double ready=double(now)+row_cost+activation_wait;  // ABLATION 10"
+   }
+  ],
+  "lines_changed": 5,
+  "lines_removed": 5,
+  "lines_added": 4,
+  "model_cpp_sha256": "94a2b3d84d549d685a840567d6b04914644db39cf4e789a7a39be7f47fcf0a6d",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ },
+ {
+  "id": "11",
+  "name": "fix-channel-startup",
+  "description": "NOT a removal: L169 channel work clock no longer carries the requester's row startup; c.work = max(t, c.work) + transfer_service (nBL, plus write_tax for writes) instead of max(t+row_cost, c.work) + transfer_service; c.transfer unchanged (the two channel clocks now evolve identically)",
+  "header": "FIX (not a removal): channel work clock advances from max(t, c.work)+transfer_service, not max(t+row_cost, c.work)",
+  "edits": [
+   {
+    "old": "c.work=std::max(double(now)+row_cost,c.work)+transfer_service;",
+    "new": "c.work=std::max(double(now),c.work)+transfer_service;  // ABLATION 11 (fix)"
+   }
+  ],
+  "lines_changed": 1,
+  "lines_removed": 1,
+  "lines_added": 1,
+  "model_cpp_sha256": "a0034530b7bd67f92d9f6e553ec5096aab52d31a51dca20c25d41790d8638b33",
+  "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+ }
+]

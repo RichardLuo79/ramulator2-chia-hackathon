@@ -1,0 +1,16 @@
+--- frozen/model.cpp
++++ 08-no-bus/model.cpp
+@@ -1,3 +1,4 @@
++// ABLATION 08 no-bus: channel data-bus clocks disabled (channel_wait = 0, C = t): bank-only model.
+ #include "ramulator/controller/atomic_model/api.h"
+ 
+ // Admission-order transaction service envelopes. No command objects, command
+@@ -158,7 +159,7 @@
+     // This records aggregate workload provenance, not future bus slots.
+     double shared=(kind==0 && hit && ready<=now && !c.mixed)
+       ? c.transfer_work : c.work;
+-    double channel_wait=std::max(0.0,shared-now);
++    double channel_wait=0;  // ABLATION 08
+     double group_wait=std::max(0.0,groups[gi]-now);
+     double wait=std::max({ready-now,channel_wait,group_wait});
+     // A transfer cannot consume channel bandwidth before its own row

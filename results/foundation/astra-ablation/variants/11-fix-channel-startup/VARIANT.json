@@ -1,0 +1,18 @@
+{
+ "id": "11",
+ "name": "fix-channel-startup",
+ "description": "NOT a removal: L169 channel work clock no longer carries the requester's row startup; c.work = max(t, c.work) + transfer_service (nBL, plus write_tax for writes) instead of max(t+row_cost, c.work) + transfer_service; c.transfer unchanged (the two channel clocks now evolve identically)",
+ "header": "FIX (not a removal): channel work clock advances from max(t, c.work)+transfer_service, not max(t+row_cost, c.work)",
+ "edits": [
+  {
+   "old": "c.work=std::max(double(now)+row_cost,c.work)+transfer_service;",
+   "new": "c.work=std::max(double(now),c.work)+transfer_service;  // ABLATION 11 (fix)"
+  }
+ ],
+ "lines_changed": 1,
+ "lines_removed": 1,
+ "lines_added": 1,
+ "model_cpp_sha256": "a0034530b7bd67f92d9f6e553ec5096aab52d31a51dca20c25d41790d8638b33",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}

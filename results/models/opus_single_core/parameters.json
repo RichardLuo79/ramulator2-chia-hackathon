@@ -1,0 +1,1 @@
+{"arrival_model": 3, "arrival_buckets": 32, "drain_after_reads": 3, "drain_block": 1, "same_cycle_writes": 1, "col_slip": 1, "slip_sync": 1, "drain_pending": 0.5, "pending_cap": 1, "pending_unforced": 1, "pre_wait": 1}

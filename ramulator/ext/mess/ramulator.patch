@@ -1,0 +1,125 @@
+--- a/mess_mem_ctrl.cpp
++++ b/mess_mem_ctrl.cpp
+@@ -37,6 +37,10 @@
+ #include <cstring>
+ #include <stdexcept>
+ #include <utility>
++#include <algorithm>
++#include <limits>
++#include <map>
++#include <sstream>
+ 
+ // Custom round function to avoid dependency issues
+ static double roundDouble(double d) {
+@@ -70,6 +74,60 @@
+     std::vector<CurveEntry> curves;  ///< All parsed curves, in file order.
+ };
+ 
++// Ramulator input compatibility only. Prediction and feedback routines below
++// are unchanged from the pinned standalone implementation (see UPSTREAM.json).
++static void validateCurves(const CurveFile& file) {
++    if (file.measuredChannels == 0 || file.curves.empty())
++        throw std::runtime_error("MeSS: expected positive measuredChannels and nonempty curves");
++    bool seen[101] = {};
++    for (const auto& curve : file.curves) {
++        const int pct = curve.readPercentage;
++        if (pct < 0 || pct > 100 || seen[pct] || curve.points.empty())
++            throw std::runtime_error("MeSS: invalid/duplicate read percentage or empty curve");
++        seen[pct] = true;
++        double previous = std::numeric_limits<double>::infinity();
++        for (const auto& [bw, latency] : curve.points) {
++            if (!std::isfinite(bw) || bw < 0 || bw >= previous ||
++                !std::isfinite(latency) || latency <= 0)
++                throw std::runtime_error("MeSS: expected finite positive latency and strictly descending bandwidth");
++            previous = bw;
++        }
++    }
++}
++
++static CurveFile loadLegacyCurves(const char* data, size_t size) {
++    // Legacy calibration: read_pct bandwidth_GBps latency_ns, one point/line.
++    // These curves were measured for one channel. Do not fit or alter points.
++    std::map<int, CurveEntry> curves;
++    std::istringstream input(std::string(data, size));
++    std::string line;
++    while (std::getline(input, line)) {
++        std::istringstream fields(line);
++        fields >> std::ws;
++        if (fields.eof()) continue;
++        int pct;
++        double bw, latency;
++        if (!(fields >> pct >> bw >> latency))
++            throw std::runtime_error("MeSS: expected read_pct bandwidth_GBps latency_ns");
++        fields >> std::ws;
++        if (!fields.eof() || pct < 0 || pct > 100 || !std::isfinite(bw) ||
++            bw < 0 || !std::isfinite(latency) || latency <= 0)
++            throw std::runtime_error("MeSS: invalid legacy calibration point");
++        auto& curve = curves[pct];
++        curve.readPercentage = pct;
++        curve.points.emplace_back(bw * 1000.0, latency);  // GB/s -> MB/s
++    }
++    CurveFile file;
++    file.measuredChannels = 1;
++    for (auto& [pct, curve] : curves) {
++        std::sort(curve.points.begin(), curve.points.end(),
++                  [](const auto& a, const auto& b) { return a.first > b.first; });
++        file.curves.push_back(std::move(curve));
++    }
++    validateCurves(file);
++    return file;
++}
++
+ /**
+  * @brief Throws a ``std::runtime_error`` describing a JSON parse failure.
+  *
+@@ -225,6 +283,10 @@
+     const char* p = buf.data();
+     const char* end = p + static_cast<size_t>(size);
+ 
++    skipWs(p, end);
++    if (p == end) throw std::runtime_error("MeSS: empty calibration file");
++    if (*p != '{') return loadLegacyCurves(p, static_cast<size_t>(end - p));
++
+     CurveFile out;
+ 
+     expectChar(p, end, '{');
+@@ -240,6 +302,9 @@
+ 
+         if (keyLen == 16 && std::memcmp(keyBeg, "measuredChannels", 16) == 0) {
+             double v = readNumber(p, end);
++            if (!std::isfinite(v) || v < 1 || std::floor(v) != v ||
++                v > std::numeric_limits<uint32_t>::max())
++                parseError("measuredChannels must be a positive integer");
+             out.measuredChannels = static_cast<uint32_t>(v);
+         } else if (keyLen == 6 && std::memcmp(keyBeg, "curves", 6) == 0) {
+             expectChar(p, end, '{');
+@@ -281,10 +346,13 @@
+     }
+     expectChar(p, end, '}');
+ 
++    skipWs(p, end);
++    if (p != end) parseError("trailing data");
+     if (out.measuredChannels == 0) {
+         throw std::runtime_error(
+             "Curve file is missing a positive 'measuredChannels' field: " + path);
+     }
++    validateCurves(out);
+     return out;
+ }
+ 
+@@ -678,4 +746,4 @@
+         return latency - static_cast<uint32_t>(maxLatencyPerRdRatio[curveDataIndex]);
+     else
+         return 0;
+-}
+\ No newline at end of file
++}
+--- a/mess_mem_ctrl.h
++++ b/mess_mem_ctrl.h
+@@ -238,4 +238,4 @@
+     uint64_t GetQsMemLoadCycleLimit();
+ };
+ 
+-#endif  // BW_LAT_MEM_CTRL_H_
+\ No newline at end of file
++#endif  // BW_LAT_MEM_CTRL_H_

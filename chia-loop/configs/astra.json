@@ -1,0 +1,1757 @@
+{
+  "backend": {
+    "auto_compact_tokens": null,
+    "kind": "codex_cli",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "xhigh",
+    "service_tier": null
+  },
+  "campaign_id": "astra-artifact-reproduction",
+  "experiment": {
+    "evaluation": {
+      "champsim": {
+        "builds": {
+          "1": {
+            "binary": "${WORK_ROOT}/champsim/source1/bin/champsim-1core",
+            "source": "${WORK_ROOT}/champsim/source1"
+          },
+          "4": {
+            "binary": "${WORK_ROOT}/champsim/source4/bin/champsim-4core",
+            "source": "${WORK_ROOT}/champsim/source4"
+          },
+          "8": {
+            "binary": "${WORK_ROOT}/champsim/source8/bin/champsim-8core",
+            "source": "${WORK_ROOT}/champsim/source8"
+          }
+        },
+        "cases": {
+          "test-c1-bark": {
+            "placement": {
+              "decoded_sha256": "e8eaf59527e666dee5ea34641683d58a70e9cecfe719249db9bd01b708026417",
+              "path": "${DATA_ROOT}/maps/test-c1-bark.txt.gz",
+              "sha256": "901b83b3776f0782f823b3643c2a6917291e3fdaf13e419e77310de78697c7ad"
+            },
+            "programs": [
+              "bark"
+            ]
+          },
+          "test-c1-biogpt": {
+            "placement": {
+              "decoded_sha256": "2741d06ed1a2aed6c6998b64d207de6dbef05187004974887203c3305a82f5a8",
+              "path": "${DATA_ROOT}/maps/test-c1-biogpt.txt.gz",
+              "sha256": "130316b45f19e8debcebcb6012c8fbf65e8010afddd50c7befdaa3ee09d32cec"
+            },
+            "programs": [
+              "biogpt"
+            ]
+          },
+          "test-c1-cam4": {
+            "placement": {
+              "decoded_sha256": "e863245a7fbdc282cd2b88cbd0c6acb989a899641e50fb62ea98d87ecf9c87d5",
+              "path": "${DATA_ROOT}/maps/test-c1-cam4.txt.gz",
+              "sha256": "00a00a1cea365975ca836f47632bb293362dcc6cd1a6b6b9c1e2b84ac217c9ca"
+            },
+            "programs": [
+              "cam4"
+            ]
+          },
+          "test-c1-gap_bc": {
+            "placement": {
+              "decoded_sha256": "5449b1e987c35ed638e05e986947c1d8e7e4e32890bf10bf25c9806ac441250c",
+              "path": "${DATA_ROOT}/maps/test-c1-gap_bc.txt.gz",
+              "sha256": "1a15dbdf2e9baeef397ef9d478e073d56e0d223cb6596078dcb351d2c54862ca"
+            },
+            "programs": [
+              "gap_bc"
+            ]
+          },
+          "test-c1-gcc": {
+            "placement": {
+              "decoded_sha256": "95e49a484b6518a621b6a21732a1858fcfd70bf6864858a0184e2aabb60a7c31",
+              "path": "${DATA_ROOT}/maps/test-c1-gcc.txt.gz",
+              "sha256": "a570f48b468746408486a370e9bf6db334cf9f2af3198d0d71f0d009f745c72b"
+            },
+            "programs": [
+              "gcc"
+            ]
+          },
+          "test-c1-ligra_cf": {
+            "placement": {
+              "decoded_sha256": "97a35fbd4b38c38bf232c1fb2f7bcbd0778956bf57efb51e406f817ea5c40f43",
+              "path": "${DATA_ROOT}/maps/test-c1-ligra_cf.txt.gz",
+              "sha256": "976e9f40271ec73cec5b5db3cc7c673d03d951cbabdc4ac72095c46c74096aa8"
+            },
+            "programs": [
+              "ligra_cf"
+            ]
+          },
+          "test-c1-ligra_radii": {
+            "placement": {
+              "decoded_sha256": "3f47aacde7ef81fa0d6c3ff0bf5a17bffe56216929dcd51a4b7d044468c42d08",
+              "path": "${DATA_ROOT}/maps/test-c1-ligra_radii.txt.gz",
+              "sha256": "6945eb96af5dd870748bb624ca6ecd650c648a485ffb6dcea35aed154f0d9f3b"
+            },
+            "programs": [
+              "ligra_radii"
+            ]
+          },
+          "test-c1-pop2": {
+            "placement": {
+              "decoded_sha256": "e3d79a40197aeceb715284f1224dbca8a7b8435df0983ef6a4009115cbbb6941",
+              "path": "${DATA_ROOT}/maps/test-c1-pop2.txt.gz",
+              "sha256": "29fb2cb1d92db0eba9b84bfd9fd332a7d69e1a5e51787b30c02599edf839fc5e"
+            },
+            "programs": [
+              "pop2"
+            ]
+          },
+          "test-c1-sierra_a_3_0001": {
+            "placement": {
+              "decoded_sha256": "985243064ad3aed110909bc25c98edf84f5f91f2de8ad315cdd80dc8761ea6ea",
+              "path": "${DATA_ROOT}/maps/test-c1-sierra_a_3_0001.txt.gz",
+              "sha256": "00263d4b879d7aaad8022bb0cb91031b90ea253c21a7db13496f2c92d1ba6ff2"
+            },
+            "programs": [
+              "sierra_a_3_0001"
+            ]
+          },
+          "test-c1-sierra_a_3_0006": {
+            "placement": {
+              "decoded_sha256": "c25cc283db8e66292479766c01ca9ddd8d22fe17d7207eeb13e39bc912427f2d",
+              "path": "${DATA_ROOT}/maps/test-c1-sierra_a_3_0006.txt.gz",
+              "sha256": "4ad2f6c86e14512c64a3cf2e1dbf0dc611b77593a40843a5c72b0828b3adfe2a"
+            },
+            "programs": [
+              "sierra_a_3_0006"
+            ]
+          },
+          "test-c1-sierra_a_4_0005": {
+            "placement": {
+              "decoded_sha256": "db0fe14f3d0858d6dd8f59f30fd3bb314911df142c4a137768e35f0d0825c290",
+              "path": "${DATA_ROOT}/maps/test-c1-sierra_a_4_0005.txt.gz",
+              "sha256": "96e0ba793756e4e8808dd9a9a07f9f0d28381b239a15b5fafaff0c42ba914d66"
+            },
+            "programs": [
+              "sierra_a_4_0005"
+            ]
+          },
+          "test-c1-sierra_a_4_0013": {
+            "placement": {
+              "decoded_sha256": "d277ade3e27f28b144443dde4a2d0def977dbee5238580524eb6f220208b8584",
+              "path": "${DATA_ROOT}/maps/test-c1-sierra_a_4_0013.txt.gz",
+              "sha256": "9db423e2df9da2194726a0172436cbde95e080483308977207a2617b8de97f6a"
+            },
+            "programs": [
+              "sierra_a_4_0013"
+            ]
+          },
+          "test-c1-sierra_a_6_0001": {
+            "placement": {
+              "decoded_sha256": "ddae7455f79943691df23791cfa1ca0756f9375f8d7466e2a6cd2b2952461b92",
+              "path": "${DATA_ROOT}/maps/test-c1-sierra_a_6_0001.txt.gz",
+              "sha256": "be96eeda68e1018e3b8ffb865c8a16adf9656d8a0b1e480b572d90574c3858df"
+            },
+            "programs": [
+              "sierra_a_6_0001"
+            ]
+          },
+          "test-c1-sierra_a_6_0006": {
+            "placement": {
+              "decoded_sha256": "926617ea6411472055a28dcc133101e230a7fa828fce2d53d264070c385f239c",
+              "path": "${DATA_ROOT}/maps/test-c1-sierra_a_6_0006.txt.gz",
+              "sha256": "628ba6c9d36edf0fcf5a67f9138fa908231abef40b0f6a6a3a12bc6a8239eecd"
+            },
+            "programs": [
+              "sierra_a_6_0006"
+            ]
+          },
+          "test-c1-sierra_a_6_0011": {
+            "placement": {
+              "decoded_sha256": "02a9d4394609b4aa4285b27ab2604667ef599544735a5b827c72e0a8eeeaa5b5",
+              "path": "${DATA_ROOT}/maps/test-c1-sierra_a_6_0011.txt.gz",
+              "sha256": "276bfebd96a115bbb3c47520fbdedd0548671eaf35e5eccf6fcbd595accd84ff"
+            },
+            "programs": [
+              "sierra_a_6_0011"
+            ]
+          },
+          "test-c1-tahoe_0006": {
+            "placement": {
+              "decoded_sha256": "57af8543eb87ebc50979e83f4ff0367e40d478c230d945865ffd264449d0b5fc",
+              "path": "${DATA_ROOT}/maps/test-c1-tahoe_0006.txt.gz",
+              "sha256": "e54291a5df2d4a2277e92da86183b3e8fad6317929fbb99d687c57c38e91af48"
+            },
+            "programs": [
+              "tahoe_0006"
+            ]
+          },
+          "test-c1-tahoe_0010": {
+            "placement": {
+              "decoded_sha256": "4e42018667c66ced0781595c9dea502bb5fa90383508c4f014bf4c66ee08b4d0",
+              "path": "${DATA_ROOT}/maps/test-c1-tahoe_0010.txt.gz",
+              "sha256": "761947dedd87d12a2f0454410590491b11d0f43c9f381941b33859df82fcd52c"
+            },
+            "programs": [
+              "tahoe_0010"
+            ]
+          },
+          "test-c1-tahoe_0011": {
+            "placement": {
+              "decoded_sha256": "ec1014fc2e326cddcc13ec0e188e4de9cce93c067940a285d5b1d68bd2e188fc",
+              "path": "${DATA_ROOT}/maps/test-c1-tahoe_0011.txt.gz",
+              "sha256": "c74d1b0f80336f608c22166abb548f3926946bc9c0a96b21e69dff8c8f2bc61a"
+            },
+            "programs": [
+              "tahoe_0011"
+            ]
+          },
+          "test-c1-tahoe_0013": {
+            "placement": {
+              "decoded_sha256": "c043a30c8450952b2081ee5c246a5f3dca30419c93a2bf6e00478fe2b328c634",
+              "path": "${DATA_ROOT}/maps/test-c1-tahoe_0013.txt.gz",
+              "sha256": "69e55872b7ea5827ebdfd9ee0a0a4b165c1eb9621f886cdbf057bb579b5469ab"
+            },
+            "programs": [
+              "tahoe_0013"
+            ]
+          },
+          "test-c1-tahoe_0014": {
+            "placement": {
+              "decoded_sha256": "4b1015b3ca0e4ba5a0ea857e7e408a06c1af6dde08fd228aca1f5c857666d17e",
+              "path": "${DATA_ROOT}/maps/test-c1-tahoe_0014.txt.gz",
+              "sha256": "6ab07f40c11978ff7b9cd820db6777751a0c95f87a4f942ad5a59acd7e6e1e4e"
+            },
+            "programs": [
+              "tahoe_0014"
+            ]
+          },
+          "test-c1-tahoe_0016": {
+            "placement": {
+              "decoded_sha256": "d2c91a2e33609afa43f250d90668deba6bdf3c83386226cf7c943402f9789d6c",
+              "path": "${DATA_ROOT}/maps/test-c1-tahoe_0016.txt.gz",
+              "sha256": "6239746e55daada59c08cd84e8610ff44da41696ff91c1371d2cd9fc0f38ffce"
+            },
+            "programs": [
+              "tahoe_0016"
+            ]
+          },
+          "test-c1-tahoe_0023": {
+            "placement": {
+              "decoded_sha256": "e215318de0451e40df42e0ed7eea9bb1d5396c619344494bcef09adda6206589",
+              "path": "${DATA_ROOT}/maps/test-c1-tahoe_0023.txt.gz",
+              "sha256": "a2f2c8e92b265c375690772b82f398119739c3e5259209fd940dc73c20ac2ce3"
+            },
+            "programs": [
+              "tahoe_0023"
+            ]
+          },
+          "test-c1-tahoe_0035": {
+            "placement": {
+              "decoded_sha256": "3143c16287281b4addd014fbb406057f1612ba53b3d48beb9ac437ce01c6235d",
+              "path": "${DATA_ROOT}/maps/test-c1-tahoe_0035.txt.gz",
+              "sha256": "4a787e61cf4214f560a5c480e6a8c75240215793da3bcb4e4b9922848c83ccb1"
+            },
+            "programs": [
+              "tahoe_0035"
+            ]
+          },
+          "test-c1-xalancbmk": {
+            "placement": {
+              "decoded_sha256": "ea11feea70f3fe1ea758c9b389950b6f3aa9108259edc300f2cbcfeb2455a012",
+              "path": "${DATA_ROOT}/maps/test-c1-xalancbmk.txt.gz",
+              "sha256": "802cfaa6be92ca7f0aca56e01c4b487cbd26404543cd094152017fd5d8354207"
+            },
+            "programs": [
+              "xalancbmk"
+            ]
+          },
+          "test-c4_google_03": {
+            "placement": {
+              "decoded_sha256": "819f28eec1982a18e05311a601f23b00806a29b8076205a0dc5955185a4beef5",
+              "path": "${DATA_ROOT}/maps/test-c4_google_03.txt.gz",
+              "sha256": "82bd905a3afc918117115ba115220e7045c72153fa9fd136383b8fc0139309fd"
+            },
+            "programs": [
+              "sierra_a_4_0013",
+              "sierra_a_3_0006",
+              "sierra_a_6_0001",
+              "sierra_a_6_0011"
+            ]
+          },
+          "test-c4_google_04": {
+            "placement": {
+              "decoded_sha256": "d29a2e00ef1d2e93575d0d773ef11aab034065e16c9d0cc98cc1d795ee751f04",
+              "path": "${DATA_ROOT}/maps/test-c4_google_04.txt.gz",
+              "sha256": "3cd0b745a2ae603a069d038d6ab8bc7fc4cb6971767e6453fc50ebd0be2c19ae"
+            },
+            "programs": [
+              "tahoe_0023",
+              "tahoe_0013",
+              "tahoe_0011",
+              "tahoe_0006"
+            ]
+          },
+          "test-c4_mixed_05": {
+            "placement": {
+              "decoded_sha256": "0b9c6b59cdd5c4e94d85f9f52c2f66069a9164efe837edba2f619aaa2d4a7d89",
+              "path": "${DATA_ROOT}/maps/test-c4_mixed_05.txt.gz",
+              "sha256": "28f0e8b5d49ade411e0c71cab7ba30d416a901da9efb69c6e0b32d14481e601a"
+            },
+            "programs": [
+              "gcc",
+              "sierra_a_4_0005",
+              "tahoe_0016",
+              "biogpt"
+            ]
+          },
+          "test-c4_mixed_06": {
+            "placement": {
+              "decoded_sha256": "3460e8ceb8ce5e49dc881b26e066aa2fefc7366adadb7b8b36e9b3be1ca93852",
+              "path": "${DATA_ROOT}/maps/test-c4_mixed_06.txt.gz",
+              "sha256": "7195bae630090cc21d08c428fe281b24afee20bcdad4339d03da3cc4407f7143"
+            },
+            "programs": [
+              "tahoe_0035",
+              "sierra_a_6_0006",
+              "ligra_radii",
+              "cam4"
+            ]
+          },
+          "test-c4_mixed_07": {
+            "placement": {
+              "decoded_sha256": "8a89ca40498e9bdb579a7533d4e1163313dc28048e6683454abb208de9349dc2",
+              "path": "${DATA_ROOT}/maps/test-c4_mixed_07.txt.gz",
+              "sha256": "866871077c9be91b24d78d20eb9f592c876f372938d833fbee6d2876b8161602"
+            },
+            "programs": [
+              "tahoe_0014",
+              "gap_bc",
+              "sierra_a_3_0001",
+              "bark"
+            ]
+          },
+          "test-c4_mixed_08": {
+            "placement": {
+              "decoded_sha256": "085b5ada2122fc81c9549b11a46dbb81c494ad25187c924cdd635c8562042aef",
+              "path": "${DATA_ROOT}/maps/test-c4_mixed_08.txt.gz",
+              "sha256": "1511f872c6004daa8e5b59e380384216ba2d321f5c3188eb94d055bf99df7597"
+            },
+            "programs": [
+              "sierra_a_4_0013",
+              "tahoe_0010",
+              "ligra_cf",
+              "xalancbmk"
+            ]
+          },
+          "test-c4_non_google_01": {
+            "placement": {
+              "decoded_sha256": "c1d52d7d388cd0bc37df52fb8b2acd5f9ce1e8b472fec3643e7e417ff970579e",
+              "path": "${DATA_ROOT}/maps/test-c4_non_google_01.txt.gz",
+              "sha256": "fee894d222e89becee63df934bfa76345d0ccb96a2b71b14a79ff4f879f04795"
+            },
+            "programs": [
+              "ligra_radii",
+              "gap_bc",
+              "biogpt",
+              "cam4"
+            ]
+          },
+          "test-c4_non_google_02": {
+            "placement": {
+              "decoded_sha256": "3d86923c8c6b515a776e41be40fca875aa11d85f352b7ad5f0021fe023ef68a2",
+              "path": "${DATA_ROOT}/maps/test-c4_non_google_02.txt.gz",
+              "sha256": "5dc53faefbc2b5845855b9e5a7bdcf69a4be49804cc97778619f2902a0c04a90"
+            },
+            "programs": [
+              "pop2",
+              "bark",
+              "xalancbmk",
+              "ligra_cf"
+            ]
+          },
+          "test-c8-01": {
+            "placement": {
+              "decoded_sha256": "24a7ce71f0d1f799675f43c0b41666978967c5aaa41166bfbad897f3625b74d8",
+              "path": "${DATA_ROOT}/maps/test-c8-01.txt.gz",
+              "sha256": "6b178dec216135958cb8f0e9dcf4b25f36c4a121300f2190e105ae5ea4fbc415"
+            },
+            "programs": [
+              "cam4",
+              "tahoe_0010",
+              "sierra_a_3_0006",
+              "sierra_a_4_0005",
+              "tahoe_0016",
+              "biogpt",
+              "sierra_a_6_0011",
+              "sierra_a_3_0001"
+            ]
+          },
+          "test-c8-02": {
+            "placement": {
+              "decoded_sha256": "4c50627b879e25ec79a83c4df3614ee5d1f949654b27f325fd90eb76aacf9326",
+              "path": "${DATA_ROOT}/maps/test-c8-02.txt.gz",
+              "sha256": "91c7ef59a83c35520d238f8b2fe7c249ca096e0eb3e3d1e919bb21d13a6ad6e2"
+            },
+            "programs": [
+              "gcc",
+              "gap_bc",
+              "tahoe_0023",
+              "sierra_a_4_0013",
+              "pop2",
+              "xalancbmk",
+              "sierra_a_6_0006",
+              "sierra_a_6_0001"
+            ]
+          },
+          "test-c8-03": {
+            "placement": {
+              "decoded_sha256": "c8b1dd3d592699c0392ec2316d979708f33e6583569e52dff2b636f4c962c8b2",
+              "path": "${DATA_ROOT}/maps/test-c8-03.txt.gz",
+              "sha256": "d905e673176940840b41ecf4626c038f95364de096ff59272b3fb68a22ef7c23"
+            },
+            "programs": [
+              "tahoe_0013",
+              "tahoe_0006",
+              "tahoe_0014",
+              "ligra_cf",
+              "bark",
+              "tahoe_0035",
+              "ligra_radii",
+              "tahoe_0011"
+            ]
+          },
+          "test-c8-04": {
+            "placement": {
+              "decoded_sha256": "72912ff69457fe55a7bcf0d7c01ebd2fc1b783d26fd92eac7e170c9751cb5516",
+              "path": "${DATA_ROOT}/maps/test-c8-04.txt.gz",
+              "sha256": "d9c2b8ba0f74f827d7ed4aafb4b39d100973177c3482f232f3f1a3060d6984c6"
+            },
+            "programs": [
+              "sierra_a_3_0001",
+              "cam4",
+              "sierra_a_4_0013",
+              "tahoe_0014",
+              "xalancbmk",
+              "tahoe_0011",
+              "tahoe_0010",
+              "pop2"
+            ]
+          },
+          "test-c8-05": {
+            "placement": {
+              "decoded_sha256": "a4320409ea4977f25ed3948d0d95111c0164bf222f8e733e77cc0cf9d2574949",
+              "path": "${DATA_ROOT}/maps/test-c8-05.txt.gz",
+              "sha256": "58feb51ada686ea05402e90aecdd23732d7290f6efa054a8c670fb1a8016f488"
+            },
+            "programs": [
+              "sierra_a_6_0001",
+              "tahoe_0035",
+              "tahoe_0016",
+              "sierra_a_4_0005",
+              "gcc",
+              "tahoe_0006",
+              "sierra_a_3_0006",
+              "ligra_radii"
+            ]
+          },
+          "test-c8-06": {
+            "placement": {
+              "decoded_sha256": "5649db11ebb4c7845a5492988eb5ff527e1e8558aaebe6a07c52f00732eaa2eb",
+              "path": "${DATA_ROOT}/maps/test-c8-06.txt.gz",
+              "sha256": "f7f0ed9d123b4a4a8073b9430db84c9af2f1075ac7de5777a15238d5724d62e9"
+            },
+            "programs": [
+              "bark",
+              "gap_bc",
+              "sierra_a_3_0001",
+              "tahoe_0023",
+              "tahoe_0013",
+              "sierra_a_6_0011",
+              "sierra_a_4_0005",
+              "sierra_a_6_0006"
+            ]
+          },
+          "test-c8-07": {
+            "placement": {
+              "decoded_sha256": "44317fec66a0f02a77f53de4c6232a5d6892c7593de083638acfc84c3ce2f0c7",
+              "path": "${DATA_ROOT}/maps/test-c8-07.txt.gz",
+              "sha256": "7ff70e1ac61a79385bef1a5a80e3559921a43b491c1c20d165b6e183a5b69fc9"
+            },
+            "programs": [
+              "biogpt",
+              "ligra_cf",
+              "gap_bc",
+              "sierra_a_6_0001",
+              "sierra_a_6_0011",
+              "sierra_a_4_0013",
+              "tahoe_0035",
+              "tahoe_0010"
+            ]
+          },
+          "test-c8-08": {
+            "placement": {
+              "decoded_sha256": "a2e032d264b6493065945f2976d8171315b4e810383b884f18365486ebcd3463",
+              "path": "${DATA_ROOT}/maps/test-c8-08.txt.gz",
+              "sha256": "4b608c44593c42f3c0a2d2c800688157227f711fc88513b3e025b974c8c867b7"
+            },
+            "programs": [
+              "ligra_radii",
+              "biogpt",
+              "pop2",
+              "sierra_a_6_0006",
+              "sierra_a_3_0006",
+              "bark",
+              "cam4",
+              "ligra_cf"
+            ]
+          },
+          "training-c1-arizona": {
+            "placement": {
+              "decoded_sha256": "74a3c7f34c655922327b09208bf6ded69a5772504dbd5c55ccae34e6a6f3d225",
+              "path": "${DATA_ROOT}/maps/training-c1-arizona.txt.gz",
+              "sha256": "16355e41cfb6b94c63b001c14a7d1cb7ee4fe631c8601653251e36a678c49b33"
+            },
+            "programs": [
+              "arizona"
+            ]
+          },
+          "training-c1-bravo": {
+            "placement": {
+              "decoded_sha256": "de217b25c17f7471c17b9522f881ff1f3579a1c05ffa1aea8d88bf2cddd1bf9c",
+              "path": "${DATA_ROOT}/maps/training-c1-bravo.txt.gz",
+              "sha256": "60beaa72182aa0c81e52ac30a17832f05e2825a29462863b9e4898eed1d7f296"
+            },
+            "programs": [
+              "bravo"
+            ]
+          },
+          "training-c1-cactu": {
+            "placement": {
+              "decoded_sha256": "fe654659303979f15eaadbc8faffa7254f43a9b3cabf23b56e22fe4f198c570e",
+              "path": "${DATA_ROOT}/maps/training-c1-cactu.txt.gz",
+              "sha256": "61c2bac85be297f62f0e09b2e55924fe2f6d06cb5462dedc89bfaf34ea391b81"
+            },
+            "programs": [
+              "cactu"
+            ]
+          },
+          "training-c1-charlie": {
+            "placement": {
+              "decoded_sha256": "103f69eb1c7d96af76d3339cc1fe49c6d44f0b9dad2bc27cef7f98638d78c706",
+              "path": "${DATA_ROOT}/maps/training-c1-charlie.txt.gz",
+              "sha256": "9ba6180d84e6962d10846aba2e64566760217cfe2be7068218831a7d64108d1e"
+            },
+            "programs": [
+              "charlie"
+            ]
+          },
+          "training-c1-gap_bfs": {
+            "placement": {
+              "decoded_sha256": "37408c34c838b2335dc0af1d2e1eb39df99c754c651bd63249aa20b12a6f5e5c",
+              "path": "${DATA_ROOT}/maps/training-c1-gap_bfs.txt.gz",
+              "sha256": "18d21f800a69c42a671c07cf5108ad91c407e71970949920fe4e10b6f23be7bc"
+            },
+            "programs": [
+              "gap_bfs"
+            ]
+          },
+          "training-c1-gap_sssp": {
+            "placement": {
+              "decoded_sha256": "7457ae3ec40db1775f58b0cb3c2141dbaeb6051282292ced7409e252c90d3b51",
+              "path": "${DATA_ROOT}/maps/training-c1-gap_sssp.txt.gz",
+              "sha256": "21c917e4cbc21af1a8985c7e7ce283137ca484bb53aab71b752c9e689e6cc498"
+            },
+            "programs": [
+              "gap_sssp"
+            ]
+          },
+          "training-c1-gms_kstar": {
+            "placement": {
+              "decoded_sha256": "678994324631736cb81603239f4638a34bbaccd69a5aca82c05d625e81cc2d9d",
+              "path": "${DATA_ROOT}/maps/training-c1-gms_kstar.txt.gz",
+              "sha256": "667835f7884f6a26fceecbda2f13a75847c2437b717b9cc8264128d194f3a84d"
+            },
+            "programs": [
+              "gms_kstar"
+            ]
+          },
+          "training-c1-gms_maxclique": {
+            "placement": {
+              "decoded_sha256": "3bf20db2f4c51b8f81aeee09abe24877cc739995775aac618cf95c562bc183d8",
+              "path": "${DATA_ROOT}/maps/training-c1-gms_maxclique.txt.gz",
+              "sha256": "6aed60005552159f0ba00e6b0287fab4a6bacb05c49d73520209c5f72bf0b30f"
+            },
+            "programs": [
+              "gms_maxclique"
+            ]
+          },
+          "training-c1-lbm": {
+            "placement": {
+              "decoded_sha256": "941b9052a70f92d5078816b0b8287dadfa3037accdd3dcff7a084c823ad8e962",
+              "path": "${DATA_ROOT}/maps/training-c1-lbm.txt.gz",
+              "sha256": "3e289e7698e6b3590eb53017a3de25338d2dd1e4c8b4f313276b46e2daf4050b"
+            },
+            "programs": [
+              "lbm"
+            ]
+          },
+          "training-c1-llama7b": {
+            "placement": {
+              "decoded_sha256": "f25a2d7e59f7591374008b98566ebd973ca359534230c166b2fd5a46dfa8e2dc",
+              "path": "${DATA_ROOT}/maps/training-c1-llama7b.txt.gz",
+              "sha256": "3f0492687fb725ed597e8a35afe88abb3f2f17273468332003135be1671afbda"
+            },
+            "programs": [
+              "llama7b"
+            ]
+          },
+          "training-c1-mcf": {
+            "placement": {
+              "decoded_sha256": "2fa25483ecfd8657da30e0556fab6b1e6200d0cd05135c3337fc10fe499a7e6e",
+              "path": "${DATA_ROOT}/maps/training-c1-mcf.txt.gz",
+              "sha256": "c89f3a410843fb27faa30541cd2e22ff375d0b0aad5c07274a0506eec36de11f"
+            },
+            "programs": [
+              "mcf"
+            ]
+          },
+          "training-c1-omnetpp": {
+            "placement": {
+              "decoded_sha256": "277b04f5d6371adca6d2e54a6f1ec79c1e88cd40def3189406b9ce4426ee51a1",
+              "path": "${DATA_ROOT}/maps/training-c1-omnetpp.txt.gz",
+              "sha256": "01bb6ad38b1142ab0b0f3dcb224772482bb0aa6850ef45ab3f7e220a5cd4244b"
+            },
+            "programs": [
+              "omnetpp"
+            ]
+          },
+          "training-c1-whiskey": {
+            "placement": {
+              "decoded_sha256": "49e57ed5cc57a3a62d55b565b9b685df67d7aee94b179865f5c8a87d61d7457e",
+              "path": "${DATA_ROOT}/maps/training-c1-whiskey.txt.gz",
+              "sha256": "e4c3ea1c4ae9ea750439f95b8b98016bad817f6f442b81fbdca6be9b10fe5a22"
+            },
+            "programs": [
+              "whiskey"
+            ]
+          },
+          "training-c1-whisper": {
+            "placement": {
+              "decoded_sha256": "6c378c42bda04092010423c8a912bf926021bef893c22c590baccdac0683c083",
+              "path": "${DATA_ROOT}/maps/training-c1-whisper.txt.gz",
+              "sha256": "3526e681c2d94f99e3c21375524e203d5a2c4609b0978bf6c70aa883d7384717"
+            },
+            "programs": [
+              "whisper"
+            ]
+          },
+          "training-c4-01": {
+            "placement": {
+              "decoded_sha256": "dc4b60c6d7d18d9558edf2606484dc64fde5677f472fa344879431904bd86912",
+              "path": "${DATA_ROOT}/maps/training-c4-01.txt.gz",
+              "sha256": "ef5a72313bddc499f79750298f23a2f141cff40a1c0974e921e06912c864aafd"
+            },
+            "programs": [
+              "arizona",
+              "gap_bfs",
+              "whisper",
+              "gms_maxclique"
+            ]
+          },
+          "training-c4-02": {
+            "placement": {
+              "decoded_sha256": "fc2fa9e88ad405c2c5eb2395692b2bbe037b570e6e4070c831df5e201587bd87",
+              "path": "${DATA_ROOT}/maps/training-c4-02.txt.gz",
+              "sha256": "140e7dcc53c750060e9a6550649710657de4bde1aebaa0a364d00902b3ffcecc"
+            },
+            "programs": [
+              "cactu",
+              "whiskey",
+              "llama7b",
+              "charlie"
+            ]
+          },
+          "training-c4-03": {
+            "placement": {
+              "decoded_sha256": "a8ba6f99f3a7283dc03667a7f1b00f3d9f2c55baf5868da8d4ac0dba6912f78a",
+              "path": "${DATA_ROOT}/maps/training-c4-03.txt.gz",
+              "sha256": "770d9f8aae8b20104478fe759938e5605f72dde2e0d8dfb9c6e2db49fa228991"
+            },
+            "programs": [
+              "mcf",
+              "gap_sssp",
+              "omnetpp",
+              "bravo"
+            ]
+          },
+          "training-c4-04": {
+            "placement": {
+              "decoded_sha256": "334e3aaadeb41c0c660d542a7f658fc3fb2374167343bc1578b772c3536d25d2",
+              "path": "${DATA_ROOT}/maps/training-c4-04.txt.gz",
+              "sha256": "a6dc5fcb03e7c32b4395256f33ede43da3ce4dc3c539ec4c0b563ceb2e67d496"
+            },
+            "programs": [
+              "lbm",
+              "gms_kstar",
+              "gms_maxclique",
+              "mcf"
+            ]
+          },
+          "training-c4-05": {
+            "placement": {
+              "decoded_sha256": "316c8d18eda374dd2c6830b671fa79de23231be5d5d2a6cdb53b49e4dd76a42f",
+              "path": "${DATA_ROOT}/maps/training-c4-05.txt.gz",
+              "sha256": "30de7fd9c9fd3343aebfd31af24f5427197de9d17ccfc5d19a7661b6bb09aa82"
+            },
+            "programs": [
+              "arizona",
+              "charlie",
+              "gms_kstar",
+              "omnetpp"
+            ]
+          },
+          "training-c4-06": {
+            "placement": {
+              "decoded_sha256": "4db5f397f416cd2726a7b9b78fbe30edbb34bf61299077f0de4857583bd0df44",
+              "path": "${DATA_ROOT}/maps/training-c4-06.txt.gz",
+              "sha256": "9c1696a1135cb78505a23558196efabae9d6de9a9ffe291939efab84d9886b13"
+            },
+            "programs": [
+              "gap_bfs",
+              "llama7b",
+              "gap_sssp",
+              "lbm"
+            ]
+          },
+          "training-c4-07": {
+            "placement": {
+              "decoded_sha256": "369a80671ef89acc988beecfcd614ece6ad3c6a92dfc37e0c4a24118659d2963",
+              "path": "${DATA_ROOT}/maps/training-c4-07.txt.gz",
+              "sha256": "6b67325dd3dfab059c919051d1da7b4d42f5a4be58529306037e1a0507d8a1d9"
+            },
+            "programs": [
+              "whiskey",
+              "bravo",
+              "whisper",
+              "cactu"
+            ]
+          },
+          "training-c4-08": {
+            "placement": {
+              "decoded_sha256": "de1719a530bf17728fe5169137bd04b5214cd5a98632a543dfcaf6119c1ca8a8",
+              "path": "${DATA_ROOT}/maps/training-c4-08.txt.gz",
+              "sha256": "d507e12f7bd594f1f314728c714edc31082a633c348faf5eff7320d47cb7fef5"
+            },
+            "programs": [
+              "omnetpp",
+              "cactu",
+              "gap_bfs",
+              "gms_kstar"
+            ]
+          },
+          "training-c8-01": {
+            "placement": {
+              "decoded_sha256": "4ddd33390fbe3e140cef0d946d41938eb63263108a5dc894c6b527cf83b08644",
+              "path": "${DATA_ROOT}/maps/training-c8-01.txt.gz",
+              "sha256": "612d23774da618ef6ab7bae82d4b40860ee76d39e5190ebede25319ec268e731"
+            },
+            "programs": [
+              "mcf",
+              "omnetpp",
+              "whisper",
+              "gms_maxclique",
+              "whiskey",
+              "charlie",
+              "llama7b",
+              "gap_sssp"
+            ]
+          },
+          "training-c8-02": {
+            "placement": {
+              "decoded_sha256": "786da1836d8e797da25b92429453e35aae819eb8bc2384a50a833a1fd733962b",
+              "path": "${DATA_ROOT}/maps/training-c8-02.txt.gz",
+              "sha256": "0682545b68e43229826cf0b52a1ac2e9bb12ca7987e5bf2e89142f6cebf9101f"
+            },
+            "programs": [
+              "cactu",
+              "arizona",
+              "gms_kstar",
+              "lbm",
+              "bravo",
+              "gap_bfs",
+              "charlie",
+              "gap_sssp"
+            ]
+          },
+          "training-c8-03": {
+            "placement": {
+              "decoded_sha256": "e16a2d08dfc27a272b1cb22066e03abfc27ded1b8b21e60a810c2012f014da05",
+              "path": "${DATA_ROOT}/maps/training-c8-03.txt.gz",
+              "sha256": "0e7d7a02ef2e92a4ab2b6b9d4d869f4c8bcc70e8c9350ab3b2c7457b50decfde"
+            },
+            "programs": [
+              "cactu",
+              "omnetpp",
+              "lbm",
+              "gms_maxclique",
+              "mcf",
+              "gap_bfs",
+              "gms_kstar",
+              "whisper"
+            ]
+          },
+          "training-c8-04": {
+            "placement": {
+              "decoded_sha256": "7702db864d917bcabb8efeeb55e2a63962572f6fefaf4018443d3ff887aa2bcb",
+              "path": "${DATA_ROOT}/maps/training-c8-04.txt.gz",
+              "sha256": "ab8c1f592ea25044db91631fc582de87fcd0f217ac7ab9ba18550bef38f22abc"
+            },
+            "programs": [
+              "arizona",
+              "llama7b",
+              "whiskey",
+              "bravo",
+              "cactu",
+              "gms_maxclique",
+              "gap_bfs",
+              "whisper"
+            ]
+          },
+          "training-c8-05": {
+            "placement": {
+              "decoded_sha256": "186565fd9be17b51144e8e1a517d57115ebb34ee59d36b6ca5044026ab259a0b",
+              "path": "${DATA_ROOT}/maps/training-c8-05.txt.gz",
+              "sha256": "867a079d2c7f1e5eff9206e0525263c04d08bee997fbdc4229ad6bfea33c8490"
+            },
+            "programs": [
+              "gap_sssp",
+              "mcf",
+              "bravo",
+              "gms_kstar",
+              "llama7b",
+              "arizona",
+              "omnetpp",
+              "lbm"
+            ]
+          },
+          "training-c8-06": {
+            "placement": {
+              "decoded_sha256": "bc078cfcb8aeadeea6ca1778c19b4208f54247502baab6b0abbb3e9f4b346a52",
+              "path": "${DATA_ROOT}/maps/training-c8-06.txt.gz",
+              "sha256": "e3ad0cc974bd1839eb64a8c0cf019dea12a9aa8581915fd631fe082a4fea5658"
+            },
+            "programs": [
+              "charlie",
+              "whiskey",
+              "lbm",
+              "mcf",
+              "arizona",
+              "gms_maxclique",
+              "bravo",
+              "gap_bfs"
+            ]
+          },
+          "training-c8-07": {
+            "placement": {
+              "decoded_sha256": "fb9aba44e35953c44f6c5c08c93382e0717e13955efec4b86dd7fa98e4989502",
+              "path": "${DATA_ROOT}/maps/training-c8-07.txt.gz",
+              "sha256": "1f62c8099c9c175b8ac5c7bf3b762e6f2b36168026c96307802ffb8938475fcd"
+            },
+            "programs": [
+              "whisper",
+              "gms_kstar",
+              "charlie",
+              "llama7b",
+              "cactu",
+              "whiskey",
+              "omnetpp",
+              "gap_sssp"
+            ]
+          },
+          "training-c8-08": {
+            "placement": {
+              "decoded_sha256": "f98577fa9c22d0884d440578ec14bef8a6477346cf94ed12be7cd9797e29b5a5",
+              "path": "${DATA_ROOT}/maps/training-c8-08.txt.gz",
+              "sha256": "30ba9194590ac4fe69c1a1acb54995d302ea42c5e4730e7265bf3b18bbe8005f"
+            },
+            "programs": [
+              "gap_sssp",
+              "gms_maxclique",
+              "bravo",
+              "omnetpp",
+              "gap_bfs",
+              "whisper",
+              "lbm",
+              "whiskey"
+            ]
+          },
+          "validation-c1-bwaves": {
+            "placement": {
+              "decoded_sha256": "2f11ef5a62c492826faa554223a314395c1b2fc4fa03084bc1e11953577bd6d5",
+              "path": "${DATA_ROOT}/maps/validation-c1-bwaves.txt.gz",
+              "sha256": "8ed257314d9c5b26bab167b6da473fc88ca0e2dbd929923bb642b27982467c44"
+            },
+            "programs": [
+              "bwaves"
+            ]
+          },
+          "validation-c1-delta": {
+            "placement": {
+              "decoded_sha256": "b9e93f7f0226b6ba81ab6839ab073d8612a85597f342b4ff9051bf83afa4a0fe",
+              "path": "${DATA_ROOT}/maps/validation-c1-delta.txt.gz",
+              "sha256": "947c7f16016cee94af6efa35e28033f9757637b936162e15b1314725510d327f"
+            },
+            "programs": [
+              "delta"
+            ]
+          },
+          "validation-c1-fotonik": {
+            "placement": {
+              "decoded_sha256": "01dd0c274c8bcf56257bee82e8cc3b298ec7f8bd3d00097297181741b8e39df5",
+              "path": "${DATA_ROOT}/maps/validation-c1-fotonik.txt.gz",
+              "sha256": "7389dedbbe6c2351f655ec1403be6b5fff116a7a5f8f157dc254f0f7fba57f9a"
+            },
+            "programs": [
+              "fotonik"
+            ]
+          },
+          "validation-c1-gap_pr": {
+            "placement": {
+              "decoded_sha256": "bb8e090163c726a4553da7a0e755f5b270d3a9c458c2cf344d244b1c37ddcc5a",
+              "path": "${DATA_ROOT}/maps/validation-c1-gap_pr.txt.gz",
+              "sha256": "dd2eed21bdd56b3afa73414c67b95d4b51f9d91efeaefab145876c0d8f9152ff"
+            },
+            "programs": [
+              "gap_pr"
+            ]
+          },
+          "validation-c1-gms_subgraph": {
+            "placement": {
+              "decoded_sha256": "3dd1bad4f64dc89b76aa3db37963aa55ef8e4821f63ebebc1366767f0c8b00fe",
+              "path": "${DATA_ROOT}/maps/validation-c1-gms_subgraph.txt.gz",
+              "sha256": "642c09381c2c9739e13905b22ce8f64575705f468d5f9defed79501d1d4ec875"
+            },
+            "programs": [
+              "gms_subgraph"
+            ]
+          },
+          "validation-c1-gms_triangle": {
+            "placement": {
+              "decoded_sha256": "d85e6b97c1329b99735286d3c85dd93e21e68309fad9cfea19b85b331b4ba751",
+              "path": "${DATA_ROOT}/maps/validation-c1-gms_triangle.txt.gz",
+              "sha256": "48b7f9862cb534f80530b3fd63cb11658f5ba911d78f366b767e9d0209ef808c"
+            },
+            "programs": [
+              "gms_triangle"
+            ]
+          },
+          "validation-c1-ligra_components": {
+            "placement": {
+              "decoded_sha256": "095cd7226a7571d4632de704a7306ec41044f880091a039b010abc0779f32137",
+              "path": "${DATA_ROOT}/maps/validation-c1-ligra_components.txt.gz",
+              "sha256": "2e566b50fc7f14d1cb5970bfbc596cecf1de538227137247a492f8c346b5211f"
+            },
+            "programs": [
+              "ligra_components"
+            ]
+          },
+          "validation-c1-merced": {
+            "placement": {
+              "decoded_sha256": "76c8b4cafe78c0a96b49f4899e544b22296406ec1ea40f3fb5885a7e44065c95",
+              "path": "${DATA_ROOT}/maps/validation-c1-merced.txt.gz",
+              "sha256": "9a4373173fb071f3c2d545efd7c24f06b2d85a2c96429ee4401ffea7d08d8f17"
+            },
+            "programs": [
+              "merced"
+            ]
+          },
+          "validation-c1-rwkv": {
+            "placement": {
+              "decoded_sha256": "0734fc7088236022b84eccabff1e05643ccfaf4bea5f96469e4e374b30cf53c9",
+              "path": "${DATA_ROOT}/maps/validation-c1-rwkv.txt.gz",
+              "sha256": "aa84faa87aa8f56055e6f23ea965c61ec77c96542a0aa793f1f24748b4cc4b60"
+            },
+            "programs": [
+              "rwkv"
+            ]
+          },
+          "validation-c1-sd14": {
+            "placement": {
+              "decoded_sha256": "2f5047f92e8a54b01887689212ff52f9072b972a9b1054b194a599370e49b594",
+              "path": "${DATA_ROOT}/maps/validation-c1-sd14.txt.gz",
+              "sha256": "b393fc9f96c80e3a07dc737ed35daeb5547743fa3bdabaf2ca8b006074e4b56d"
+            },
+            "programs": [
+              "sd14"
+            ]
+          },
+          "validation-c1-tango": {
+            "placement": {
+              "decoded_sha256": "50268142b3ddcdcbcda75293414de1ca2a5adf2a42ac6762962336abda0b3932",
+              "path": "${DATA_ROOT}/maps/validation-c1-tango.txt.gz",
+              "sha256": "f7bdb04b7443c555e134c3fc1ce67f19d6753fd6207a13e8fbc4223bac7428e5"
+            },
+            "programs": [
+              "tango"
+            ]
+          },
+          "validation-c1-vit_large": {
+            "placement": {
+              "decoded_sha256": "5014c6ef2781a2bb29da2b711919cad91551336797ed1e3223efd59d38bf6928",
+              "path": "${DATA_ROOT}/maps/validation-c1-vit_large.txt.gz",
+              "sha256": "ec44995de124e1e418b21fe123f3d45247cc21117dc6d15fef9b5f8eda452ed9"
+            },
+            "programs": [
+              "vit_large"
+            ]
+          },
+          "validation-c1-xz": {
+            "placement": {
+              "decoded_sha256": "a4778c63f1b10d8a4cd639942be1f002e66db60a69523a44867c2a0bef967334",
+              "path": "${DATA_ROOT}/maps/validation-c1-xz.txt.gz",
+              "sha256": "c41d27c4259d13ffd09cfffe3db3f959cf1718d586c1e1b0fe01c125dd47feae"
+            },
+            "programs": [
+              "xz"
+            ]
+          },
+          "validation-c1-yankee": {
+            "placement": {
+              "decoded_sha256": "1d610886e1f3da7cb4991307c5ed9d2fdfca2999601a13e9f70d76339c06392e",
+              "path": "${DATA_ROOT}/maps/validation-c1-yankee.txt.gz",
+              "sha256": "caaf887e8849eddf983779539a8e396141c81f0a99fa10c7f3b5c7b9be92964a"
+            },
+            "programs": [
+              "yankee"
+            ]
+          },
+          "validation-c4-01": {
+            "placement": {
+              "decoded_sha256": "14143d926c2dcd92c0438afd97f706f918ebff4b2dca303056689ea8339639a6",
+              "path": "${DATA_ROOT}/maps/validation-c4-01.txt.gz",
+              "sha256": "e8d5ab5b45a748725e2130d7d9540789455b7e3d20a9912bb2880d35af0c567f"
+            },
+            "programs": [
+              "bwaves",
+              "tango",
+              "fotonik",
+              "delta"
+            ]
+          },
+          "validation-c4-02": {
+            "placement": {
+              "decoded_sha256": "179f89324b875e0e3c365cfde28e24e5c3e68694b268d1829e603fdcb174503e",
+              "path": "${DATA_ROOT}/maps/validation-c4-02.txt.gz",
+              "sha256": "ac6a7b192bdbceb5fc66b37fbdf32f694fd978fde241d67b3940f408430d74e3"
+            },
+            "programs": [
+              "gms_subgraph",
+              "gms_triangle",
+              "sd14",
+              "xz"
+            ]
+          },
+          "validation-c4-03": {
+            "placement": {
+              "decoded_sha256": "795e0ef2acb3f37d5be0cb0bab95d002cd375e337cb50ae70972263897ff4d37",
+              "path": "${DATA_ROOT}/maps/validation-c4-03.txt.gz",
+              "sha256": "5daa6d669eeeaf37f760f91497ddbcbfc6b082fd7a67eb41dc444be6fa6e91e9"
+            },
+            "programs": [
+              "ligra_components",
+              "rwkv",
+              "gap_pr",
+              "merced"
+            ]
+          },
+          "validation-c4-04": {
+            "placement": {
+              "decoded_sha256": "10675883cd3d7ba93b1c94c067284767f1825a97cdb90fb579867c61ea437368",
+              "path": "${DATA_ROOT}/maps/validation-c4-04.txt.gz",
+              "sha256": "bd44e4b6b61cdd5a619254ac32e1f511f79872a2256b3637ce8fc86620fde67a"
+            },
+            "programs": [
+              "vit_large",
+              "yankee",
+              "xz",
+              "gap_pr"
+            ]
+          },
+          "validation-c4-05": {
+            "placement": {
+              "decoded_sha256": "705502ba02f85bd5c31ca375d3cea8f8f005b5b2e39dc45fe4e0fd183062a95e",
+              "path": "${DATA_ROOT}/maps/validation-c4-05.txt.gz",
+              "sha256": "6c413e5999ab54e93b18c0539267b4f65d3e3fa2a09a6cc523e97004deeb64bd"
+            },
+            "programs": [
+              "gms_triangle",
+              "vit_large",
+              "rwkv",
+              "fotonik"
+            ]
+          },
+          "validation-c4-06": {
+            "placement": {
+              "decoded_sha256": "de222175b1796f31846e66b4e8013906effbb8f38f79171f89e94f385a0c3c96",
+              "path": "${DATA_ROOT}/maps/validation-c4-06.txt.gz",
+              "sha256": "322f5fb763d77df7fb0dadbfaa85887fd8dc487b72211476822f1434388a8720"
+            },
+            "programs": [
+              "gms_subgraph",
+              "delta",
+              "ligra_components",
+              "yankee"
+            ]
+          },
+          "validation-c4-07": {
+            "placement": {
+              "decoded_sha256": "376994169621ffb7eb6d2c0a40f413dc2195640027c398c4be3d5f6b314956ef",
+              "path": "${DATA_ROOT}/maps/validation-c4-07.txt.gz",
+              "sha256": "80c576315b551e133f9c6a5634c51229e5e9c7a742d230f85465cb11cf8bd9b6"
+            },
+            "programs": [
+              "tango",
+              "merced",
+              "sd14",
+              "bwaves"
+            ]
+          },
+          "validation-c4-08": {
+            "placement": {
+              "decoded_sha256": "67c959c6848c985c42093697655bec924afde1b690aa1d60418162d9d5a3839d",
+              "path": "${DATA_ROOT}/maps/validation-c4-08.txt.gz",
+              "sha256": "56bbe7864d097349ea19bb60728cb05da3f8b7f093a82778194018aa1bec01ab"
+            },
+            "programs": [
+              "rwkv",
+              "bwaves",
+              "xz",
+              "gms_subgraph"
+            ]
+          },
+          "validation-c8-01": {
+            "placement": {
+              "decoded_sha256": "edff47cd11a351ae1c12e01d11e98ae50e54afd07069ff132d1acdb1bd6beab9",
+              "path": "${DATA_ROOT}/maps/validation-c8-01.txt.gz",
+              "sha256": "9075ba803dc9bad8ddb3844a770199f86a8acab841b3ca80936463ccb1c57973"
+            },
+            "programs": [
+              "rwkv",
+              "xz",
+              "gms_subgraph",
+              "yankee",
+              "tango",
+              "delta",
+              "sd14",
+              "ligra_components"
+            ]
+          },
+          "validation-c8-02": {
+            "placement": {
+              "decoded_sha256": "1e85c8f11d516f64e98b18125003daf587b89ba3744729ad94b73d4541e70537",
+              "path": "${DATA_ROOT}/maps/validation-c8-02.txt.gz",
+              "sha256": "9bf67a880d5d1bad0b8a9a30e2251ac3326d8e68f3d181e87dfb0c1a44585344"
+            },
+            "programs": [
+              "gap_pr",
+              "bwaves",
+              "vit_large",
+              "fotonik",
+              "merced",
+              "gms_triangle",
+              "xz",
+              "delta"
+            ]
+          },
+          "validation-c8-03": {
+            "placement": {
+              "decoded_sha256": "a90089342e850fe09d9bd13ff151e9fb2ce191f1e52a4a31cbbda9b5fd629383",
+              "path": "${DATA_ROOT}/maps/validation-c8-03.txt.gz",
+              "sha256": "f47b98534e6735ff904ebc84916c5d9833839c19696c77acbdcbb7787f9a0130"
+            },
+            "programs": [
+              "vit_large",
+              "ligra_components",
+              "bwaves",
+              "rwkv",
+              "gap_pr",
+              "yankee",
+              "tango",
+              "fotonik"
+            ]
+          },
+          "validation-c8-04": {
+            "placement": {
+              "decoded_sha256": "104253a8d8283de45ccfd6a6bdb990b1585ae788d2f2faff6006d97e40edae11",
+              "path": "${DATA_ROOT}/maps/validation-c8-04.txt.gz",
+              "sha256": "31d12735f1f3d481d31d640580d49e586f2246909765970f7adf174d0f67eb5b"
+            },
+            "programs": [
+              "gms_triangle",
+              "gms_subgraph",
+              "merced",
+              "sd14",
+              "gap_pr",
+              "ligra_components",
+              "fotonik",
+              "yankee"
+            ]
+          },
+          "validation-c8-05": {
+            "placement": {
+              "decoded_sha256": "e64ebd6c4008c57b142dd51a5c6fae0ff80f54d9a1c5b23cf50dcd82abb7edca",
+              "path": "${DATA_ROOT}/maps/validation-c8-05.txt.gz",
+              "sha256": "0b278ad228a3a411011643216222541e35d184276b9da1d96daec67554c995ce"
+            },
+            "programs": [
+              "delta",
+              "gms_subgraph",
+              "vit_large",
+              "bwaves",
+              "sd14",
+              "merced",
+              "rwkv",
+              "tango"
+            ]
+          },
+          "validation-c8-06": {
+            "placement": {
+              "decoded_sha256": "6e19bdd1c6e59bd5c6533f893da31d1185f3631a60e5c26a228495185266f312",
+              "path": "${DATA_ROOT}/maps/validation-c8-06.txt.gz",
+              "sha256": "1a6a12bc9476b0486aafd24bcb1e16d8ba83677946293ba1c17f19627256dd23"
+            },
+            "programs": [
+              "gms_triangle",
+              "xz",
+              "rwkv",
+              "tango",
+              "merced",
+              "gap_pr",
+              "yankee",
+              "vit_large"
+            ]
+          },
+          "validation-c8-07": {
+            "placement": {
+              "decoded_sha256": "9ebce11369167f7ef9f48f9131a21a63ef6566f0abf1c596bbfcfb08383102d7",
+              "path": "${DATA_ROOT}/maps/validation-c8-07.txt.gz",
+              "sha256": "dc4aad70d29b7e7a3f5e98663e4599d74e6d83297d42bc831bd840b52e9c2168"
+            },
+            "programs": [
+              "delta",
+              "ligra_components",
+              "gms_triangle",
+              "bwaves",
+              "gms_subgraph",
+              "xz",
+              "fotonik",
+              "sd14"
+            ]
+          },
+          "validation-c8-08": {
+            "placement": {
+              "decoded_sha256": "daf57ac1ce8762c6e5221dfe8a4a87501026e3311b1053d42fcc3cc59cbf61ef",
+              "path": "${DATA_ROOT}/maps/validation-c8-08.txt.gz",
+              "sha256": "b46c9988b2344bd06089a8ab03884e57adae8cd5c8402b29284f175e8da7264e"
+            },
+            "programs": [
+              "gap_pr",
+              "sd14",
+              "delta",
+              "vit_large",
+              "yankee",
+              "xz",
+              "ligra_components",
+              "bwaves"
+            ]
+          }
+        },
+        "minimum_oracle_owner_reads": 10000,
+        "request_objective": "champsim_exact_physical_filter",
+        "roi_instructions": 20000000,
+        "test": [
+          "test-c1-bark",
+          "test-c1-biogpt",
+          "test-c1-cam4",
+          "test-c1-gap_bc",
+          "test-c1-gcc",
+          "test-c1-ligra_cf",
+          "test-c1-ligra_radii",
+          "test-c1-pop2",
+          "test-c1-sierra_a_3_0001",
+          "test-c1-sierra_a_3_0006",
+          "test-c1-sierra_a_4_0005",
+          "test-c1-sierra_a_4_0013",
+          "test-c1-sierra_a_6_0001",
+          "test-c1-sierra_a_6_0006",
+          "test-c1-sierra_a_6_0011",
+          "test-c1-tahoe_0006",
+          "test-c1-tahoe_0010",
+          "test-c1-tahoe_0011",
+          "test-c1-tahoe_0013",
+          "test-c1-tahoe_0014",
+          "test-c1-tahoe_0016",
+          "test-c1-tahoe_0023",
+          "test-c1-tahoe_0035",
+          "test-c1-xalancbmk",
+          "test-c4_google_03",
+          "test-c4_google_04",
+          "test-c4_mixed_05",
+          "test-c4_mixed_06",
+          "test-c4_mixed_07",
+          "test-c4_mixed_08",
+          "test-c4_non_google_01",
+          "test-c4_non_google_02",
+          "test-c8-01",
+          "test-c8-02",
+          "test-c8-03",
+          "test-c8-04",
+          "test-c8-05",
+          "test-c8-06",
+          "test-c8-07",
+          "test-c8-08"
+        ],
+        "traces": {
+          "arizona": {
+            "decoded_sha256": "1afcdb270b8dedadb2f080491a04c710eba43c352b1c635284744772167f5300",
+            "family": "arizona",
+            "path": "${DATA_ROOT}/traces/arizona.gz",
+            "sha256": "6e2a1b0f912ee8ecaba5d8a0980b54794f444ac23a79ca6d5ec5cd2c114f3d3c"
+          },
+          "bark": {
+            "decoded_sha256": "941c1c88e3ad0814c4e6c6969be02858b35b0e3aaf55d6225809a6dc1b4ac7cf",
+            "family": "bark",
+            "path": "${DATA_ROOT}/traces/bark.gz",
+            "sha256": "614c365315846c07df273ac300f8ac992d56705697fe4576bb76f782a0034994"
+          },
+          "biogpt": {
+            "decoded_sha256": "f4477bfc60e6161f5ad9588dc91644dfd58951b15eb14dcd779ee06117b4201b",
+            "family": "biogpt",
+            "path": "${DATA_ROOT}/traces/biogpt.gz",
+            "sha256": "6cf824f2350476f76b43847ddd60af4d3a5eda73348a661873b3327a709ef6c8"
+          },
+          "bravo": {
+            "decoded_sha256": "5abbd9cb2a91cf64ffe066996b620ae17e27a54ce57847136c2275f838eaa5b8",
+            "family": "bravo",
+            "path": "${DATA_ROOT}/traces/bravo.gz",
+            "sha256": "b3fa62079e29bad257bc6bc3e1bba5808210469c48c500c5e19ff73cf8110911"
+          },
+          "bwaves": {
+            "decoded_sha256": "1a6a40e4e113b44c8208f34521ea19ce17d404664e66cdbda85fe273a848d02d",
+            "family": "bwaves",
+            "path": "${DATA_ROOT}/traces/bwaves.gz",
+            "sha256": "a2d4fc5e7c18529c453fceabe54cf24be0e7561912df21b4704adb6df1460f46"
+          },
+          "cactu": {
+            "decoded_sha256": "5dfdee5fccc9e52e07d68d8c82d2142fe264aeaab6d62bb7c5f14d975e934e96",
+            "family": "cactu",
+            "path": "${DATA_ROOT}/traces/cactu.gz",
+            "sha256": "ba2da5ece0c075c94a8187892a9b08d85bc3a7fc211278f014edd1374c67efcd"
+          },
+          "cam4": {
+            "decoded_sha256": "338be36950e418ec6036ad2596de61e6dc6ad8482fd52dc4e134fb5849e0d9dd",
+            "family": "cam4",
+            "path": "${DATA_ROOT}/traces/cam4.gz",
+            "sha256": "51b220943025fca55e09ab31d63ad1069f6997e61f7f34b486daa6f773290b60"
+          },
+          "charlie": {
+            "decoded_sha256": "069ffb5506b2afa2aae2b7e0a4f34e9ea393b8da24ec9e5982577b6ede80294a",
+            "family": "charlie",
+            "path": "${DATA_ROOT}/traces/charlie.gz",
+            "sha256": "a6443fa3df60e6897347ba3f8b2665cd40418df108e7a1f88589d74116761c83"
+          },
+          "delta": {
+            "decoded_sha256": "4628b144d0ab67d3a919ebb2a11f3a1fcafaf4bc47503a1100639693953d0639",
+            "family": "delta",
+            "path": "${DATA_ROOT}/traces/delta.gz",
+            "sha256": "a69e3e16e14e2864ef40b736da9d90b3b0396cca5c579c702f5b69cafdba3e24"
+          },
+          "fotonik": {
+            "decoded_sha256": "cb69c83b01071927f392dafb4dcfeb68dc26b21e300d339fc387ba5365bf7ebc",
+            "family": "fotonik",
+            "path": "${DATA_ROOT}/traces/fotonik.gz",
+            "sha256": "3968bfabdd9a1c30edefca5c6c9e0f41a891b172f39840b8b43d87ebe62b9f05"
+          },
+          "gap_bc": {
+            "decoded_sha256": "a690feff6516f2bccb535703ae510375ce8902517e40612fd32b4bcebed7e729",
+            "family": "gap_bc",
+            "path": "${DATA_ROOT}/traces/gap_bc.gz",
+            "sha256": "6edcd06473deb60bc7d3f8df5387c0d0d1e23c8a4f26504fc86ba9eea3474d14"
+          },
+          "gap_bfs": {
+            "decoded_sha256": "4ac90ee0b8721011135ebda8440f4f201909e58543392b2d4df36a4101513a28",
+            "family": "gap_bfs",
+            "path": "${DATA_ROOT}/traces/gap_bfs.gz",
+            "sha256": "41047dce187fb26224b2fff997bd59aad3df8f629aafaca5a0a4bc54c67e13df"
+          },
+          "gap_pr": {
+            "decoded_sha256": "8b09ca285042f07cb78217d27f2173d2d530676723ede2a9ca36bd65b26509db",
+            "family": "gap_pr",
+            "path": "${DATA_ROOT}/traces/gap_pr.gz",
+            "sha256": "53ce08dcfe45d684c51482be220c0c4534107824fd79368c900f742992eb3def"
+          },
+          "gap_sssp": {
+            "decoded_sha256": "dc167e8f5a485496b1c5e6da62eb0ed2261f1ed56f331938795a8ef2b3a78156",
+            "family": "gap_sssp",
+            "path": "${DATA_ROOT}/traces/gap_sssp.gz",
+            "sha256": "a56985ee537c513166c6480572fc34e5209bb2fb04983de08427ba0f9ddd250c"
+          },
+          "gcc": {
+            "decoded_sha256": "70700d06783df5f4e1c7e508ba023c44ca6fd7a695e5f8dd910591259f4d104e",
+            "family": "gcc",
+            "path": "${DATA_ROOT}/traces/gcc.gz",
+            "sha256": "8e925f8f5b33404aaf3a259b6edb2849d84304f227c72d25bc111848cc241f5b"
+          },
+          "gms_kstar": {
+            "decoded_sha256": "a4faa08f06f90ffba65fa83f6f6a5a699902903cb1fe43efa26d0ddb1efd8900",
+            "family": "clique",
+            "path": "${DATA_ROOT}/traces/gms_kstar.gz",
+            "sha256": "e97d6d1129e13566ca6eba197fb0d60a4ebc384667143993c198904319274cb7"
+          },
+          "gms_maxclique": {
+            "decoded_sha256": "541dbd4b1c118df13b4ae0c1555ceec6459d19457e917554c0a632c66af1933d",
+            "family": "clique",
+            "path": "${DATA_ROOT}/traces/gms_maxclique.gz",
+            "sha256": "208676c2886800852f65bf05b359898485cae6c3be23e2322c1e528ad7b28a4e"
+          },
+          "gms_subgraph": {
+            "decoded_sha256": "24f8455307c5c9a678d8192b655ec92d90b511b5045f3efd16e42e2b32c151d5",
+            "family": "gms_subgraph",
+            "path": "${DATA_ROOT}/traces/gms_subgraph.gz",
+            "sha256": "447c1a3770e9749e0f4e847e7b8e607a766c7b7f8f445ad48efc61934bb611db"
+          },
+          "gms_triangle": {
+            "decoded_sha256": "dc517411fb28a087196de7253fcd3a5e558c674b1828723f6a43f860ebaea024",
+            "family": "gms_triangle",
+            "path": "${DATA_ROOT}/traces/gms_triangle.gz",
+            "sha256": "0580348fd7f8a3725988110129e8162c2a2bbfc6f9ce61aa28107bdc6d0cca2a"
+          },
+          "lbm": {
+            "decoded_sha256": "e0a6c7e69a120b3e1250711ee71afb1266328a3cd22152d951997e462fae0560",
+            "family": "lbm",
+            "path": "${DATA_ROOT}/traces/lbm.gz",
+            "sha256": "abf05d84328e34be3a87df04c46a4f47ecef91664a15d94f4b2bf5771b7009e0"
+          },
+          "ligra_cf": {
+            "decoded_sha256": "c237a51c1069722dff7e13d549eab3fcfe725d3af0258d0deb0422cb9abc850c",
+            "family": "ligra_cf",
+            "path": "${DATA_ROOT}/traces/ligra_cf.gz",
+            "sha256": "33fc66bc786737004a1ff18ce6e8240ea627046c730b7c10910ff7a8f63d722a"
+          },
+          "ligra_components": {
+            "decoded_sha256": "7426402bc3d89147b12719ce62b38a43154c7767c37ce36739f66fed6a32f1b1",
+            "family": "ligra_components",
+            "path": "${DATA_ROOT}/traces/ligra_components.gz",
+            "sha256": "fea69d5531197aced389234ff379641fb107e5d34d7d7e9fc4004406f1df37bc"
+          },
+          "ligra_radii": {
+            "decoded_sha256": "ae0e07e76159862052f3ce6b82ec9ec073807d9473a1ee6ec062306de8581865",
+            "family": "ligra_radii",
+            "path": "${DATA_ROOT}/traces/ligra_radii.gz",
+            "sha256": "0b692d5c410f77489fc76ef7e83738c8f3153c46b354c061437ac0425e44b3a8"
+          },
+          "llama7b": {
+            "decoded_sha256": "54b163927b858393299c91902a4bf17301b8a8f2e6c2c1f9ae104f7d8cb5e03c",
+            "family": "llama7b",
+            "path": "${DATA_ROOT}/traces/llama7b.gz",
+            "sha256": "42b89967667775991b4776691b0b3ae88354f14c0eaac25c2ce112a2fea09241"
+          },
+          "mcf": {
+            "decoded_sha256": "b0268f2edfee9a3321ae827e6016a14cad8c69d56488c429f39f723f1c1dfbaa",
+            "family": "mcf",
+            "path": "${DATA_ROOT}/traces/mcf.gz",
+            "sha256": "5f3d587d4dd87df42f3b2434fce5cb1aa4016cb735d6702c5e8a40e6f455bb48"
+          },
+          "merced": {
+            "decoded_sha256": "b1650d17ef562946a0b285b35d40181b66cd782e6c92bfabe384d87b327009da",
+            "family": "merced",
+            "path": "${DATA_ROOT}/traces/merced.gz",
+            "sha256": "bd13675cdc3d7f30f3fbf2e8da6d6b6dc8a50c1c28f52bf39c3ec2a8694f20ff"
+          },
+          "omnetpp": {
+            "decoded_sha256": "d29104a94f060479135d2e7fbad88f9109ecd0bc52eb8d35e8cf9d47beb163f2",
+            "family": "omnetpp",
+            "path": "${DATA_ROOT}/traces/omnetpp.gz",
+            "sha256": "29cba4941f41b673c9156b81a0574d3f91195b5f5623ae5b8c370f505cd1901a"
+          },
+          "pop2": {
+            "decoded_sha256": "d439fbbbd98f212c030736d32f1359026fe285f64578fd3deaf1b57070fa1c17",
+            "family": "pop2",
+            "path": "${DATA_ROOT}/traces/pop2.gz",
+            "sha256": "81decbc670f8e748b9f80f1f86f237aad4e1048dd7f270858a12400d369a2dac"
+          },
+          "rwkv": {
+            "decoded_sha256": "1d593c5e8aea8b4b1a0d17bfd8fb7726d2d371c831effea4cb65a0861438ce4b",
+            "family": "rwkv",
+            "path": "${DATA_ROOT}/traces/rwkv.gz",
+            "sha256": "638deba556115e9bb8643b3b94d2e14ccb3a3d680717ad525f0f0c57b58d090f"
+          },
+          "sd14": {
+            "decoded_sha256": "f54b5e6ee3478eb96362ba07efff9384169324542bed3bb0354be6d6e94f87ce",
+            "family": "sd14",
+            "path": "${DATA_ROOT}/traces/sd14.gz",
+            "sha256": "fd1da5b363bead2afaf94676fc96a24dfb367f015acdad46c802b8a4c4ee1b20"
+          },
+          "sierra_a_3_0001": {
+            "decoded_sha256": "2a3dcc06c86ec2b217147414e6322fae8286e604ebc0cf9b53eabf8fcd18aefe",
+            "family": "sierra",
+            "path": "${DATA_ROOT}/traces/sierra_a_3_0001.gz",
+            "sha256": "7c051a07c0bc0381fa43112c9c9924a1577a4adf73014a62b7892b0d63f0d536"
+          },
+          "sierra_a_3_0006": {
+            "decoded_sha256": "0e74098f44896a423bc633d09127161b37fd45053e76c735119ed86b3dac4177",
+            "family": "sierra",
+            "path": "${DATA_ROOT}/traces/sierra_a_3_0006.gz",
+            "sha256": "01f49d95067bb7e0b567c9928b002cba10b9ddab762ceb7a16ff88994ea2f624"
+          },
+          "sierra_a_4_0005": {
+            "decoded_sha256": "02cc3ad97345a1c62aca814ab5344a3cb43ffb6b7193ebac4e6430c1c6872cf3",
+            "family": "sierra",
+            "path": "${DATA_ROOT}/traces/sierra_a_4_0005.gz",
+            "sha256": "f30b05ce6f5e6a66951537a246eec5f16599c80d45320cdd0b4d357b73690662"
+          },
+          "sierra_a_4_0013": {
+            "decoded_sha256": "e7b04ef6fd4dc6a3eb05a661f10e501e40f90c4bbe5202f375a9a82d6ed09347",
+            "family": "sierra",
+            "path": "${DATA_ROOT}/traces/sierra_a_4_0013.gz",
+            "sha256": "da2545637551e373391c8c86f137c51c99df9563e85e70270bdae5d7412959ba"
+          },
+          "sierra_a_6_0001": {
+            "decoded_sha256": "059f9094c574170aa40761dbd34231e916837d1283ed1520ccc84c6255b45913",
+            "family": "sierra",
+            "path": "${DATA_ROOT}/traces/sierra_a_6_0001.gz",
+            "sha256": "6b397aaafa5569a5861eb2f35f4903eafba1fa1456993f4c18c47c01d1bce680"
+          },
+          "sierra_a_6_0006": {
+            "decoded_sha256": "f38d238525e6ca16cc4679e20b5775d89ef6c9656ab18c32fc2e7c31518528e7",
+            "family": "sierra",
+            "path": "${DATA_ROOT}/traces/sierra_a_6_0006.gz",
+            "sha256": "6aac780bbd7eb569878bd6617661a4df2d220018553ffb7bda70a27c777554ab"
+          },
+          "sierra_a_6_0011": {
+            "decoded_sha256": "010357c5b9725a5e583c3157dc52e37845789664b7fcbf0c26d92e0c92ff6866",
+            "family": "sierra",
+            "path": "${DATA_ROOT}/traces/sierra_a_6_0011.gz",
+            "sha256": "929cdbc1edfa306246ddd49174df740582bbebfc731e2a20487f079da0b549ec"
+          },
+          "tahoe_0006": {
+            "decoded_sha256": "905c74d82c97728fb197aaa9d7f1937500859786e17edb5ed2fe47927eb778d1",
+            "family": "tahoe",
+            "path": "${DATA_ROOT}/traces/tahoe_0006.gz",
+            "sha256": "20b9c509a39a46a684a6af5c4bb9d068fdb95a4bd5972f83c60c3b9eb258f835"
+          },
+          "tahoe_0010": {
+            "decoded_sha256": "9d59b8105909f3f2174301364185cb3ee54e61982a5af9f733f3854c37487022",
+            "family": "tahoe",
+            "path": "${DATA_ROOT}/traces/tahoe_0010.gz",
+            "sha256": "c87b227344357515b2cb6b0c52591b8459112085e1fad1afb0599145b4e34cd0"
+          },
+          "tahoe_0011": {
+            "decoded_sha256": "4b80aa2fcac3c39481324f7b10ef330b6957c4de5ea4538e216aeb772f79e4b8",
+            "family": "tahoe",
+            "path": "${DATA_ROOT}/traces/tahoe_0011.gz",
+            "sha256": "24370975a9eda90dbddc6ac38226d14267b28ac002a0374923543c7bd73d64d2"
+          },
+          "tahoe_0013": {
+            "decoded_sha256": "d83b2008345d58f56f88994053987195ba918be337b22487bbc618ba1dd71c2b",
+            "family": "tahoe",
+            "path": "${DATA_ROOT}/traces/tahoe_0013.gz",
+            "sha256": "e1a26b4434a55a402beb58b91378e3f3557c599ec636e7d7763e3ac72a35a6ac"
+          },
+          "tahoe_0014": {
+            "decoded_sha256": "e36c47b127794f4cdbf0b5b9cabe744b3ea54552252443313d85ae41a5184e40",
+            "family": "tahoe",
+            "path": "${DATA_ROOT}/traces/tahoe_0014.gz",
+            "sha256": "6537f52997432a4cd31931078b70f368e33dd8de1bc5494534b6d4a9b48561ab"
+          },
+          "tahoe_0016": {
+            "decoded_sha256": "1c2fb8e9f6cabda80abab3de27c0674b1f386ffe02096eacfbbf1be49df1a90c",
+            "family": "tahoe",
+            "path": "${DATA_ROOT}/traces/tahoe_0016.gz",
+            "sha256": "7ff3573614c788ffc24b2df92839ff958a3995987161af53c67c3c6afb2b6743"
+          },
+          "tahoe_0023": {
+            "decoded_sha256": "375e3cf1b552c0429bee806ba2a28be5d9c81f4ef85743ca3f95808e17732c90",
+            "family": "tahoe",
+            "path": "${DATA_ROOT}/traces/tahoe_0023.gz",
+            "sha256": "a84712b8b5f04739a7fc31597197108568b996c6b85bf4f8ed9840e9418de2ce"
+          },
+          "tahoe_0035": {
+            "decoded_sha256": "312e8e314abb052a6516d19e9cba4977155538f02b303433922e2efbd6e235c9",
+            "family": "tahoe",
+            "path": "${DATA_ROOT}/traces/tahoe_0035.gz",
+            "sha256": "4736ed3f282da55ff50dc69cc489012ac333bc0841e80ce6c792d25e1d81c6fd"
+          },
+          "tango": {
+            "decoded_sha256": "dcf7076fc1c3a660f2876dca673ed4135746f2912b7ebbfc8744bd1f22f0af2e",
+            "family": "tango",
+            "path": "${DATA_ROOT}/traces/tango.gz",
+            "sha256": "f3eed7a54b9667f2cbf7df33074657f7014b679d9cb5ecead36b75239440d3c0"
+          },
+          "vit_large": {
+            "decoded_sha256": "0459988f3c3647b2680b5f01548bb635806b84a50209b348561871aaae6f5b8d",
+            "family": "vit_large",
+            "path": "${DATA_ROOT}/traces/vit_large.gz",
+            "sha256": "712579a8719fac055ff722cb2fdd2440adaa9845257091ea951d3337075e6b45"
+          },
+          "whiskey": {
+            "decoded_sha256": "8beefab369c38efc6860570d340f94ad53034dec90abcc1840138c5e0a000792",
+            "family": "whiskey",
+            "path": "${DATA_ROOT}/traces/whiskey.gz",
+            "sha256": "4e06084cce53cdb88819e751030b1cd5d017d3bcf3cc8a18a66d5deec5444d73"
+          },
+          "whisper": {
+            "decoded_sha256": "19e873c781e10ae9508221f9928e48b62e0580ae59d961bc256ded96b15c6bab",
+            "family": "whisper",
+            "path": "${DATA_ROOT}/traces/whisper.gz",
+            "sha256": "209f8b272a730739d257b2db7c476bb35ffe7a550f86c6ed4cc17f6bf131d3ea"
+          },
+          "xalancbmk": {
+            "decoded_sha256": "041e036b19687503d564840b30c539ddc2fe061f1304a001705c1b2d9d0b8ea7",
+            "family": "xalancbmk",
+            "path": "${DATA_ROOT}/traces/xalancbmk.gz",
+            "sha256": "d39c7b373a1ec48249c586ffc719a60700d9a1070c084f07cdf3fad06a064ee0"
+          },
+          "xz": {
+            "decoded_sha256": "72d8061af3d7238d2c1b72e909635c41544c0a2f1a25eccbaccdb9e8aadb6069",
+            "family": "xz",
+            "path": "${DATA_ROOT}/traces/xz.gz",
+            "sha256": "50fd305c4dfc7d776a8615ffbfeb8ccd58d537c6331fa28066b5984df57e2e88"
+          },
+          "yankee": {
+            "decoded_sha256": "89865f69657ab4d7a3e0981ebd0fe2287d53ff867206970634fb2b158a5107d7",
+            "family": "yankee",
+            "path": "${DATA_ROOT}/traces/yankee.gz",
+            "sha256": "c236cd3625cbd124e2c982619b02646140b4b0b43f7d70113c76effdb56e7bfe"
+          }
+        },
+        "training": [
+          "training-c1-arizona",
+          "training-c1-bravo",
+          "training-c1-cactu",
+          "training-c1-charlie",
+          "training-c1-gap_bfs",
+          "training-c1-gap_sssp",
+          "training-c1-gms_kstar",
+          "training-c1-gms_maxclique",
+          "training-c1-lbm",
+          "training-c1-llama7b",
+          "training-c1-mcf",
+          "training-c1-omnetpp",
+          "training-c1-whiskey",
+          "training-c1-whisper",
+          "training-c4-01",
+          "training-c4-02",
+          "training-c4-03",
+          "training-c4-04",
+          "training-c4-05",
+          "training-c4-06",
+          "training-c4-07",
+          "training-c4-08",
+          "training-c8-01",
+          "training-c8-02",
+          "training-c8-03",
+          "training-c8-04",
+          "training-c8-05",
+          "training-c8-06",
+          "training-c8-07",
+          "training-c8-08"
+        ],
+        "validation": [
+          "validation-c1-bwaves",
+          "validation-c1-delta",
+          "validation-c1-fotonik",
+          "validation-c1-gap_pr",
+          "validation-c1-gms_subgraph",
+          "validation-c1-gms_triangle",
+          "validation-c1-ligra_components",
+          "validation-c1-merced",
+          "validation-c1-rwkv",
+          "validation-c1-sd14",
+          "validation-c1-tango",
+          "validation-c1-vit_large",
+          "validation-c1-xz",
+          "validation-c1-yankee",
+          "validation-c4-01",
+          "validation-c4-02",
+          "validation-c4-03",
+          "validation-c4-04",
+          "validation-c4-05",
+          "validation-c4-06",
+          "validation-c4-07",
+          "validation-c4-08",
+          "validation-c8-01",
+          "validation-c8-02",
+          "validation-c8-03",
+          "validation-c8-04",
+          "validation-c8-05",
+          "validation-c8-06",
+          "validation-c8-07",
+          "validation-c8-08"
+        ],
+        "warmup_instructions": 2000000
+      },
+      "name": "dpc4-ddr5-staged-contention-v1",
+      "schema_version": 2,
+      "simpleo3": null,
+      "standard": "DDR5",
+      "transfer": {
+        "champsim": null,
+        "gem5": null
+      }
+    },
+    "features": {
+      "open_loop_diagnostics": true,
+      "synthetic_diagnostics": true
+    },
+    "promotion_policy": "llm_review",
+    "prompt_sha256": {
+      "multicore.md": "a5f5356830865fe2a6bb7f50f3429b48ac6235afb04952df3d95b9f16f77c89a",
+      "promotion_review.md": "1c66e6883fb0be14e9ca36844ab205c9153b74a6c37cd30c6973ed5cdda5d32f",
+      "reflection.md": "8e7c3f12555a2b1aea14f350b47b368ddbf65e5d35251451e274ba283b640a5f",
+      "single_core.md": "f3151402d39b6225c4500c7ff2c3ed849686db16fe50a107735a1fcd3e3f43b8",
+      "task.md": "44caa6ebac74c5d8d917fbea1ffe513561c3cbc21a3e0446939d79bef04e8539"
+    },
+    "semantic_llm_check": true,
+    "stages": [
+      {
+        "core_counts": [
+          1
+        ],
+        "name": "single_core",
+        "rounds": 10
+      },
+      {
+        "core_counts": [
+          1,
+          4,
+          8
+        ],
+        "name": "multicore",
+        "rounds": 5
+      }
+    ],
+    "synthetic_limits": {
+      "maximum_total_reads": 1000000,
+      "maximum_trace_rows": 100,
+      "requests_per_stream": 100000
+    },
+    "validation_non_worsening": false
+  },
+  "run": {
+    "evaluation_execution": "native",
+    "maximum_attempts": 3,
+    "maximum_iterations": 15,
+    "model_timeout_seconds": 10800,
+    "resources": {
+      "build_timeout_seconds": 1800,
+      "cpus": 4,
+      "file_bytes": 34359738368,
+      "gzip_level": 3,
+      "memory_bytes": 8589934592,
+      "simulation_timeout_seconds": null,
+      "source_bytes": 1048576
+    },
+    "retry_delay_seconds": 5
+  }
+}

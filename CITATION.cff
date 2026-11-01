@@ -1,0 +1,58 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite the paper below."
+title: "Synthesizing Fast and Accurate Immediate-Response DRAM Latency Model with Agents: research artifact"
+type: software
+repository-code: "https://github.com/RichardLuo79/ramulator2-chia-hackathon"
+abstract: "The CHIA loop, the Ramulator 2, ChampSim and gem5 simulator code, the DRAM latency models synthesized by four LLMs, the data behind every figure and table, and the scripts that reproduce them."
+authors:
+  - given-names: Haocong
+    family-names: Luo
+    affiliation: ETH Zurich
+  - given-names: Nisa
+    family-names: Bostanci
+    affiliation: ETH Zurich
+  - given-names: Ataberk
+    family-names: Olgun
+    affiliation: ETH Zurich
+  - given-names: Jikun
+    family-names: Wang
+    affiliation: ETH Zurich
+  - given-names: Harsh
+    family-names: Songara
+    affiliation: ETH Zurich
+  - given-names: Konstantinos
+    family-names: Sgouras
+    affiliation: ETH Zurich
+  - given-names: Onur
+    family-names: Mutlu
+    affiliation: ETH Zurich
+preferred-citation:
+  type: conference-paper
+  title: "Synthesizing Fast and Accurate Immediate-Response DRAM Latency Model with Agents"
+  collection-title: "A³ Workshop at MICRO 2026 (Hackathon Spotlight)"
+  conference:
+    name: "A³ Workshop at MICRO 2026"
+  year: 2026
+  repository-code: "https://github.com/RichardLuo79/ramulator2-chia-hackathon"
+  authors:
+    - given-names: Haocong
+      family-names: Luo
+      affiliation: ETH Zurich
+    - given-names: Nisa
+      family-names: Bostanci
+      affiliation: ETH Zurich
+    - given-names: Ataberk
+      family-names: Olgun
+      affiliation: ETH Zurich
+    - given-names: Jikun
+      family-names: Wang
+      affiliation: ETH Zurich
+    - given-names: Harsh
+      family-names: Songara
+      affiliation: ETH Zurich
+    - given-names: Konstantinos
+      family-names: Sgouras
+      affiliation: ETH Zurich
+    - given-names: Onur
+      family-names: Mutlu
+      affiliation: ETH Zurich

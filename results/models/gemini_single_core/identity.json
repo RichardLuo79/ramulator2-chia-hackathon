@@ -1,0 +1,25 @@
+{
+  "candidate_id": "5536845081f69f0d9d956a31fdf93764eac02edfdd65708ae359a0ed4bcdfd3b",
+  "configuration_sha256": "b03bfa54179bee1930943adc8958e865792335d8b974a5890841213d9070af01",
+  "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+  "files": {
+    "model.cpp": {
+      "bytes": 15101,
+      "sha256": "d028fe1b6157cfd524c80471c24d57055f8add2107a606e777e76140c2ad595d"
+    },
+    "parameters.json": {
+      "bytes": 171,
+      "sha256": "3bc99a47e47300e8d95ddfd59db22c5320dc5b681f0f2a7cf1359987bc670f42"
+    }
+  },
+  "parameters": {
+    "ca_bank_delay": 1.2,
+    "ca_bg_delay": 0.15,
+    "ca_linear_delay": 0.5,
+    "ca_quad_delay": 0.02,
+    "drain_cycles_per_write": 11.0,
+    "write_congestion_weight": 0.75
+  },
+  "schema_version": 1,
+  "source_sha256": "3f94c23514027536d69d64f2938028133e12f9dc9425705e1abcd1450c7f892e"
+}

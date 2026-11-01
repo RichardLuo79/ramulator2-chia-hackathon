@@ -1,0 +1,16 @@
+--- frozen/model.cpp
++++ 07-no-bankgroup-clock/model.cpp
+@@ -1,3 +1,4 @@
++// ABLATION 07 no-bankgroup-clock: per-bank-group column clock disabled (group_wait = 0).
+ #include "ramulator/controller/atomic_model/api.h"
+ 
+ // Admission-order transaction service envelopes. No command objects, command
+@@ -159,7 +160,7 @@
+     double shared=(kind==0 && hit && ready<=now && !c.mixed)
+       ? c.transfer_work : c.work;
+     double channel_wait=std::max(0.0,shared-now);
+-    double group_wait=std::max(0.0,groups[gi]-now);
++    double group_wait=0;  // ABLATION 07
+     double wait=std::max({ready-now,channel_wait,group_wait});
+     // A transfer cannot consume channel bandwidth before its own row
+     // access path has traversed activation/precharge. Preserve that startup

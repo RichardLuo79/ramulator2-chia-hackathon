@@ -1,0 +1,39 @@
+{
+  "candidate": {
+    "candidate_id": "d92f2be6229ccdf6b0cbbd1c834e1a3a0524ff9aea1236560ac41b8b0a516496",
+    "configuration_sha256": "22bc04ec9c085d9fa1ba7915f8f02498c95e2b0ad4f91254614973bdace213f8",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+      "model.cpp": {
+        "bytes": 48299,
+        "sha256": "73c69ed036939759b475b3355a5004e5552b0f0739c3a7aceab8df7ad77ef727"
+      },
+      "parameters.json": {
+        "bytes": 291,
+        "sha256": "dbb3fba4c328b9cb1b8f76072a88bd39767eb4e508c988f4b455db8afb9608a2"
+      }
+    },
+    "parameters": {
+      "active_first": 1,
+      "arrival_buckets": 32,
+      "arrival_model": 3,
+      "col_slip": 1,
+      "drain_after_reads": 3,
+      "drain_block": 1,
+      "drain_join": 1,
+      "drain_pending": 0.5,
+      "hit_extend": 2,
+      "pending_cap": 1,
+      "pending_unforced": 1,
+      "pre_wait": 1,
+      "same_cycle_writes": 1,
+      "slip_sync": 1,
+      "trigger_hits": 1
+    },
+    "schema_version": 1,
+    "source_sha256": "8ef6377375caddc292c324e45ba20c37930fe3e1a1f23d7a0ab80e187250d6d3"
+  },
+  "introduced_round": 14,
+  "original_database_sha256": "a636d34a538a11d44561c3af8a0e62a3bf93d0897a97e2b461b0ab083ab155a7",
+  "retained_at_round": 15
+}

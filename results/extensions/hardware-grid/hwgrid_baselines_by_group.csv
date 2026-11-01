@@ -1,0 +1,37 @@
+study,arm,cores,point,frontend_mode,ending,verified_cases,required_cases,complete_cohort,mean_absolute_core_or_time_error_pct,mean_request_MAE_over_L,weighting
+hardware,fixedlat,1,DDR5_16Gb_x8_q64,,,24,24,True,23.880890545344517,0.5161690823006163,equal case; partial cohort explicitly labeled
+hardware,fixedlat,1,DDR5_16Gb_x8_q32,,,24,24,True,24.109835736629552,0.5238504409538631,equal case; partial cohort explicitly labeled
+hardware,fixedlat,1,DDR5_16Gb_x8_q128,,,24,24,True,23.788070119941356,0.5127443430333735,equal case; partial cohort explicitly labeled
+hardware,fixedlat,1,DDR5_8Gb_x8_q64,,,24,24,True,24.62422830254937,0.5266206979137037,equal case; partial cohort explicitly labeled
+hardware,fixedlat,1,DDR5_8Gb_x8_q32,,,24,24,True,24.860525298548378,0.5343035383293344,equal case; partial cohort explicitly labeled
+hardware,fixedlat,1,DDR5_8Gb_x8_q128,,,24,24,True,24.522553801182394,0.5229162646691545,equal case; partial cohort explicitly labeled
+hardware,fixedlat,1,DDR5_16Gb_x16_q64,,,24,24,True,24.728483880386374,0.5279057462302152,equal case; partial cohort explicitly labeled
+hardware,fixedlat,1,DDR5_16Gb_x16_q32,,,24,24,True,24.957973120545237,0.5353453961591432,equal case; partial cohort explicitly labeled
+hardware,fixedlat,1,DDR5_16Gb_x16_q128,,,24,24,True,24.631841328775234,0.5244485818433565,equal case; partial cohort explicitly labeled
+hardware,md1,1,DDR5_16Gb_x8_q64,,,24,24,True,22.701249187605143,0.530516666557367,equal case; partial cohort explicitly labeled
+hardware,md1,1,DDR5_16Gb_x8_q32,,,24,24,True,22.932840777067025,0.5390924863469876,equal case; partial cohort explicitly labeled
+hardware,md1,1,DDR5_16Gb_x8_q128,,,24,24,True,22.607308626550736,0.5255076781982947,equal case; partial cohort explicitly labeled
+hardware,md1,1,DDR5_8Gb_x8_q64,,,24,24,True,23.457616266233387,0.5399540385971647,equal case; partial cohort explicitly labeled
+hardware,md1,1,DDR5_8Gb_x8_q32,,,24,24,True,23.696625936606384,0.5482655884978068,equal case; partial cohort explicitly labeled
+hardware,md1,1,DDR5_8Gb_x8_q128,,,24,24,True,23.354814712165012,0.5347680815746176,equal case; partial cohort explicitly labeled
+hardware,md1,1,DDR5_16Gb_x16_q64,,,24,24,True,23.56363280028661,0.5416783809403226,equal case; partial cohort explicitly labeled
+hardware,md1,1,DDR5_16Gb_x16_q32,,,24,24,True,23.795764857520336,0.5496646728494272,equal case; partial cohort explicitly labeled
+hardware,md1,1,DDR5_16Gb_x16_q128,,,24,24,True,23.465929070911397,0.536957311374425,equal case; partial cohort explicitly labeled
+hardware,wmg1,1,DDR5_16Gb_x8_q64,,,24,24,True,24.4379080476504,0.5569291711366561,equal case; partial cohort explicitly labeled
+hardware,wmg1,1,DDR5_16Gb_x8_q32,,,24,24,True,24.665212860584163,0.564121075302474,equal case; partial cohort explicitly labeled
+hardware,wmg1,1,DDR5_16Gb_x8_q128,,,24,24,True,24.34555707690194,0.5535652929421221,equal case; partial cohort explicitly labeled
+hardware,wmg1,1,DDR5_8Gb_x8_q64,,,24,24,True,25.175922864152056,0.5665064788341357,equal case; partial cohort explicitly labeled
+hardware,wmg1,1,DDR5_8Gb_x8_q32,,,24,24,True,25.410455162051438,0.5735463750724716,equal case; partial cohort explicitly labeled
+hardware,wmg1,1,DDR5_8Gb_x8_q128,,,24,24,True,25.07483085872642,0.5629843454494928,equal case; partial cohort explicitly labeled
+hardware,wmg1,1,DDR5_16Gb_x16_q64,,,24,24,True,25.279164097963843,0.5681235806796263,equal case; partial cohort explicitly labeled
+hardware,wmg1,1,DDR5_16Gb_x16_q32,,,24,24,True,25.506927067195573,0.5749264040703143,equal case; partial cohort explicitly labeled
+hardware,wmg1,1,DDR5_16Gb_x16_q128,,,24,24,True,25.183075554069408,0.564845772141507,equal case; partial cohort explicitly labeled
+hardware,mess,1,DDR5_16Gb_x8_q64,,,24,24,True,8.566498271889259,0.4756378677619062,equal case; partial cohort explicitly labeled; MESS uses the default-config curve
+hardware,mess,1,DDR5_16Gb_x8_q32,,,24,24,True,8.641640105004214,0.4866289307438904,equal case; partial cohort explicitly labeled; MESS uses the default-config curve
+hardware,mess,1,DDR5_16Gb_x8_q128,,,24,24,True,8.496559379077825,0.46954986961585293,equal case; partial cohort explicitly labeled; MESS uses the default-config curve
+hardware,mess,1,DDR5_8Gb_x8_q64,,,24,24,True,8.354678295690045,0.46796042213715255,equal case; partial cohort explicitly labeled; MESS uses the default-config curve
+hardware,mess,1,DDR5_8Gb_x8_q32,,,24,24,True,8.428804781514648,0.47892191048934435,equal case; partial cohort explicitly labeled; MESS uses the default-config curve
+hardware,mess,1,DDR5_8Gb_x8_q128,,,24,24,True,8.280019774941602,0.4616388520936731,equal case; partial cohort explicitly labeled; MESS uses the default-config curve
+hardware,mess,1,DDR5_16Gb_x16_q64,,,24,24,True,8.382280882902192,0.4685891946934882,equal case; partial cohort explicitly labeled; MESS uses the default-config curve
+hardware,mess,1,DDR5_16Gb_x16_q32,,,24,24,True,8.463525106772432,0.4792345012515324,equal case; partial cohort explicitly labeled; MESS uses the default-config curve
+hardware,mess,1,DDR5_16Gb_x16_q128,,,24,24,True,8.311793817683993,0.4627509115518649,equal case; partial cohort explicitly labeled; MESS uses the default-config curve

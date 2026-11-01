@@ -1,0 +1,10 @@
+{
+  "write_congestion_weight": 0.75,
+  "ca_linear_delay": 0.50,
+  "ca_quad_delay": 0.02,
+  "ca_quad_hit_delay": 0.008,
+  "ca_bg_delay": 0.15,
+  "ca_bg_hit_delay": 0.08,
+  "ca_bank_delay": 1.2,
+  "drain_cycles_per_write": 11.0
+}

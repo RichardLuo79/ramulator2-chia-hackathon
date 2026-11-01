@@ -1,0 +1,18 @@
+{
+ "id": "08",
+ "name": "no-bus",
+ "description": "channel data-bus clocks disabled: channel_wait = 0, i.e. C = t (L161); bank-only model, write tax becomes inert",
+ "header": "channel data-bus clocks disabled (channel_wait = 0, C = t): bank-only model",
+ "edits": [
+  {
+   "old": "double channel_wait=std::max(0.0,shared-now);",
+   "new": "double channel_wait=0;  // ABLATION 08"
+  }
+ ],
+ "lines_changed": 1,
+ "lines_removed": 1,
+ "lines_added": 1,
+ "model_cpp_sha256": "8d2da3bb68fbf789bb62887b32b5470270a1ce60cbc1d0648a06eacf9cb9cb85",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}

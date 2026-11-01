@@ -1,0 +1,16 @@
+{
+  "t_cmd_to_data": 35.0,
+  "t_activate": 34.0,
+  "t_precharge": 33.0,
+  "precharge_scale": 1.0,
+  "burst_cycles": 8.0,
+  "bus_gap": 0.0,
+  "bus_interval": 8.0,
+  "write_extra": 10.0,
+  "write_wait_scale": 0.0,
+  "drain_conflict_extra": 90.0,
+  "drain_window_cycles": 250.0,
+  "same_bank_interval": 12.0,
+  "queue_extra": 0.0,
+  "fixed_offset": 0.0
+}

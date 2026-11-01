@@ -1,0 +1,16 @@
+--- frozen/model.cpp
++++ 01-no-row-state/model.cpp
+@@ -1,3 +1,4 @@
++// ABLATION 01 no-row-state: open-row proxy removed (hit=false, cold=true): every access pays row_cost = tRCD; all hit-gated rules see a miss.
+ #include "ramulator/controller/atomic_model/api.h"
+ 
+ // Admission-order transaction service envelopes. No command objects, command
+@@ -69,7 +70,7 @@
+     Channel& c=channels[ch];
+     // Provenance of the current fluid busy period, not a write queue.
+     if(c.work<=now) c.mixed=false;
+-    bool cold=b.row<0, hit=b.row==a.levels[row_level];
++    bool cold=true, hit=false;  // ABLATION 01
+     // For an established-row conflict the admission bookkeeping can overlap
+     // the initial precharge step. Cold activation and column hits still pay
+     // the full admission overhead. This is an observed transaction-path

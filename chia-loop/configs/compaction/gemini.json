@@ -1,0 +1,7 @@
+{
+  "adk_python": "${ARTIFACT_ROOT}/.venv-context/bin/python",
+  "input_limit_tokens": 1048576,
+  "token_counter": "vertex_count_tokens",
+  "trigger_fraction": 0.8,
+  "retain_tool_rounds": 8
+}

@@ -1,0 +1,15 @@
+{
+  "repository": "https://github.com/bsc-mem/Mess-simulator",
+  "commit": "7feba12ce4af081116592fb5f045895a3b86de34",
+  "upstream_directory": "Standalone/src",
+  "upstream_sha256": {
+    "mess_mem_ctrl.cpp": "e8e221a6116ff53d3cd8030397d858cd00f0ce7df590e237c756a4b00e7a7654",
+    "mess_mem_ctrl.h": "75b7168b0ac39ac04cf6c041b906ef8a32115e0660833b563c01c3874da96439",
+    "LICENSE": "a728bd19c8c16729cf0d9137d2fc716521d2dbb09d688bb89a1ea0f9243e584c"
+  },
+  "patch": "ramulator.patch",
+  "changes": [
+    "Input loader: legacy text GB/s to upstream MB/s and descending point order; validate malformed curves.",
+    "Final newline added; prediction routines and header declarations unchanged."
+  ]
+}

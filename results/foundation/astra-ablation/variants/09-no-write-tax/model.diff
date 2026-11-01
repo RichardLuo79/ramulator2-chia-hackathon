@@ -1,0 +1,16 @@
+--- frozen/model.cpp
++++ 09-no-write-tax/model.cpp
+@@ -1,3 +1,4 @@
++// ABLATION 09 no-write-tax: amortized write turnaround tax disabled (write_tax = 0).
+ #include "ramulator/controller/atomic_model/api.h"
+ 
+ // Admission-order transaction service envelopes. No command objects, command
+@@ -58,7 +59,7 @@
+     overhead=p.number("admission_overhead",1,0,8);
+     // Mean direction-switch work per write, amortized across a small drain.
+     double batch=p.number("write_batch",12,1,128);
+-    write_tax=(timing("nRTW",base)+timing("nWTRL",timing("nWTR_L",ccd)))/batch;
++    write_tax=0*batch;  // ABLATION 09
+   }
+   Cycle predict(Access a, Cycle now) override {
+     int ch=a.levels[channel_level], bi=ch;

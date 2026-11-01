@@ -1,0 +1,18 @@
+{
+ "id": "03",
+ "name": "no-class-rows",
+ "description": "separate read-row/write-row classes disabled: class_hit = hit (L82)",
+ "header": "separate read/write row classes disabled (class_hit = hit only)",
+ "edits": [
+  {
+   "old": "bool class_hit=hit || b.class_row[kind]==a.levels[row_level];",
+   "new": "bool class_hit=hit;  // ABLATION 03"
+  }
+ ],
+ "lines_changed": 1,
+ "lines_removed": 1,
+ "lines_added": 1,
+ "model_cpp_sha256": "dbfaf1ce918d02f4b1b4e3d896a05b3e7d5d3cfb89383e80419954123848390c",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}

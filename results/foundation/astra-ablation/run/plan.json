@@ -1,0 +1,3431 @@
+{
+ "cases": [
+  "test-c1-bark",
+  "test-c1-biogpt",
+  "test-c1-cam4",
+  "test-c1-gap_bc",
+  "test-c1-gcc",
+  "test-c1-ligra_cf",
+  "test-c1-ligra_radii",
+  "test-c1-pop2",
+  "test-c1-sierra_a_3_0001",
+  "test-c1-sierra_a_3_0006",
+  "test-c1-sierra_a_4_0005",
+  "test-c1-sierra_a_4_0013",
+  "test-c1-sierra_a_6_0001",
+  "test-c1-sierra_a_6_0006",
+  "test-c1-sierra_a_6_0011",
+  "test-c1-tahoe_0006",
+  "test-c1-tahoe_0010",
+  "test-c1-tahoe_0011",
+  "test-c1-tahoe_0013",
+  "test-c1-tahoe_0014",
+  "test-c1-tahoe_0016",
+  "test-c1-tahoe_0023",
+  "test-c1-tahoe_0035",
+  "test-c1-xalancbmk"
+ ],
+ "jobs": [
+  {
+   "arm": "oracle",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "8c7497b787d1af046aa6b5dd45ca8e3859b5fdf31928612732856ba3305a570f",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    11528950
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-8c7497b787d1af046aa6b5dd45ca8e3859b5fdf31928612732856ba3305a570f.json",
+   "reference_status_sha256": "14c772abe6e6b991a407bef34d090943473f6c93a08b18f032cab14c7b4cb557",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "1ab47c4838196b461cf1190ceb1375105a409943d0f0722b01cf4b956a3bf7d1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "5e4e6c8ecac120e571a866cf37344fe0903bc29156d252b5e6433c6eccffe406",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "e7213e1ba2ed7367decc436a3c6b989afed585611b8f59a04ec968efd0e41d22",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "9d1ed0ffd71b5ef618b79330616322d36cb1133897ca51b79b07b6ee511ea932",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "3fbe455d7460a4d6ea3262a423885bce371a9d22ffb87dda8c24f3edf2fc9ebc",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "692daed4b996847d374097f0686e3d86ed28de82d57baee709b5d86fc54f0590",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "f83ab8a745fd6e881b55ec0cb6ab6d6bf0cef8c8cd427f82242c6285b0a5527f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "d802949b871b9094bf9c3e28eacc4addec0c378f33d966402524d48dd457f8d9",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "6f9693b92b65460cb8b2baa493d7b84a1bb6b788dee353542e46f628d3c55f14",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "2d78e40a937940c301dd5da68736ade131df61b8966d4f64e905b18ee11397bf",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "90aa86242d4d1212ca4c2edb03993198ed413c804b09a5aa8430f017cd67e73e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-bark",
+   "cores": 1,
+   "id": "c9951063a7817d5358a759bbb5d0e0b12e66a19a6e56a3460d0482ab32b87298",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "a6cbc4a8061dc96784cb1f88fed2b77b128fac64b719758895489528d4aa2cd7",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    72771529
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-a6cbc4a8061dc96784cb1f88fed2b77b128fac64b719758895489528d4aa2cd7.json",
+   "reference_status_sha256": "805e50637ab337a31dcc9b370dbcaeb858f4b6963d9f309ea88b10c2565b14e2",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "a53606e51dd0988ce3739fd4f5f6a886f7f043bf94ed0f8512cfd36c00605a3d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "6fa8bf2b3346cb8fe6b07e64abf2b3b964cb5212c0711a637010171e400deb18",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "995a228aa1f11e8a0ebbc47b6e59b0f8f958c0b14350864348ba8127f0e232e4",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "722f147e4055df44ebf4153dd6d90088971b955c9128b287b2e78bcefadfafdb",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "dd7097a7964c0ab337bfedf121c201e726efac6c3237391be7d14324e510bc33",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "1589b689c96a8a55782d18deb84a0ff77b4846a8f8c0a2a00f04a52c0633da7f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "e4d6f527c4f6e90deacaf22d824993eab8ee54b9cb481b3ee2055aaa093d5d28",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "e985525530b650fef44c02de61b2aeac9628d902e188f7f12bf912133bc83f54",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "e6d694e4207a93d156329ee876e2fb98f1767580b6a8687ac274d89b1c939a7f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "cc279b8241d660913150f36a3c09f616d18b61dd178dee05cba8eb5292dc82c1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "b3a1b036b03cf3335e9621c26cf61f4b3a56d2c6bca1a4cc8200675d9301e247",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-biogpt",
+   "cores": 1,
+   "id": "2c3ce6151cb687df20f8a583d57bc843902b1430b36f19c63760973e187e1022",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "a3a9eeb74e0cdcd37c09f1f76a08b530a85bfb8c7495509a14f65be659303827",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    11056963
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-a3a9eeb74e0cdcd37c09f1f76a08b530a85bfb8c7495509a14f65be659303827.json",
+   "reference_status_sha256": "271fded9973429861fa4669932c0d1148f42b0b2d91c6e621083b858bf8cdc23",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "87d2cea43d8654b317c6c8c160940c4c9a94f6171e6d174621b87aaaf787936b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "ec9ab95626038c8aea5761f3664336d20fb6357eaa64616587e11bf452d9d49c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "6a7ab82b7a6cba1b4e4df42c16a2712d2917cd8cc7b15ad75eae4d15af260815",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "90102b3470ace866b6001fefc0169435c378a9ce396e2e9b3e30bac1b24284e6",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "0fbd9b29bf30d6367cfbeb49568f5065152f69f9fbbd2e07a4ea6ae7a503048b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "9d2f6a7a1b23703eb723612abad779e96811d131f3e77730e1ec7629fa57ef7a",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "b9dac029062c6e2e6cb9bbd235546d1a1f6652685de4482f2357ad20cf718aea",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "dd84985a672fdee1e0c48d78b368f89d715bc9964edb1fce9d9e1e665819a40d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "a6d34c50a833ef441dbe4c333f45124a088472e30cb1b1d80f20ccbee8e776ca",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "9bcfb655f26277404f0d2478ea9301ad36abaad1d96cf4927d4bba5bdf477712",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "1045520a722548a6d188e176892b0f97cacb6355862670dcdaa1ca8a3dad5ba2",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-cam4",
+   "cores": 1,
+   "id": "3b818918e6303568008e3212f92e5018444cc65a02fec9c813e3091207822f03",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "a3bbad6cff333959853c7485a061a3189d6e5dd88dbdedddb9d034e3505097e1",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    131922784
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-a3bbad6cff333959853c7485a061a3189d6e5dd88dbdedddb9d034e3505097e1.json",
+   "reference_status_sha256": "ed404f3fac902f04001cae7335a4d092003ae490a7bca6a59d75934e480b949d",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "532cc2ebb9178057a3469a19b575ea98c32e9765353cb52c3a4873af0c601cbd",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "2e16af69d7933322613e958c4fd5c91f3aeefc758633f5fd91b760cba84f6165",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "821793cb9c8d94c2a1a1c9fd168da92736a71a6fed162732e2ad764fc52f927c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "2eff686cb1e2b147ec7cd6dcd0cfd26c652d1c014873592e3847bc2a50292366",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "06e789d0a70e962af05a4b0a3097dcf48ee9e8c74e7a8f6282a6977d5eaa1e59",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "13c0a623eb273025d190fdfc63b0aad3c55ea05368bf4c9ecfeeba06cea1dfae",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "2dcb458031c7af27c94a5f9e72b3674989bd786992b1a36f16684854fe5074b2",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "b201bcc3ec1a321d430f8c1aa6d8c14d55a5b47ede3bed2177a1681dd1ec8da3",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "a6453301cab1491cbf5f64726f2774f0ce20a15e7f48666e5f28bffcfda006d2",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "6f8761306d5a683f5288e2e8a5d98d0662b35f385e65de73a07ac515417d8b69",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "9512371e0592b768f6d3c259ceee3406fccfaa9d1f4b10abcc4a03c62e458db2",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-gap_bc",
+   "cores": 1,
+   "id": "838214b747b9ae36bc3a907a110e81b78c0204adc27a6e37f032010ec539688f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "c756558b0d080d4c7b413de57f8fe421376601a78d00c12e6bce72e9151d4e4d",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    31304269
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-c756558b0d080d4c7b413de57f8fe421376601a78d00c12e6bce72e9151d4e4d.json",
+   "reference_status_sha256": "95ebf7e6817fe830bc9f1f2c5fefba6d07511501e5f8e7abd2a6e23bfddaac07",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "237d5ef0a8f120ef06bf0bae2b68b39fecd8a2abc71f6dd5811f0c8c766a077d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "0328a3ea00b54881607ab1b2dece90b6a697a99f643dd14cd72a790e8d7d7776",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "2a25a036928da39e7833b19cc60560fcbbeddc5bc71ae7a5120fed51aab6b8b3",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "1a6d9fe4bda4caac1bfd44f4e7f450987cb9cb36b38739fe0ed2296f880c7a8c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "4d3ce9dc8e3544c8be590e8364f9df35d4f001abea0f7638825a5909681ac8c1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "94140c2816e19e772a85f5670e81220d7cd032d1f78417453daf24c4bc4c166a",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "9d0b8b09ef54b118649cd0b640f47378560054f0ac28b81e73340500a20ee563",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "6e0bc47e6e27e1791f4ee0d82fda69e1a8f9fcb1e050558da188757a7bf7a3d8",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "b7f4860878c303e70b74df87d29b8f1bd6a42e7d555c9518bb7137bc7cee2fc0",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "5c3795d9488ee3efda8cb349ce10edadf89cd5a169281cca4db645f0f8a81724",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "1744371bbdec1c55ba479abd6dec402dfafb6af41a48d70dea307ffa996de915",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-gcc",
+   "cores": 1,
+   "id": "0a0038d21a2dd69979b8f89bd20029a7c3d8fee20dd10bf03ea9dc5b2ec1ad0e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "29f4f3a3e896577983c05ebc1d534fb0842362394b3382a26c42c098aa305a8d",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    52208330
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-29f4f3a3e896577983c05ebc1d534fb0842362394b3382a26c42c098aa305a8d.json",
+   "reference_status_sha256": "0b12a5e624af35e0908ce23796479cf68e46249c8e3c5d5c116255d3ec0de399",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "09b88defe455c78e2dd9505d2385ec964754d63a373b06bebf74d7ee60f6bf65",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "e9c73629a7402309238388968b9118902ee1638e6d2259a2fccc99cea81ffa45",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "3b42b72d1a59307220ba8a162a0673a5654df29582a7f64cbd8de473516ff820",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "877fd915206fea90a5b5a7a4848dd436a9315c4cd48eb296e0e9a7ca04324031",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "3232753d5c415db4fe34f5c7a3a231d1d54d6aee099f13cff66588c3274b04fd",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "d307ca35a8764f443a162d8a9bfb0a7083b82d38c0adcc898723edd631c0bc35",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "1ba9b453003ba898a9a34f77a756b8afd8e6b9928d13053f9820666b3c20d73e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "73f572f1f2d72d7456e459c9343ffa0efda3aacc4414a707b9afe8ae68401f72",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "5b4f1411efb07696877e8704018f80c05fcb8fc99a407f4bf69951139a4c3d85",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "642aadd6f94b43b098a23b634d5c588026832b047a59a385996427346c274dc7",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "cf17bd5a61c32feb651b8d9f635bcb53c987a7a99bc4612915b904633562be85",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-ligra_cf",
+   "cores": 1,
+   "id": "bc44f32d66b7ef18c351ba3a6c2ddce002b2455b8654ab36cf049d0c2e1a4f9e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "b35676cda02cf2f3246529182d37903013c7229a984c1c7daa017ec680110217",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    12437044
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-b35676cda02cf2f3246529182d37903013c7229a984c1c7daa017ec680110217.json",
+   "reference_status_sha256": "eae00cac5443dc1eec4d0eb728d99f33daed64770696f59f2e0909a7b36d1be6",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "225539da8ae682cc249d73b8a7e82afb68a24ec28484c3551ea12472319a6f22",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "97ea4b87755ab3178ffc920e93a1b3d64569ba8ef5536fb60f7cefc7d28452f4",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "df2dcf713a9ab9e52e184c4a2876fcd2b6d81de253c1175f9da4cef734b5015f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "f4fed89a9b9f8b00805666fefb93e4a24018e35926c5e434819baae333d91dd8",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "04bc8454da87c373a28d6d541a026508b86b9090341968be39d4011ac0f86fb3",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "70c872431689e367243c69dd657f496f90aea8703032a5ab471ee2cc86cf4639",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "0a329727a1afcd9e30d1c6616bf8352ff36c74c50209f0271270bca03e3a3aa3",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "ea1762483c716db2c03e733934de3c222f7e0a61e1acd25564774b05e45bb8c5",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "990fbc457e386774747b713b109a16690d0cadc2706d59d66e2d26161045aae3",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "10ce984799d4d98d130b2bf087db69668d37e852be34bb2e26cf9a480f396918",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "47aed66111f7db3fa528440b12b8fb782b232e15c13f8d89717dcf53c91556e8",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-ligra_radii",
+   "cores": 1,
+   "id": "3c321f3a645d856516a1aa356b5b5eb0027634724aca2eb253134113974154c1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "fc4258326f12c3753fede26b5e94cf74773138a4c664773eafe79a2b5b8134d7",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    14712854
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-fc4258326f12c3753fede26b5e94cf74773138a4c664773eafe79a2b5b8134d7.json",
+   "reference_status_sha256": "bf298b46bed9021bd34e763c2d33f7cd86173e5ea3c7cc6ed31ae2939ce2f128",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "71f7f4dfe221dbac612fc20a40b9b360e6c51d32894ce9793bc2bd5fd85aa8e1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "9d130fb31f774d0ab68c6d885f2910a8288cb447a03665724ccd3ddedea20cd2",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "ee1097e0aeb27de47e9eafd937aefe82f77e741fcfe46711b8b15c974267c89a",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "68378801ad740b8f3de760db4638d211a886c36359c6f5dee3ae0373e8a2fc2c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "6bf1b3d0931538d493e6cac2e5f13e0520309383ba75c29de564b2b690fc33fb",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "575012a63c44737d8ee7dd569ac9cce8429d1787f7ee0360c89e4400e69f3d8f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "76c727cf1c249d7b78644e145b48d4dae78a5bc90c86493c4e78dc5ebd98a6ed",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "68d0dbde639baa0c76e6375a233f7fd42b901ad0cd00e88708b6f55c9bb0deb5",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "2df5bf6490e370a40e8f971677761aeef97636514e1944c0c70e434241f9df23",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "5b5722b89feb6eee7e58eb06b9d8e99130bd1bbee05b3aba770f8cc58bf07038",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "54f079ab6eaf2815f87ce44ed0c22a18215dda56b9aa49456ba0ef965b5c2f47",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-pop2",
+   "cores": 1,
+   "id": "df397d58a93c72fb159295567f415bccc881add0d12c7a476a4c27dfe69458f1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "e03785e032318969535ea1d9ed9a02833e63d2f90d8acd3b4b74736e9ff27ee0",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    39499650
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-e03785e032318969535ea1d9ed9a02833e63d2f90d8acd3b4b74736e9ff27ee0.json",
+   "reference_status_sha256": "da6ab31f4fcf3b9e67a477b914207d314f39ea07e68aa130755556946f27f327",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "fb6b601b81c42445ef730bf0150973424e8d8323fbe52fce77b89fd4264ce727",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "6080009fd213c269f3ac000f2fc812559351922d0f26b8e8dbee0a064762c9f9",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "0f03f52f62ac7574baea525575b1bd84ec0f1a9997fc71be0ef23366af701802",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "748bafa6f7886281b487789d89d3bb7316db3e0de9eb288f20426430f2d772c3",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "187076263a1c9983d75d38e62e7836d898e537e9e79c74c5ac2e3fb52a2a2571",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "749b75124ce8b5c3d764dc07eb03c9b7c4ad494fa5e1a0421a2b56c423969a85",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "c6b74d46c2f86a00de4b01d419f2509db56c2ac2727a8575524700ea7d585410",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "74de624d3ab9b5048fa2be9f2502504eb3182c55128c649237e1dcd030610755",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "bdf72e152ea573d647750b2a9c607722532c019d47a0fe8d3a4b2b502f13f5e7",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "0f04e7dc8abb5a914b1b3400212f29ae6958eeadd97bacc69f26c48e97dc170b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "a0d1dac292613ede62dd06380ca82cb6c59d9e337092fd5c3234fd825e8bdc9d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-sierra_a_3_0001",
+   "cores": 1,
+   "id": "70736ee58139169b44a4d8031d2a0e0d21992756fa2757c999f84e1fd0e1ddef",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "b39eae233b0f3f393e6a996e8a6e67219a9bd4bb65462c7dbe77a70e8338eb9f",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    36137593
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-b39eae233b0f3f393e6a996e8a6e67219a9bd4bb65462c7dbe77a70e8338eb9f.json",
+   "reference_status_sha256": "d8ccf943b1c8f1c54a4b22f1fd16eaabc3f9c244c9156469c0569b85cb3bde0e",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "1aaff527e76355fa54d2089f286de910229162d16604bf45503702f57c81f689",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "1e7dc4b33c208cb9d20a2710d0a83852596aca12a31850b1b4095ab53b94da36",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "04657d64d9ee30ad058367cad546e172aab0f94323f0ff0ab6861d5b94172a47",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "2d4c2459fda5a9921e27cdc573696edccf5a4ca82297814e66fc4b74a570130b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "66715e532d075942acaaad3d03a876549d8b8e22dcfa2e533c0af06f1430e30d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "cff71b5c01dbb64e901d97cd6cde65ff984e565767918a7ec7e58eacababd63c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "936c50fd4e75e07c33e8b1ad0d2af37363e44dbd45c8f7b72fc3618424879f34",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "8cdd65e1965fd04ec8c7dfc2c7c83ee6d3a4c20d89fe03ff80a7361e0a245487",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "f60dbccad41faf0ac9d56e0c016c0b9635dd809eca6ad5aae08bdf4f0c5472ff",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "8ac493f825a886890ff54e635527abf10da249f2e819b26613bbe5d9134e5a5e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "ad5f04b82e1c2c9c8219d483790c2d6d21db7151792c5dc90ca4c02ae5278ab5",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-sierra_a_3_0006",
+   "cores": 1,
+   "id": "c6ef0ac9371d3f69d7c77448c684ff2c5991eb3192d9558999fd67d08c73779c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "225624a44648e4a16be977489feb8afebbe068463f86d0c7979322d3b8e3ef8d",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    65676479
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-225624a44648e4a16be977489feb8afebbe068463f86d0c7979322d3b8e3ef8d.json",
+   "reference_status_sha256": "860b366c1e00afba5b10408ee98a023b5c46dd9e5da1f46dbf6c9153896da999",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "cd5ae34f2141f7a405fce65edc93b0bb1f03f0e5e482cc882db333515c40acd3",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "831880c3bda108e5c24f85d3c725e9972b5917c871abbe2079dcc5c676e126d4",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "0aaa95ad58ede3b44f78289d466d63ff0ca798219f07239f2bf65cc7fd8dd04c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "896fd3a8054de172f747aa8eac03a3fe55dcc91e40bad7375b44c3f3f8ff6926",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "e69e0a0c8974d2d835a6b533e7e5d5c7f1cec5d8c3e7cba9d52ca12256a19923",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "4c30e2894bfba145fe69054350e7368418d47294b67258eb0dea80ed796e2b92",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "b6bd2f84c98a64e94af496fbf12227442dba6ad8df83cbac23ef0dd027ac4b4b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "c932f16cc541a0484c72ff63470c36e83a7a944d9eceface47cb0085640d3fcf",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "949ae829d2a7a505c243941a6e7aff52455b578ebdf98d4f06e2936a75efaa24",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "553fd91b1e804eb0d1f97bb9e63180a88e065b3139b2936ffc7c0ed2d2601954",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "5aa0ba7243f6ccbf18edce0f6dcf1b6723e42638207d0a3ccedec48316b1f9e6",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-sierra_a_4_0005",
+   "cores": 1,
+   "id": "63efbddfb29abdff560cb39eeccb25b4471f5115d3d45630639acc651ca9550e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "baa0d2b174117ed4345b0df6da03b7362fe51e3d2a749d1529c3668a47e81d2a",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    72836559
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-baa0d2b174117ed4345b0df6da03b7362fe51e3d2a749d1529c3668a47e81d2a.json",
+   "reference_status_sha256": "12500aee18c4f7885213d1cbca256acd5412eac470db0dda6f2285057eaf3c4f",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "6e9b0a8d10115c4e1ea884cff56439d9a67fda80f956479ca672c8399e445a36",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "52e6e4fbedde2ec1387e29f8a2b2e6068e2f3295dd3dbb93d90388abba7283ee",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "32bea0eb7bc93570b93c5e0429423cc49b9f7e2998ae4adb96834690cdf1db1d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "e3d371cdfcfa4f3eaa046076bf0a593fee6066ed915c76b7dec91b2b0e519ce4",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "7baf6593b3b2f5ae99845aa9a3b033091ef215eb78a9155ea0d60ba2cd44ae6f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "7714aeadc4d2e472c47232e7215ee07934d6db78b7d8ca1fbed12b0cdcc9b59d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "f6421f42ba65e7e7c75fc67b9d16d5631451fa3f929665a0edfd54c85a320ade",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "15b3d4aa3e9aebe56aa07f87832d274a92d7e461316857677e4b655dd5162f99",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "f5145072847c4756f70f3a0edd26b4a055fa6ef06143cba9839d4d22585b365b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "6cddc4686e087a94127049c0a8075de4f4efd65d13e21f5a901fbe9d18b26223",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "a4aafd604f773daac6df463bda8353269654fa577da282b4553ade7e087f9c33",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-sierra_a_4_0013",
+   "cores": 1,
+   "id": "356a9e3aac4a819b55bbbb0c22d04c5bdd621056f79751bd4d74d9487d02ba97",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "c9a67d53259024f80607650b06256ff430bfcd2bd7e8d593fea5aa8fd6ada6dd",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    47318630
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-c9a67d53259024f80607650b06256ff430bfcd2bd7e8d593fea5aa8fd6ada6dd.json",
+   "reference_status_sha256": "89fc78de58e438b761eb64bafa289edbf3982ba36018c5d38d550ae7689383f8",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "b56a9783e392e8e4f23bf8384d5e5757b66c0623f4db9ed9c811c0eec49634b4",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "14abaf03d6838195a2af808b5244910649939271be9dfac03d5c43aaab7c2b13",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "ed78c54164d01193797dee80939e00e68b2fc50fd43b1a03cddf76535e72bd2e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "9e50a896ab3507932319100e6424eb7dcb247621606b43e764ab141f5aa234d1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "623e4c6866866640489f60c9a4817fffbb60a63a25e9cc2daa6b19a463f8f0f1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "4e0ea211e81c32ca1bb08de4540ade2204352ea9eba19d5d3372abca5d61dda9",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "2d7827eef23426bea7cd71f5359e5ad8db17aef1ff9560f7a062eb0982ca2a14",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "0c2015bd8b3b8fc6af3c97d1a82ebeee20e80ca1bc6d1c41738e92f1750430b0",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "d2bc73df793e96ba3f9057f282c9eabaa295b026552fb4d9e9868629782725c7",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "60a48fe976102312355045f46d254e709bfbddc4cba2d58729e5cdaa7ff825f7",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "488d136ea9055eb2df067f8901975815fc1a07be4a3d11b43f3483f0cc563fed",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-sierra_a_6_0001",
+   "cores": 1,
+   "id": "7337ee1906647d7fed18fa3ddee930c733713fc441f5af2fdf58beef895182ca",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "c34f7c5df5831ca79de41d5a12280eb34ee080262e0268ccad34a78188ef459c",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    38463165
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-c34f7c5df5831ca79de41d5a12280eb34ee080262e0268ccad34a78188ef459c.json",
+   "reference_status_sha256": "855d3d907ff728fd12f5221bc8bd77964bdef85b7fa505e0c1aa375b435ec5f4",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "7b70955ea06c090a34721a0210597ca11fff6c12d700ddd2cc05faaa3d56b1b8",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "f80b6a39b482cc7d590dc527347d91f2c56d71009222654e3175d7fb54c27328",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "5705efdf0d4345d923a2dfe26fab4c9f1e227a53fa6a16514998e1c1f6169af8",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "d8115755c270255d0a80d70ebcce02e800212b299086ca57cd6198680246a6d3",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "638b6224b9824f39b09ad5f9b17a2d6dddb5dbc03afaab3f9acbec0e3b7bbbaf",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "bb5d5682465a7438d356b7d5f7e453b8d65819cbb3c83f2babf8b1875ba22583",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "4febb39403084e54649f5aea3c92b4be00fb64d59ca875d5567192f2d642e973",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "cd15f2c2ad0e448451542605cacd23a3e226f44eb188b1d2f62fce8d27104a5c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "d2d530245b5e99dad9872d27bd56548608a4b8f3ecde4feb8549bb949c9fc8b4",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "fa0cf7aa2665d528ee49d177654c40f2ccdea85df03939315fbd4f291ddff91e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "c228da0e982c18eb189d2e91b36dd1a0f0fd4c6a5eac8d64cf4e857153ab8004",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-sierra_a_6_0006",
+   "cores": 1,
+   "id": "87a22a24e089987274e1848ce8531dfafc73caaa3a6456cf115b74b753d5de18",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "3afcc4299738f6eed35182364b2103d05af55485bdca916b119bc5a1de5b136c",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    40630272
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-3afcc4299738f6eed35182364b2103d05af55485bdca916b119bc5a1de5b136c.json",
+   "reference_status_sha256": "1dc9492036f9e756e42ff4cbf1c7a07ca815e6551d197615469469e4fa0bfec6",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "9d233943cb45a7279da8842099f278baf79d5678fbe56da1c9f9ae194eff9b8b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "74609a6260f9d8d44a17bccf34dc9d6374b26b5b3d0ab6e66296f5330e72b89a",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "6cb527bbf63dc42147634d40f50357d0dcd1ed1a28d6c1f9b61c61ed8e8b51fd",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "ac1738245ada24990c8228a81d6c4597e7d8673fe55f00796ca21c7ab1edeb71",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "f090c72ab933897ab90e990a47b22232f0d2c57d28dc71e7be1f53caf776d546",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "e948023680895eaf77e6a8795b18c085e9736641621618f86afbd0f1714decd1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "20d19603450e9a9231676310c87b111abea74239fad27ea8f3c750ac588e0ad1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "95da0c2a741acc77ec2e53fbfcf2467e8d41386bf76bcb7e14b267a1de5926df",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "4cf14890491fd9d1935408f4a8c971fc96aacd06721bbf5988a4ac8a7d543a45",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "95e86fec4c9c98876bdc56e715ddaf491c7c6ca79ae85bbd27fef5f4446aa55c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "d5a3ca86de7ddfd882bc443dc7bf792ebd07d07161d84efd261536b1f6be9398",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-sierra_a_6_0011",
+   "cores": 1,
+   "id": "edc9014d4d41e8b09301e9c8fdd3b4021f750535460347fea23c965fcaa70b0f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "39d3f5d56d9db075fc32bb69d57f93a53557bf40f6d512dc7f4d1ecf7c8301f4",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    45743096
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-39d3f5d56d9db075fc32bb69d57f93a53557bf40f6d512dc7f4d1ecf7c8301f4.json",
+   "reference_status_sha256": "667bb865e04fbf2f8eaa13b0c1b6dceac70e905d41e012f3676484af5f28f31d",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "1d28a342f8c1128fb4ffcc92567c9216839e6f7538b2712cc31cd1567d084863",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "c2285729d702665a152287a58186a19c85e3bfe7a8939050f60a63c5ed51195e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "b87116683a11dc718e5bef60c226c5a41e3c8a6359fd170f257feebe6f3f50bc",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "9c6784fb5b6098b655cde8247c3cd25de22635e2727a7e31a8088e1e3025237a",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "e05c28c637e551b96830c48b1696bce357e58161f1457c9231d4650fbff9183a",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "70450a9f8fa47f376164ace7fd4c55bb6d9b6cede7fa825d1f2c3888ee447cdd",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "44df30b316fbf6137f4d6ab3bd69700ad2a006e617e0f8601c73e94848b63f0c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "84665b83abae74b595bc60f5c0aa0348d046e1f7b28250eee05f2b458bd6456b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "21f01df6f24b66b419ed7bdfcda9dd68ec3ffb89529c6d8da0553dd9d0febf7b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "76a82881d0f19e08a69e8ebfe535b6346ea1174871404852e319a54ed6abed93",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "f02cd3fda3d401c125fc960642eac30ca23af3b3d5f66b7ca15d5ee6af9af5eb",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-tahoe_0006",
+   "cores": 1,
+   "id": "8dce1ae72c47ded03db7d3505a35f547cc9594c08211315f701df677f928d0b5",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "2fc83ea5cd58f1e6ac2cc8afec89dd24c6e10c0648011526da4c3e42d978c75d",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    49814854
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-2fc83ea5cd58f1e6ac2cc8afec89dd24c6e10c0648011526da4c3e42d978c75d.json",
+   "reference_status_sha256": "a9c6ea9c07f09df00076875fb6d3c9b427835bc73f9c368b48bf5ff6d2305adc",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "ee628f23fb09ad67da7c2262e0a0ccc592a774c23492aec16f95597aca9b5752",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "0a98b29d19458cb7dd01386ee1e80b38e0b0fec4827b93c03ce266d0d3dec8d8",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "ef9e466ceaadffb9b7294003685fd03d74c94b27f7b9d0e880f2885411ce1a02",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "97cffcdb18a985e56770944ce8f84cb880f3254aafea295af985189f6f191d5e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "0cc64fb930d263024418fe5aa35566c95b843a89e664ad8ca660188ad81d8f77",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "0a486842570a862ff2e6b95d257aa6b54a0725b3ba11bcff036d52c23ac951eb",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "c904e6167650df964d22c52215384abf0338a478400357c30de62583da159641",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "db83d45144737b70c6c3a7948fd4c3c5dcfab161eea3a3f46efddbab38b70fa8",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "ac658b25d4f3091a4763698ca720e3c2e90916288fa271e3ca7a6457fb1a83ee",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "30bf387eb83aba6f4605f852bf7b1e097227d6588f1d998111a9d30a78d53c30",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "668a557e269a97ac106852d804bac729408caaf4022e148b6bc240cead8d4a26",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-tahoe_0010",
+   "cores": 1,
+   "id": "1de8a860d055e0c4c7b92bdebcfc53577c4de54e7ad36a12d328d5402528326f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "eb26f5a94b3da9f627d5aef0d787a8130453f35441e5667ff7571b903ae56aa6",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    36806194
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-eb26f5a94b3da9f627d5aef0d787a8130453f35441e5667ff7571b903ae56aa6.json",
+   "reference_status_sha256": "a91e3df89d33dee9cf6de335eb001b778dade4863a28c213567c61ac89e889f9",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "8cb8e807e1e7ae312180e175d8e9ab44ed0a71477049b96f3e34646f3bcea0a4",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "1ce329338a36de142bbfdbd06fa6089a3e28e2db2f63bd5919486da52dfb467c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "a7e4d6b36e3db0450a017723d2a035e8fc27fe0a5ac52e3c3c227e94c6531ec9",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "b096ebde8265fe63833c147464e518c294d7c8a90e902f233a16a15af5a9ab0f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "b2ffa15bce704d43f0f7190c69162abbbdfc1d89d427d63b8e1b2b08682e859a",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "8e47e943257bdd79f751e75f73c064780df49200cfeca71f151027216dd4b229",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "f019028ba11961f62f584e254c131fd044948a324910056dc3a9c29da05ba0bb",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "3ef5f7c6948b545bcffa58f21bd905d184851f9afc9ffe9f3867f634db7a6abc",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "6e4708e61642ca24b793a92dd2fdfa42ab5dbd02eed46a63b3c056764697fafd",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "42d564b68f67e631f84f557f0a9f3c7a40935d8c059ef8378da2c7baad182ec1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "226e3bc46c6724261b975307c8be589340e9c39b50ee612f11de441f76ee6f0d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-tahoe_0011",
+   "cores": 1,
+   "id": "2803939d7fec875a0163f68d141f2a3f7acb704f46a6ff96fc1b05eb923c17db",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "bc03c94295339deaf0af19abc91717d9356cb8e0bb7d2d1cd8f46401c4e994f3",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    52382865
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-bc03c94295339deaf0af19abc91717d9356cb8e0bb7d2d1cd8f46401c4e994f3.json",
+   "reference_status_sha256": "bab85b57302c885d961de506fd48da7fbbbf0e9298633cddefec8fb827bc4bdd",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "a6dd79c206689861289edec327eace589459e44bc14ecfffb45f5741c19cb4b7",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "89005b423c095356e6a0340a39085509e685de0f3c5c04baa84a7ee66fa873ea",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "e5fcd334f31a88e30fd8bd4121236104632feb8fd0c6a962b8a6e818c6ab3d8e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "7d1c981ab5b3e7f6491aa550c09d85e5fbe4a00681b9a286230945cddff4cbd6",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "4a5974f4780b2e1907d0a260c1f59ceb917b3a1b342c104fa3fff8e876a83b56",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "756b93c737f88733816320f59bb901ada9e85c4865aeb778484fba5ae4c86e51",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "35ca435ba07aba3269e47e11db6cc5ca83aa1a7c7207ed399bb29bc6524474a0",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "b4a619b57b85ffff5a729f2e31e93c956ea19633f607c8be12bbcd431b969de5",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "21a2adda873dfab219c2e805cf21b2fb95ea4194cf00ef53747490f183dccc53",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "1acbb71a19dc876282e14c4aaadbd88a02bac371cfb70677c84a31bad736457e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "6a8f17b17de02dc5c9678a413006d36ab7947dcd09df3768fe5bedb173e37f24",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-tahoe_0013",
+   "cores": 1,
+   "id": "eed7eec0e0026f5e9f5625c3a77e5ff90befea65e1488cca4323c69dd0477ba0",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "19bb5debb82c4b09357107037c2b89d0995acce09935ad07f1b3519a2c7c83c1",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    33464650
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-19bb5debb82c4b09357107037c2b89d0995acce09935ad07f1b3519a2c7c83c1.json",
+   "reference_status_sha256": "330a265bcf7ebcea3d1bd1a4edfb832463d67392740cf6d2041ae1bec3096692",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "493b7184f088b7b4f62f98457bc55a5fda13a5c57d173ff3b8fff3ae10a9ead9",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "4408b9ceb678bd713ff369edc1d60b3e6f639ce52c2ab97eccbaa2f9fca16393",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "34b1ff9f48cacc726be633b5acd801b68f692402667993817915a8fba196abda",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "635b9730c56ee4de2a1bc23c22be4cffb4de13885fdabebd0fec32a965fa3c96",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "fe311ec73f525914e88a277c3c1dc9b99ecc065baadf39f7d846cae45761ce49",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "16e42a38461d1b3e7d125969d05357bcdc816b657390d6575b151df062c9faae",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "57859a140c1c57df4920a0d52abb0b2936836c376a43134698896ee2c3a612ff",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "c831c386bfa3f9ee4cd01f07eac6302876b355a1933221f39fcca7c77554bb35",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "7b7a07885a19fdbfb091715934ce9c6fb7fc6ad290b37e5d6c0355e3b81fa9bc",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "1e4943c63d450022798d41f5e4c84b1ce8ff4a9a677e42b76ea700d8b59ec5ba",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "5977b3d131a1053e6159f41371e256b7d0c51a93303e75a951cca9242de57fe8",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-tahoe_0014",
+   "cores": 1,
+   "id": "1019677244cac21ccfdac52998725cd8ca18afee9be5ee960c30dc195df08080",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "f0b9fcfe6a8679066be080e66fb2c6a565def1d4b6c80107bac87f1a266ae6dc",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    44423786
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-f0b9fcfe6a8679066be080e66fb2c6a565def1d4b6c80107bac87f1a266ae6dc.json",
+   "reference_status_sha256": "ca48d1ac8249be134baac7cd9c85766c63aa8162b4d2bef3a90e76c105fd2e77",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "135c565d25fce33a7e4fafa4626d2d4f4491ceddd9df8cbdd81f52da618ce2ed",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "ca3f1ed89286e750d2882818f8c73c2c93ced87805b87b452fa232ddeefcb475",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "802376cf9a32b988edcff946a7bb03df18aa87f875568a6e4c70d04678189658",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "dad723c7c6e946fc81052362d2ab66d5486510294adae8a539d622d051442dcf",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "6ccde7077d1cb789ab9b24022bb37ac1c135bb01253f3e71e869785418e4bf86",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "ba131ee19454ff656684f1556fd3f1ab26594826f1cd4556e7c92351152f29e1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "9ddbe8d9e37295110e600d47911fc8c55da5cf7adef4d6bda643c9a5ba78ed9b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "21e79ba16726195b08a516830d6940bb3abaf9f0a33dd7e631e30e6003f38455",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "2e80fb8ea0b3e1b77460a24afd4558b4b001c96dc91c808d3d2a17a180bae69f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "7d151f19fb105f1eae5cc0a1d52fa077dc8cbeb578ae54155333a429188936df",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "d9068d1dfd81ac1b40675189603d2a5d0e934c482e5c638054ee2f618da9fb08",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-tahoe_0016",
+   "cores": 1,
+   "id": "21342d3528815a4543b7d67fb85c055e219b065381940cc80173c29781172591",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "8ebb115dac36bdc927702e5a83e4ae514374ed41d844cab1441e06e21556ae66",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    30355491
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-8ebb115dac36bdc927702e5a83e4ae514374ed41d844cab1441e06e21556ae66.json",
+   "reference_status_sha256": "daee88a3ed9dd5d3c242331672ec00a30fe4ae8c640e40545cf22dda08c1891b",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "c14dde6ab3cc952c6b755c87d8f01d979cbc9b3b140844913e4e3ebbad0535bb",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "71a7fec402c24a2d88519c85cf29c58e591a9bf3ad268fff2c3b34fc3ecc5792",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "68836ddc53a251b4f93e4e27e641a0857d4a5919c546467269b52ef9c30a704e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "8fd2a21a36b15cbb0a3ad75987d753e22bf9e924a1f727871f669bcb3cd65d31",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "11969e32e20ca7c177c428e1deea0ed55657a21ca59e8b56640e02067c37fbc1",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "a13366d02ed3776a41ec117b5986480dfdafd0a6ee7ea7234498b2457cb53cb6",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "4ba0ae4e6dea93cf8d578863d0c0808c411bc20c0f96fa3dd9fae097bc3e75ff",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "53ac9cf09fe498482278e0125d37c4642cf55ac246c070f2b5f98a2c8ed2c34b",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "e2b89da996d345229ac31389754a46bef42fbc39091902fcb35aa03053789800",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "7e8820d12ac5c2e25b4dd45a3ac039733c8391c55a33ac43b0c94c8e895d3767",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "0b363c237985de9255a64ff90601df38c867d834571e26c1587eaca76c8d0bac",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-tahoe_0023",
+   "cores": 1,
+   "id": "53c2996d4aa2b4c1fd2ccab7184da286c39ab66079971a1e79ed68d7ab939490",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "5782a53c10df60ef23f379da7d4276bd06c91b88969c4e4d96e5d6f328a74fba",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    48204396
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-5782a53c10df60ef23f379da7d4276bd06c91b88969c4e4d96e5d6f328a74fba.json",
+   "reference_status_sha256": "4e6797306fe54d43233caf1d2f1119e6c2d782643e63b25e08ec6e86ed27c800",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "b14854bce75974e2133d9449451d087597b900bb6297cef12a3b215109272368",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "29f60a1a50620624127461856c259aa31d3bbd0c18e8229be510fbc159236e22",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "16c94b4a8024f2dc4e4df6d51c99ddb23534249ed66f8a6e191ec3cd0bb8caa9",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "0c3e59e7e88accac64ae4df319a14f2137a23069e75a8cb080078432f5245026",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "0d5696c36ada614bb47201ba0ad9bf0fa9012c991e91cdc1d46bb788a8cab87f",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "fc791270d13df70e19b4c5f9d2067ca3a53405f545090e469682d8f8d187da9e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "81e6907dcfa6d01a56af7cf8c52452ef87d8c28788d98e509293a6615f8c0a1d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "e3b5dc682964ddf295b0d937aa77ec3d61631a2a183be8bf550b3d2f051d7fd9",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "ea68158ca6eb218a44faf7cc224f69c0713a1612b703794398c7663a7310a5e5",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "92bdddeac6b08b18a3c587a1fe4849664c0079d5406e28845367545dca55a5ab",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "9bd91406b2835270016fd129edcf6da9c301c3cd63c131d9791480d9773a994d",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-tahoe_0035",
+   "cores": 1,
+   "id": "d5a247266ca92e13a87b389e3d21248e371fe20651aaaf181d854c116bddc7f0",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  },
+  {
+   "arm": "oracle",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "e59ca9a3bb9c984a965d74fe4859efc79aec3ce86d470ffea677ee36ee3beb45",
+   "point": "DDR5_16Gb_x8_q64",
+   "reference_per_core_cycles": [
+    18634442
+   ],
+   "reference_receipt": "/scratch/ab/finish/references/receipt-e59ca9a3bb9c984a965d74fe4859efc79aec3ce86d470ffea677ee36ee3beb45.json",
+   "reference_status_sha256": "98bb795c0e688c1d88a528327fcc8557b304127863116a2440aa10c08da34ab5",
+   "variant": "oracle"
+  },
+  {
+   "arm": "00-control",
+   "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "6662f19a96250b2c6921dc8d2c404e5c566816a2147f0a68edb3fd61b9bd9ccd",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "00-control"
+  },
+  {
+   "arm": "01-no-row-state",
+   "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "326cd50ec2e5263f7dcc93ee52643671057b8953152ad51abb707cc36089b6f5",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "01-no-row-state"
+  },
+  {
+   "arm": "02-no-batch-ring",
+   "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "6523cf442cf102b3539808118269078ca77d667f7e91144a96f7ffd6f9ed0445",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "02-no-batch-ring"
+  },
+  {
+   "arm": "03-no-class-rows",
+   "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "ee3907c4cb917912d0909aae99f572d963387efb6ed9733c5ce937d2ef4d3593",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "03-no-class-rows"
+  },
+  {
+   "arm": "04-no-write-recovery",
+   "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "6553eeefaa283952c45f68202fbf890b668ad11612c56a7faa458487b5ffa39e",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "04-no-write-recovery"
+  },
+  {
+   "arm": "05-no-wr-rd-turnaround",
+   "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "8e4075c2d5956dbb7d5d36bfc65afa2ac43c3cb807f0e292e4b126d27506b49c",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "05-no-wr-rd-turnaround"
+  },
+  {
+   "arm": "06-no-act-throttle",
+   "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "52108509e23dc459623b14fd827a49a018eeab4302cfb1ee8c5cc72b40f0de4a",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "06-no-act-throttle"
+  },
+  {
+   "arm": "07-no-bankgroup-clock",
+   "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "c91704a8d4db11501e77d70e831588a730e1bc17e568b6529c95358b2b168435",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "07-no-bankgroup-clock"
+  },
+  {
+   "arm": "08-no-bus",
+   "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "203f8696fae99f9b30a002aa9d58720457d5d8a75b81d91a6bad288c2f5d4063",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "08-no-bus"
+  },
+  {
+   "arm": "09-no-write-tax",
+   "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "88cf692b6b593db61b9e3f04a434fa84155141b1ca231240f757075dd48d5fcd",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "09-no-write-tax"
+  },
+  {
+   "arm": "10-bank-less",
+   "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "0e1d931d8d7736367e0c71470e7ed374fd164c188c3899bbebeafd2307aedc15",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "10-bank-less"
+  },
+  {
+   "arm": "11-fix-channel-startup",
+   "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+   "case": "test-c1-xalancbmk",
+   "cores": 1,
+   "id": "46fa0f4648dcf1c95c61b1fe349c7beb4fa7dd45302c0b660722e771cada3391",
+   "point": "DDR5_16Gb_x8_q64",
+   "variant": "11-fix-channel-startup"
+  }
+ ],
+ "point": "DDR5_16Gb_x8_q64",
+ "runtime_sha256": "bae3f93a18eeda2c77b18c85c06d68aaa28396c0cc12c6f425231997a14eea81",
+ "schema": "astra-sc-ablation-plan-v1",
+ "variants": {
+  "00-control": {
+   "build_directory": "builds/b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494/40593e15e7a14b3c8eb9025f49064afe",
+   "build_receipt_sha256": "d65950c9917db4513fe4ea44f2eee41816e85de06e94b103ae6fc754612c32d6",
+   "candidate": {
+    "candidate_id": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10453,
+      "sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "050f4c158ac5315d7ca52c1c4cf027f3a0d69b9424bdcf5414525828ab22bad6"
+   },
+   "meta": {
+    "description": "unmodified frozen model (byte-identical copy)",
+    "edits": [],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": null,
+    "id": "00",
+    "lines_added": 0,
+    "lines_changed": 0,
+    "lines_removed": 0,
+    "model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "name": "control",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "01-no-row-state": {
+   "build_directory": "builds/71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd/6856276262c74d81a73a697c7c01e563",
+   "build_receipt_sha256": "74e0a147d5cc12552e2f35532628dc67ea97092b632b26c35e46fae719922e07",
+   "candidate": {
+    "candidate_id": "71f297bb8bb5d76016da2f2bf6597b06d5ce97181d2c36f04839fc9b3fc542bd",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10588,
+      "sha256": "22465cfa5d392ec492884b468129659422eaf3106abbf6658d2435abb8cee7fe"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "cafee9e69c88e16c30e305daa8d5664949149ae4990f545182b32ea0d7fb624f"
+   },
+   "meta": {
+    "description": "open-row proxy removed: hit=false, cold=true for every access, so row_cost = tRCD always (L72)",
+    "edits": [
+     {
+      "new": "bool cold=true, hit=false;  // ABLATION 01",
+      "old": "bool cold=b.row<0, hit=b.row==a.levels[row_level];"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "open-row proxy removed (hit=false, cold=true): every access pays row_cost = tRCD; all hit-gated rules see a miss",
+    "id": "01",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "22465cfa5d392ec492884b468129659422eaf3106abbf6658d2435abb8cee7fe",
+    "name": "no-row-state",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "02-no-batch-ring": {
+   "build_directory": "builds/94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb/9ddac637103049e7973b8a1ddc213219",
+   "build_receipt_sha256": "6fe338841d2d03f275ba2a1f25476165565fe696656fbc3e9b40f71cdb3aeb65",
+   "candidate": {
+    "candidate_id": "94704e4d4c9d6b09ea224a905c41b827db154123c17eab66f26fae12df1d69fb",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10520,
+      "sha256": "35911f4f38fd573258d49f5cf1b868031beca2da38aca70b629b90a2a6360c51"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "8d06e50f9f479b4e092dfc8dec5fd65fc4c37d346d22c4536bffc1ae069a2e3a"
+   },
+   "meta": {
+    "description": "8-entry recent-row ring / batch-hit rule disabled: batch_hit never set (L88); ring bookkeeping left inert",
+    "edits": [
+     {
+      "new": "batch_hit=false;  // ABLATION 02",
+      "old": "batch_hit=backlog>ccd && now-b.recent[i].seen < std::max(rc,backlog);"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "8-entry recent-row ring batch-hit rule disabled (batch_hit always false)",
+    "id": "02",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "35911f4f38fd573258d49f5cf1b868031beca2da38aca70b629b90a2a6360c51",
+    "name": "no-batch-ring",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "03-no-class-rows": {
+   "build_directory": "builds/732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e/14aa65de2b344d33b1873908b80193e5",
+   "build_receipt_sha256": "f46a5d0a48b7ae5f071af9598af768480e8c06a7e7abead13447d7bed8f05afc",
+   "candidate": {
+    "candidate_id": "732e7f9650fd57de247e9f33a915dbcd23515cf6602e5a1af146d9033101689e",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10522,
+      "sha256": "dbfaf1ce918d02f4b1b4e3d896a05b3e7d5d3cfb89383e80419954123848390c"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "b9e1345da05763c2847a9c299e0f3ade0ef9d79dd2a1730aa9179efd4f779f50"
+   },
+   "meta": {
+    "description": "separate read-row/write-row classes disabled: class_hit = hit (L82)",
+    "edits": [
+     {
+      "new": "bool class_hit=hit;  // ABLATION 03",
+      "old": "bool class_hit=hit || b.class_row[kind]==a.levels[row_level];"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "separate read/write row classes disabled (class_hit = hit only)",
+    "id": "03",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "dbfaf1ce918d02f4b1b4e3d896a05b3e7d5d3cfb89383e80419954123848390c",
+    "name": "no-class-rows",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "04-no-write-recovery": {
+   "build_directory": "builds/ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631/7b02910c0f0e482da9950105f4ff21d1",
+   "build_receipt_sha256": "a3991a7ac99e33de4ee06f8dbc9c9da551b456513586a7d46432a1cd97345759",
+   "candidate": {
+    "candidate_id": "ac53d4c8ca713983e03ee0e7166773c2058a327a4e40b8d6458775d68a3f6631",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10600,
+      "sha256": "acc7ea0e31802c2d6b6c3aa154bcb2979fe3aee9ea129bdd0f8dac8f71e9dd29"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "fcce7803150b5f540dd2361aff6c50b6c2fa8cf641a1b80bbfc4d7c35da1ee2e"
+   },
+   "meta": {
+    "description": "write-recovery floor (nCWL+nBL+nWR+nRP+nRCD = 180 after a write before a conflict) disabled (L108)",
+    "edits": [
+     {
+      "new": "if(false && b.last_kind==1 && !hit) {  // ABLATION 04",
+      "old": "if(b.last_kind==1 && !hit) {"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "write-recovery floor (nCWL+nBL+nWR+nRP+nRCD after a write, before a conflict) disabled",
+    "id": "04",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "acc7ea0e31802c2d6b6c3aa154bcb2979fe3aee9ea129bdd0f8dac8f71e9dd29",
+    "name": "no-write-recovery",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "05-no-wr-rd-turnaround": {
+   "build_directory": "builds/6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443/875004febd9b4569badd70ee7fc5ce99",
+   "build_receipt_sha256": "479a4a83aadd1574d8ec1c430853157fa71114541d92c775ee1618904c4b9768",
+   "candidate": {
+    "candidate_id": "6d2105f2a7b246a1c5b8c423564b7912c0071fdefa3c296397bbeff47d26c443",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10580,
+      "sha256": "4cae5f9408755714e1dce540ab756e9e5779b61aeacdb92e437c5780ae00da99"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "39d680557de38335aa6fee5e0d9b28990b1641fc1541a847c3fb2303cba2118c"
+   },
+   "meta": {
+    "description": "same-bank write-to-read floor (nCWL+nBL+nWTRL = 64) disabled (L124)",
+    "edits": [
+     {
+      "new": "if(false && kind==0 && b.last_kind==1 && hit && now>b.last_arrival) {  // ABLATION 05",
+      "old": "if(kind==0 && b.last_kind==1 && hit && now>b.last_arrival) {"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "same-bank same-row write-to-read floor (nCWL+nBL+nWTRL) disabled",
+    "id": "05",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "4cae5f9408755714e1dce540ab756e9e5779b61aeacdb92e437c5780ae00da99",
+    "name": "no-wr-rd-turnaround",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "06-no-act-throttle": {
+   "build_directory": "builds/021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab/48445e5a68b84260b739dc27749ac877",
+   "build_receipt_sha256": "340b8e03c29e437bd19a10af2b84a4e302f3bf3e8dadf970a70d6099577ff42a",
+   "candidate": {
+    "candidate_id": "021933d73fd2291687b29a2416fffb802d63b19437d2cc4c7f7573dc19eff1ab",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10582,
+      "sha256": "888a0bdcb1b4435358bbe22e0433398a547a558f4469b9fdbf66d75ace4e5ad7"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "126fdf9529013896f9e7af0f5fffcf966a8196be285f690f10a695ab102acf3c"
+   },
+   "meta": {
+    "description": "rank (max(nRRDS,nFAW/4)) and bank-group (nRRDL) activation clocks disabled: A = 0, clocks never advance (L140)",
+    "edits": [
+     {
+      "new": "if(false && !class_hit && !batch_hit) {  // ABLATION 06",
+      "old": "if(!class_hit && !batch_hit) {"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "rank and bank-group activation clocks disabled (activation_wait A = 0)",
+    "id": "06",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "888a0bdcb1b4435358bbe22e0433398a547a558f4469b9fdbf66d75ace4e5ad7",
+    "name": "no-act-throttle",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "07-no-bankgroup-clock": {
+   "build_directory": "builds/f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6/a17bd958da644d428e09b800201afc93",
+   "build_receipt_sha256": "f12ab12470c3092dbd6b4778b6f1d78465b1f08b532fb4a67af59eac4ba2aa07",
+   "candidate": {
+    "candidate_id": "f1714d4f0608ecbde49cfd9ea98bd70777b10a29530f8341c6a70424d55f02a6",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10532,
+      "sha256": "403f572960bf27bd30c001a36be4b3c8bd69421b92b0116efda8f58ebd3d7ad7"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "e387a9a30e6fc01a654ee5f238f0f3f83b33298d920347651bb904cbc1db6aff"
+   },
+   "meta": {
+    "description": "per-bank-group column clock disabled: group_wait = 0 (L162); its update stays inert",
+    "edits": [
+     {
+      "new": "double group_wait=0;  // ABLATION 07",
+      "old": "double group_wait=std::max(0.0,groups[gi]-now);"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "per-bank-group column clock disabled (group_wait = 0)",
+    "id": "07",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "403f572960bf27bd30c001a36be4b3c8bd69421b92b0116efda8f58ebd3d7ad7",
+    "name": "no-bankgroup-clock",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "08-no-bus": {
+   "build_directory": "builds/8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594/988dd5bc738d4f7c88053fa46006a06c",
+   "build_receipt_sha256": "c235840a9a33ebfc395cfaea8d7b244b43f13fba54a07f93cada57dfae385acd",
+   "candidate": {
+    "candidate_id": "8d98a52728b0425c7952f9b797c367a0262af6b0d1b5ff5161178186b58ed594",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10546,
+      "sha256": "8d2da3bb68fbf789bb62887b32b5470270a1ce60cbc1d0648a06eacf9cb9cb85"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "54b3eb378917826f69ebd0a9810ae7405c4a537a0b6a366bd472fe180af37c82"
+   },
+   "meta": {
+    "description": "channel data-bus clocks disabled: channel_wait = 0, i.e. C = t (L161); bank-only model, write tax becomes inert",
+    "edits": [
+     {
+      "new": "double channel_wait=0;  // ABLATION 08",
+      "old": "double channel_wait=std::max(0.0,shared-now);"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "channel data-bus clocks disabled (channel_wait = 0, C = t): bank-only model",
+    "id": "08",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "8d2da3bb68fbf789bb62887b32b5470270a1ce60cbc1d0648a06eacf9cb9cb85",
+    "name": "no-bus",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "09-no-write-tax": {
+   "build_directory": "builds/851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a/922564ef43a84c6c91676bf7d6a3e6a6",
+   "build_receipt_sha256": "6e0983c3362d92168316d758fb92fd33183c918f39c1a0c4bc3e9951c155d2e6",
+   "candidate": {
+    "candidate_id": "851b863dac7cac9e2f261a9430770f2bfc9f1e611c21d7d824f116a8aa885f5a",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10498,
+      "sha256": "4d898f18a716591ae17b97b89026b614d928fb52690768648ea53eca92ca0d00"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "fed227a54b713510252c0fe2d1ae75cc1783005818bd9ffdf21d9b8f0915728d"
+   },
+   "meta": {
+    "description": "amortized write turnaround tax disabled: write_tax = 0 (L61)",
+    "edits": [
+     {
+      "new": "write_tax=0*batch;  // ABLATION 09",
+      "old": "write_tax=(timing(\"nRTW\",base)+timing(\"nWTRL\",timing(\"nWTR_L\",ccd)))/batch;"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "amortized write turnaround tax disabled (write_tax = 0)",
+    "id": "09",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "4d898f18a716591ae17b97b89026b614d928fb52690768648ea53eca92ca0d00",
+    "name": "no-write-tax",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "10-bank-less": {
+   "build_directory": "builds/842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0/5e0bd44294c24d6a9bf847d34197fc90",
+   "build_receipt_sha256": "e30560fb598c1f6d5c836a38e76135389bb8cde215dfadd5967fec4815084083",
+   "candidate": {
+    "candidate_id": "842cd3920b7268b76cbb62b661854c4f905c0f849f09cadebda9ce0a013a91f0",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10504,
+      "sha256": "94a2b3d84d549d685a840567d6b04914644db39cf4e789a7a39be7f47fcf0a6d"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "9b596f6076af5854991d72c520ca0679da3da89ad24cb1da188d76cac5badc7d"
+   },
+   "meta": {
+    "description": "all per-bank state disabled: hit=false/cold=true (row_cost = tRCD), class_hit=false, backlog=0 (no batch hits), bank readiness = t+tRCD+A with no b.ready+service term; write-recovery/WR-RD/read-run rules become inert; channel, bank-group column and activation clocks kept (L72, L82, L83, L150-151)",
+    "edits": [
+     {
+      "new": "bool cold=true, hit=false;  // ABLATION 10",
+      "old": "bool cold=b.row<0, hit=b.row==a.levels[row_level];"
+     },
+     {
+      "new": "bool class_hit=false;  // ABLATION 10",
+      "old": "bool class_hit=hit || b.class_row[kind]==a.levels[row_level];"
+     },
+     {
+      "new": "double backlog=0;  // ABLATION 10",
+      "old": "double backlog=std::max(0.0,b.ready-now);"
+     },
+     {
+      "new": "double ready=double(now)+row_cost+activation_wait;  // ABLATION 10",
+      "old": "double ready=std::max(double(now)+row_cost+activation_wait,\n                          b.ready+service*bank_scale);"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "all per-bank state disabled (closed-bank cost, no bank backlog); channel, bank-group and activation clocks kept",
+    "id": "10",
+    "lines_added": 4,
+    "lines_changed": 5,
+    "lines_removed": 5,
+    "model_cpp_sha256": "94a2b3d84d549d685a840567d6b04914644db39cf4e789a7a39be7f47fcf0a6d",
+    "name": "bank-less",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  },
+  "11-fix-channel-startup": {
+   "build_directory": "builds/4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7/8cbaeceb7f2e4e52acbd9fab85b6cff3",
+   "build_receipt_sha256": "9d55bbe7deb93cefc604a91934dd42afd2e0c9bcdaf6ea4a8e587c5fce1847aa",
+   "candidate": {
+    "candidate_id": "4cbeba278e225113dc83f5e6fd4893d0d74709815c6179629c35262d9793b5f7",
+    "configuration_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "contract_sha256": "3332e5680354ff1a95f468fe0e8e1b972c46f278feae5d53ebe40f7a9accfb2c",
+    "files": {
+     "model.cpp": {
+      "bytes": 10618,
+      "sha256": "a0034530b7bd67f92d9f6e553ec5096aab52d31a51dca20c25d41790d8638b33"
+     },
+     "parameters.json": {
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+     }
+    },
+    "parameters": {},
+    "schema_version": 1,
+    "source_sha256": "824832086f5433d2b7aa3c63c9f4bf818830f654b117794a18192536ef971bfe"
+   },
+   "meta": {
+    "description": "NOT a removal: L169 channel work clock no longer carries the requester's row startup; c.work = max(t, c.work) + transfer_service (nBL, plus write_tax for writes) instead of max(t+row_cost, c.work) + transfer_service; c.transfer unchanged (the two channel clocks now evolve identically)",
+    "edits": [
+     {
+      "new": "c.work=std::max(double(now),c.work)+transfer_service;  // ABLATION 11 (fix)",
+      "old": "c.work=std::max(double(now)+row_cost,c.work)+transfer_service;"
+     }
+    ],
+    "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+    "header": "FIX (not a removal): channel work clock advances from max(t, c.work)+transfer_service, not max(t+row_cost, c.work)",
+    "id": "11",
+    "lines_added": 1,
+    "lines_changed": 1,
+    "lines_removed": 1,
+    "model_cpp_sha256": "a0034530b7bd67f92d9f6e553ec5096aab52d31a51dca20c25d41790d8638b33",
+    "name": "fix-channel-startup",
+    "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   }
+  }
+ },
+ "verified": {
+  "control_candidate": "b5c2252f132bc48b90c887a52efb2d6b33015a29da657d84563a81afe5fb5494",
+  "control_identities": 24,
+  "oracle_identities": 24
+ }
+}

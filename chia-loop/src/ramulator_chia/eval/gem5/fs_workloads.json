@@ -1,0 +1,24 @@
+{
+  "description": "Full benchmark ROIs; setup and natural warmup run under O3. No instruction or wall-time truncation.",
+  "cores": [1, 4],
+  "models": ["oracle", "astra_xhigh", "deepseek_max", "gemini_flash", "fixedlat", "md1", "wmg1", "mess"],
+  "suites": {
+    "npb": {
+      "benchmarks": ["bt.B.x", "cg.B.x", "ep.B.x", "ft.B.x", "is.B.x", "lu.B.x", "mg.B.x", "sp.B.x", "ua.B.x"],
+      "pilot": "is.B.x",
+      "qualification": {"benchmark": "is.S.x"}
+    },
+    "gapbs": {
+      "benchmarks": ["bfs", "bc", "cc", "cc_sv", "pr", "pr_spmv", "sssp", "tc"],
+      "graph_scale": 20,
+      "pilot": "bfs",
+      "qualification": {"benchmark": "bfs", "graph_scale": 12}
+    },
+    "parsec": {
+      "benchmarks": ["blackscholes", "bodytrack", "canneal", "dedup", "facesim", "ferret", "fluidanimate", "freqmine", "raytrace", "streamcluster", "swaptions", "vips", "x264"],
+      "input_size": "simlarge",
+      "pilot": "blackscholes",
+      "qualification": {"benchmark": "blackscholes", "input_size": "simsmall"}
+    }
+  }
+}

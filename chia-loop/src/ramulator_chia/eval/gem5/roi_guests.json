@@ -1,0 +1,68 @@
+{
+  "source": {
+    "url": "https://downloads.sourceforge.net/project/polybench/polybench-c-4.2.1-beta.tar.gz",
+    "archive": "polybench-c-4.2.1-beta.tar.gz",
+    "sha256": "426519ee8443a5f2175de6a3e9328cda8917a5e33053d0e8f59855ab56d689a4",
+    "directory": "polybench-c-4.2.1-beta",
+    "compiler": "gcc",
+    "flags": [
+      "-O3",
+      "-std=c99",
+      "-static",
+      "-DLARGE_DATASET",
+      "-DPOLYBENCH_DUMP_ARRAYS",
+      "-DPOLYBENCH_NO_FLUSH_CACHE"
+    ],
+    "includes": [
+      "utilities"
+    ],
+    "extra_sources": [
+      "utilities/polybench.c"
+    ]
+  },
+  "programs": {
+    "polybench421_atax_large": {
+      "source": "linear-algebra/kernels/atax/atax.c",
+      "original_sha256": "b3925adb41b5efb545ee1c9278ee2776e4970fdec64e72398494a336d59facbb",
+      "patched_sha256": "b66ffe4771ebc234ff68bc03d0ab1e7cebad0125d062674eb717622256df25c7",
+      "original_binary_sha256": "8812fbb748fa73e96d92718b2bb46d92cd83a03abdd7d5a695b854297e7e19e6"
+    },
+    "polybench421_bicg_large": {
+      "source": "linear-algebra/kernels/bicg/bicg.c",
+      "original_sha256": "540a0f5864bc443857a5fa5ac473c7302980f32294a33c8dc10f49ddf8612115",
+      "patched_sha256": "f741c47fcfa9b06bc41ef8bfea810ca08939967394c4f8519224d0867709baa6",
+      "original_binary_sha256": "43dfccec87d0381108170831d2fc1b1523246b0bde2993bd38c1685a3d0d5b51"
+    },
+    "polybench421_gemver_large": {
+      "source": "linear-algebra/blas/gemver/gemver.c",
+      "original_sha256": "fc130ebf4e632bfb24dabe9f61d9184a05ad8618551bef7533d4a903caee4147",
+      "patched_sha256": "9ab06dd0e88b37d7cf7f7b2703024b84d6ea2605ee56514c2ab8991d54c603b2",
+      "original_binary_sha256": "0a5fb29728537eee9f24a445c385290ec21ffb832fa1b8bde667a9326d535ddb"
+    },
+    "polybench421_gesummv_large": {
+      "source": "linear-algebra/blas/gesummv/gesummv.c",
+      "original_sha256": "0500b876ed3d2058cdea353119d0e8e9d814e8c531c9437e069121d13e80231f",
+      "patched_sha256": "212cbdabfa27b610a368752abbd86555d13ea0507e2efcc58ad49f0bcae1ed1f",
+      "original_binary_sha256": "9088011fac10923415f8ccf8030c11039ef09384b106f4d4f94404b5f78fe30f"
+    },
+    "polybench421_mvt_large": {
+      "source": "linear-algebra/kernels/mvt/mvt.c",
+      "original_sha256": "201dfe26e1119f3901b11f4c802e970dc48c7f6a0e64dca71854292d0c689465",
+      "patched_sha256": "f8810155814d9bc0bdd648d0cc81e83667ab256f6daa2b92d3fc0ff3e89f3c24",
+      "original_binary_sha256": "ac9049bd591948d2bfb48b384d38dc537f33e2a183f3e5f1662c9fb2712d7733"
+    },
+    "polybench421_trisolv_large": {
+      "source": "linear-algebra/solvers/trisolv/trisolv.c",
+      "original_sha256": "cc6b88871b988558fd03a7091ed01a412f61ebcfc60c0fea26a6d525ec338608",
+      "patched_sha256": "50e364e180043a7d13ad8f85557e2742f528575cad3d71dd32ea863b409c4435",
+      "original_binary_sha256": "66eb83e917eae5c0a72dc299a96a526724ea2e2692ec55f6f8144596ba5cea42"
+    }
+  },
+  "patch_sha256": "64b2a01a8369c439fbcaec3eea092d9d60e3dffcef8f5743c47427426bc21ae4",
+  "flags": [
+    "-O3",
+    "-static",
+    "-DLARGE_DATASET",
+    "-DPOLYBENCH_DUMP_ARRAYS"
+  ]
+}

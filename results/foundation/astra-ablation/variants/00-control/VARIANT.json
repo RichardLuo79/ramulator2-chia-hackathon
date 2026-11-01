@@ -1,0 +1,13 @@
+{
+ "id": "00",
+ "name": "control",
+ "description": "unmodified frozen model (byte-identical copy)",
+ "header": null,
+ "edits": [],
+ "lines_changed": 0,
+ "lines_removed": 0,
+ "lines_added": 0,
+ "model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}

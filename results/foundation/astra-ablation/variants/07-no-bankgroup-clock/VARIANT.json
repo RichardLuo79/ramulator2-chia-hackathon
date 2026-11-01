@@ -1,0 +1,18 @@
+{
+ "id": "07",
+ "name": "no-bankgroup-clock",
+ "description": "per-bank-group column clock disabled: group_wait = 0 (L162); its update stays inert",
+ "header": "per-bank-group column clock disabled (group_wait = 0)",
+ "edits": [
+  {
+   "old": "double group_wait=std::max(0.0,groups[gi]-now);",
+   "new": "double group_wait=0;  // ABLATION 07"
+  }
+ ],
+ "lines_changed": 1,
+ "lines_removed": 1,
+ "lines_added": 1,
+ "model_cpp_sha256": "403f572960bf27bd30c001a36be4b3c8bd69421b92b0116efda8f58ebd3d7ad7",
+ "parameters_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+ "frozen_model_cpp_sha256": "9f6256bf90af6756eb6238b08d0288723c9ed040e3c87033d40ca6d33696cdcc"
+}
